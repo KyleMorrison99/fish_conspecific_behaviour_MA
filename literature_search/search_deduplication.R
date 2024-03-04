@@ -28,3 +28,24 @@ dim(dat2) # 4292 remain
 write_csv(dat2, here("literature_search", "all_search_combined", "fish_soc_ma_abstracts_for_screening_deduplicated.csv"))
 
 
+random_dat2 <-  dat2 %>% sample_n(nrow(dat2))
+
+write_csv(random_dat2, here("literature_search", "all_search_combined", "fish_soc_ma_abstracts_for_screening_deduplicated_randomised.csv"))
+
+
+total_rows <- nrow(random_dat2)
+num_chunks <- ceiling(total_rows / 850) # Use ceiling to ensure all data is included
+
+# Create a sequence that assigns each row to a chunk
+chunk_assignment <- rep(1:num_chunks, each=850, length.out=total_rows)
+
+# Split the dataset into chunks based on the chunk assignments
+chunks <- split(random_dat2, chunk_assignment)
+
+# Assuming 'chunks' is your list of data frames
+for (i in seq_along(chunks)) {
+  # Construct file path
+  file_path <- sprintf("literature_screen/chunk_%d.csv", i)
+  # Use write.csv to save each chunk
+  write.csv(chunks[[i]], file_path, row.names = FALSE)
+}
