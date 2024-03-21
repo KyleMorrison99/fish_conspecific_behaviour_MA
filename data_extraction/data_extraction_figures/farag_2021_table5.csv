@@ -1,0 +1,5 @@
+behaviour,control_mean,control_se,treament_mean,treatment_sd
+schooling,8.71,0.36,5.31,0.24
+chasing,4.34,0.09,6.2,0.02
+fin tugging,1.49,0.16,2.25,0.12
+mouth pushing,9.24,0.57,11.08,0.21
