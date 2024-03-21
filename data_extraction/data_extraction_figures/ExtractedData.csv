@@ -1,5 +1,23 @@
-"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
-"1","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Control",41.8874518733448,35.526073598507,12,NA,10.2554940776742,"se","mean_error"
-"2","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-Diuron",44.3101780901363,35.3497490924588,12,NA,10.2045935771584,"se","mean_error"
-"3","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCA",20.7776130233044,13.7057933468494,12,NA,3.95652173913043,"se","mean_error"
-"4","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCPMU",13.5725885616869,8.95337032835604,12,NA,2.58461538461538,"se","mean_error"
+,filename,variable,group_id,mean,sd,n,r,se,error_type,plot_type
+1,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Control,41.88745187,35.5260736,12,NA,10.25549408,se,mean_error
+2,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-Diuron,44.31017809,35.34974909,12,NA,10.20459358,se,mean_error
+3,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-DCA,20.77761302,13.70579335,12,NA,3.956521739,se,mean_error
+4,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-DCPMU,13.57258856,8.953370328,12,NA,2.584615385,se,mean_error
+5,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Control,122.1070163,34.7185614,36,NA,5.7864269,se,mean_error
+6,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.01 mg/L,91.06368906,36.34495115,36,NA,6.057491858,se,mean_error
+7,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.065 mg/L,93.22115191,42.81733971,36,NA,7.136223285,se,mean_error
+8,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.5 mg/L,93.38711059,47.2982241,36,NA,7.88303735,se,mean_error
+9,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.01 mg/L,85.67909718,21.92240182,36,NA,3.653733637,se,mean_error
+10,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.065 mg/L,86.73985856,43.13762939,36,NA,7.189604899,se,mean_error
+11,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.5 mg/L,94.51877533,21.21522757,36,NA,3.535871262,se,mean_error
+12,bridi_2017_fig6b.jpg,Number of entries,Control,39.48584365,18.80427376,26,NA,3.687821494,se,mean_error
+13,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.01 mg/L,27.75571333,10.66874599,26,NA,2.092313231,se,mean_error
+14,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.065 mg/L,24.82354168,12.73492858,26,NA,2.497524975,se,mean_error
+15,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.5 mg/L,21.99909561,6.167835682,26,NA,1.209612096,se,mean_error
+16,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.01 mg/L,24.83356868,9.477328557,26,NA,1.858657048,se,mean_error
+17,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.065 mg/L,23.43819558,6.691000316,26,NA,1.312213122,se,mean_error
+18,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.5 mg/L,24.70848757,5.893544912,26,NA,1.155819251,se,mean_error
+23,chung_2023_fig6c.jpg,Male confrontation distance (cm),Control,16.59920513,4.969572384,10,NA,1.571516773,se,mean_error
+24,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 0.1 ppm,13.46501111,4.915229889,10,NA,1.554332167,se,mean_error
+25,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 0.5 ppm,12.31616216,4.6034927,10,NA,1.455752212,se,mean_error
+26,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 1 ppm,12.37893228,4.827370764,10,NA,1.526548673,se,mean_error
