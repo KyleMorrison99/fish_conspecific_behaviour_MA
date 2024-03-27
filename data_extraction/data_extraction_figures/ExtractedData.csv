@@ -1,23 +1,51 @@
-,filename,variable,group_id,mean,sd,n,r,se,error_type,plot_type
-1,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Control,41.88745187,35.5260736,12,NA,10.25549408,se,mean_error
-2,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-Diuron,44.31017809,35.34974909,12,NA,10.20459358,se,mean_error
-3,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-DCA,20.77761302,13.70579335,12,NA,3.956521739,se,mean_error
-4,boscolo_2018_fig2.jpg,"Total frequency of aggressive interactions, 20 minutes",Treatment-DCPMU,13.57258856,8.953370328,12,NA,2.584615385,se,mean_error
-5,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Control,122.1070163,34.7185614,36,NA,5.7864269,se,mean_error
-6,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.01 mg/L,91.06368906,36.34495115,36,NA,6.057491858,se,mean_error
-7,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.065 mg/L,93.22115191,42.81733971,36,NA,7.136223285,se,mean_error
-8,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Glyphosate 0.5 mg/L,93.38711059,47.2982241,36,NA,7.88303735,se,mean_error
-9,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.01 mg/L,85.67909718,21.92240182,36,NA,3.653733637,se,mean_error
-10,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.065 mg/L,86.73985856,43.13762939,36,NA,7.189604899,se,mean_error
-11,bridi_2017_fig6a.jpg,Time spent close to stimulus (s),Treatment-Roundup 0.5 mg/L,94.51877533,21.21522757,36,NA,3.535871262,se,mean_error
-12,bridi_2017_fig6b.jpg,Number of entries,Control,39.48584365,18.80427376,26,NA,3.687821494,se,mean_error
-13,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.01 mg/L,27.75571333,10.66874599,26,NA,2.092313231,se,mean_error
-14,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.065 mg/L,24.82354168,12.73492858,26,NA,2.497524975,se,mean_error
-15,bridi_2017_fig6b.jpg,Number of entries,Treatment - Glyphosate 0.5 mg/L,21.99909561,6.167835682,26,NA,1.209612096,se,mean_error
-16,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.01 mg/L,24.83356868,9.477328557,26,NA,1.858657048,se,mean_error
-17,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.065 mg/L,23.43819558,6.691000316,26,NA,1.312213122,se,mean_error
-18,bridi_2017_fig6b.jpg,Number of entries,Treatment - Roundup 0.5 mg/L,24.70848757,5.893544912,26,NA,1.155819251,se,mean_error
-23,chung_2023_fig6c.jpg,Male confrontation distance (cm),Control,16.59920513,4.969572384,10,NA,1.571516773,se,mean_error
-24,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 0.1 ppm,13.46501111,4.915229889,10,NA,1.554332167,se,mean_error
-25,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 0.5 ppm,12.31616216,4.6034927,10,NA,1.455752212,se,mean_error
-26,chung_2023_fig6c.jpg,Male confrontation distance (cm),Treatment 1 ppm,12.37893228,4.827370764,10,NA,1.526548673,se,mean_error
+"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
+"1","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Control",41.8874518733448,35.526073598507,12,NA,10.2554940776742,"se","mean_error"
+"2","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-Diuron",44.3101780901363,35.3497490924588,12,NA,10.2045935771584,"se","mean_error"
+"3","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCA",20.7776130233044,13.7057933468494,12,NA,3.95652173913043,"se","mean_error"
+"4","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCPMU",13.5725885616869,8.95337032835604,12,NA,2.58461538461538,"se","mean_error"
+"5","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Control",122.107016348629,34.7185613991868,36,NA,5.78642689986447,"se","mean_error"
+"6","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Glyphosate 0.01 mg/L",91.0636890566235,36.3449511494343,36,NA,6.05749185823905,"se","mean_error"
+"7","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Glyphosate 0.065 mg/L",93.2211519102429,42.8173397102923,36,NA,7.13622328504871,"se","mean_error"
+"8","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Glyphosate 0.5 mg/L",93.3871105912905,47.2982240985786,36,NA,7.8830373497631,"se","mean_error"
+"9","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Roundup 0.01 mg/L",85.6790971801245,21.92240182323,36,NA,3.65373363720499,"se","mean_error"
+"10","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Roundup 0.065 mg/L",86.7398585586679,43.1376293940975,36,NA,7.18960489901625,"se","mean_error"
+"11","bridi_2017_fig6a.jpg","Time spent close to stimulus (s)","Treatment-Roundup 0.5 mg/L",94.5187753346526,21.2152275708677,36,NA,3.53587126181128,"se","mean_error"
+"12","bridi_2017_fig6b.jpg","Number of entries","Control",39.4858436546351,18.8042737585107,26,NA,3.68782149359949,"se","mean_error"
+"13","bridi_2017_fig6b.jpg","Number of entries","Treatment - Glyphosate 0.01 mg/L",27.7557133257301,10.6687459925229,26,NA,2.09231323082458,"se","mean_error"
+"14","bridi_2017_fig6b.jpg","Number of entries","Treatment - Glyphosate 0.065 mg/L",24.8235416766023,12.7349285844835,26,NA,2.4975249752497,"se","mean_error"
+"15","bridi_2017_fig6b.jpg","Number of entries","Treatment - Glyphosate 0.5 mg/L",21.9990956116367,6.16783568199852,26,NA,1.20961209612094,"se","mean_error"
+"16","bridi_2017_fig6b.jpg","Number of entries","Treatment - Roundup 0.01 mg/L",24.8335686802302,9.47732855738409,26,NA,1.85865704810891,"se","mean_error"
+"17","bridi_2017_fig6b.jpg","Number of entries","Treatment - Roundup 0.065 mg/L",23.4381955844892,6.69100031573949,26,NA,1.3122131221312,"se","mean_error"
+"18","bridi_2017_fig6b.jpg","Number of entries","Treatment - Roundup 0.5 mg/L",24.7084875674994,5.89354491248657,26,NA,1.15581925050017,"se","mean_error"
+"19","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Control",41.8874518733448,35.526073598507,12,NA,10.2554940776742,"se","mean_error"
+"20","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-Diuron",44.3101780901363,35.3497490924588,12,NA,10.2045935771584,"se","mean_error"
+"21","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCA",20.7776130233044,13.7057933468494,12,NA,3.95652173913043,"se","mean_error"
+"22","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCPMU",13.5725885616869,8.95337032835604,12,NA,2.58461538461538,"se","mean_error"
+"23","chung_2023_fig6c.jpg","Male confrontation distance (cm)","Control",16.5992051343284,4.96957238383324,10,NA,1.57151677299856,"se","mean_error"
+"24","chung_2023_fig6c.jpg","Male confrontation distance (cm)","Treatment 0.1 ppm",13.4650111097566,4.91522988854119,10,NA,1.55433216711257,"se","mean_error"
+"25","chung_2023_fig6c.jpg","Male confrontation distance (cm)","Treatment 0.5 ppm",12.3161621639817,4.60349269997963,10,NA,1.45575221238938,"se","mean_error"
+"26","chung_2023_fig6c.jpg","Male confrontation distance (cm)","Treatment 1 ppm",12.3789322812898,4.82737076441633,10,NA,1.52654867256637,"se","mean_error"
+"27","guo_2023_fig3a.jpg","Time (s)","control",268.957876853145,75.3692639711708,18,NA,17.7647058823513,"se","mean_error"
+"28","guo_2023_fig3a.jpg","Time (s)","Treatment - 2 ug/L ",235.185932669998,23.4864341873905,18,NA,5.53580562659846,"se","mean_error"
+"29","guo_2023_fig3a.jpg","Time (s)","Treatment - 20 ug/L",219.681474939871,10.9266986494387,18,NA,2.57544757033332,"se","mean_error"
+"30","guo_2023_fig3a.jpg","Time (s)","Treatment 200 ug/L",185.993406626941,29.5411490298826,18,NA,6.96291560102412,"se","mean_error"
+"31","guo_2023_fig3b.jpg","Time (s)","control",375.901367803483,57.8482421708821,18,NA,13.6349614395841,"se","mean_error"
+"32","guo_2023_fig3b.jpg","Time (s)","Treatment - 2 ug/L",351.114449291919,10.3830178255399,18,NA,2.4473007712067,"se","mean_error"
+"33","guo_2023_fig3b.jpg","Time (s)","Treatment - 20 ug/L",299.302288419707,25.0850220575,18,NA,5.91259640102413,"se","mean_error"
+"34","guo_2023_fig3b.jpg","Time (s)","Treatment - 200 ug/L",288.215027881148,37.1258326451087,18,NA,8.75064267351775,"se","mean_error"
+"35","guo_2023_fig4a.jpg","Distance (cm)","control",791.293609239868,22.3047105474902,18,NA,5.25727069351115,"se","mean_error"
+"36","guo_2023_fig4a.jpg","Distance (cm)","Treatment - 2 ug/L",822.103855665013,43.8501117997559,18,NA,10.3355704697985,"se","mean_error"
+"37","guo_2023_fig4a.jpg","Distance (cm)","Treatment - 20 ug/L",835.561847426017,65.1867029958438,18,NA,15.3646532438515,"se","mean_error"
+"38","guo_2023_fig4a.jpg","Distance (cm)","Treatment - 200 ug/L",883.171435669791,53.8160462997009,18,NA,12.6845637583892,"se","mean_error"
+"39","guo_2023_fig4b.jpg","Frequency","control",295.217415367035,51.7694062182784,18,NA,12.2021660649819,"se","mean_error"
+"40","guo_2023_fig4b.jpg","Frequency","Treatment - 2 ug/L",301.591437500836,52.1369996352132,18,NA,12.2888086642599,"se","mean_error"
+"41","guo_2023_fig4b.jpg","Frequency","Treatment - 20 ug/L",330.339820408892,32.9302436003844,18,NA,7.76173285198558,"se","mean_error"
+"42","guo_2023_fig4b.jpg","Frequency","Treatment - 200 ug/L",373.83585385408,35.7280077148852,18,NA,8.42117217782686,"se","mean_error"
+"43","guo_2023_fig4c.jpg","Distance (cm)","control ",718.702283156181,88.9227981236476,18,NA,20.9593045184379,"se","mean_error"
+"44","guo_2023_fig4c.jpg","Distance (cm)","Treatment 2 ug/L",811.12113183378,259.466380325323,18,NA,61.1568123393213,"se","mean_error"
+"45","guo_2023_fig4c.jpg","Distance (cm)","Treatment 20 ug/L",970.937746805803,367.059311889338,18,NA,86.5167095115396,"se","mean_error"
+"46","guo_2023_fig4c.jpg","Distance (cm)","Treatment - 200 ug/L",1072.11428549925,379.629089246541,18,NA,89.4794344473007,"se","mean_error"
+"47","guo_2023_fig4d.jpg","Frequency","control",401.50022346284,46.0038346942478,18,NA,10.8432078242959,"se","mean_error"
+"48","guo_2023_fig4d.jpg","Frequency","treatment - 2 ug/L",404.268702056277,27.406539817849,18,NA,6.45978338468672,"se","mean_error"
+"49","guo_2023_fig4d.jpg","Frequency","Treatment - 20 ug/L",454.27164581828,116.798073324661,18,NA,27.5295698924638,"se","mean_error"
+"50","guo_2023_fig4d.jpg","Frequency","Treatment 200 ug/L",506.218852402323,224.537865507618,200,NA,15.877224733359,"se","mean_error"
