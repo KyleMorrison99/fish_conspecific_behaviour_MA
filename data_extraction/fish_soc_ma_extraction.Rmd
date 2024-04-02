@@ -9,6 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+pacman::p_load(tidyverse,
+              here,
+              summarytools)
+```
 
 
 ```{r}
@@ -19,11 +24,48 @@ rm(list = ls())
 library(shinyDigitise)
 ```
 
-
+Opening Shiny digitise
 ```{r}
 data <- shinyDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
 
 data
 write.csv(data,file="fish_soc_ma_shinydigitise2.csv")
+```
+
+
+Mean and SD for faria et al., 2021 figure1ca
+```{r}
+farig_2021 <- read.csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1ca.csv"))
+
+# Calculate mean for each variable in Group
+farag_2021_mean <- tapply(farig_2021$Average.interfish.distance, farig_2021$Group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+farag_2021_sd <- tapply(farig_2021$Average.interfish.distance, farig_2021$Group, sd, na.rm = TRUE)
+
+# Define a function to calculate SE
+calculate_se <- function(x) {
+  sqrt(var(x, na.rm = TRUE) / length(x))
+}
+
+# Calculate standard error for each variable in Group
+farag_2021_se <- tapply(farig_2021$Average.interfish.distance, farig_2021$Group, function(x) calculate_se(x) / sqrt(length(x)))
+ 
+ 
+farag_2021_sample_size <- tapply(farig_2021$Average.interfish.distance, farig_2021$Group, length)
+
+# Combine the results into a data frame
+farag_2021_summary_stats <- data.frame(Group= names(farag_2021_mean),
+                                       Mean = farag_2021_mean,
+                             SD = farag_2021_sd,
+                             SE = farag_2021_se,
+                             Sample = farag_2021_sample_size)
+
+write.csv(farag_2021_summary_stats, file.path(here("data_extraction", "data_extraction_figures"), "farag_2021_summary_stats.csv"), row.names = FALSE)
+
+```
+
+```{r}
+
 ```
 
