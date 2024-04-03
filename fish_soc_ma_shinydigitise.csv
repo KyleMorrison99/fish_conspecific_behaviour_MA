@@ -1,0 +1,5 @@
+"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
+"1","guo_2020_fig1d.jpg","Frequency in ROA","control ",409.420469031703,94.9970023062744,18,NA,22.3910081743869,"se","mean_error"
+"2","guo_2020_fig1d.jpg","Frequency in ROA","2 ug/L",350.599311634798,108.292104073184,18,NA,25.524693713036,"se","mean_error"
+"3","guo_2020_fig1d.jpg","Frequency in ROA","20 ug/L",318.44714274547,45.730734200171,18,NA,10.7788374205268,"se","mean_error"
+"4","guo_2020_fig1d.jpg","Frequency in ROA","200 ug/L",247.105186300574,37.7633367960143,18,NA,8.90090384289772,"se","mean_error"
