@@ -1,5 +1,0 @@
-"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
-"1","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Control",41.8874518733448,35.526073598507,12,NA,10.2554940776742,"se","mean_error"
-"2","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-Diuron",44.3101780901363,35.3497490924588,12,NA,10.2045935771584,"se","mean_error"
-"3","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCA",20.7776130233044,13.7057933468494,12,NA,3.95652173913043,"se","mean_error"
-"4","boscolo_2018_fig2.jpg","Total frequency of aggressive interactions, 20 minutes","Treatment-DCPMU",13.5725885616869,8.95337032835604,12,NA,2.58461538461538,"se","mean_error"
