@@ -1,3 +1,4 @@
 "","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
-"1","paredes_2019_fig7c.jpg","Number of bites towards reflection ","Control ",28.0900922114979,17.9394844994133,7,NA,6.78048780487794,"se","mean_error"
-"2","paredes_2019_fig7c.jpg","Number of bites towards reflection ","Treatment ",40.8934080699556,15.5769504696168,7,NA,5.88753387533954,"se","mean_error"
+"1","schmidel_2014_fig3b.jpg","Social interaction","Control ",1432.07371274198,253.627566477256,8,NA,89.670886075955,"se","mean_error"
+"2","schmidel_2014_fig3b.jpg","Social interaction","ATZ 10",1519.79523172932,148.868354236651,8,NA,52.6329113924085,"se","mean_error"
+"3","schmidel_2014_fig3b.jpg","Social interaction","ATZ 1000",1067.54206717233,358.386778717863,8,NA,126.708860759502,"se","mean_error"
