@@ -1,4 +1,4 @@
 "","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
-"1","schmidel_2014_fig3b.jpg","Social interaction","Control ",1432.07371274198,253.627566477256,8,NA,89.670886075955,"se","mean_error"
-"2","schmidel_2014_fig3b.jpg","Social interaction","ATZ 10",1519.79523172932,148.868354236651,8,NA,52.6329113924085,"se","mean_error"
-"3","schmidel_2014_fig3b.jpg","Social interaction","ATZ 1000",1067.54206717233,358.386778717863,8,NA,126.708860759502,"se","mean_error"
+"1","shenoy_2012_fig2b.jpg","Number of mating attempts","Control",0.65319927120025,0.29394009277043,17,NA,0.071290944123314,"se","mean_error"
+"2","shenoy_2012_fig2b.jpg","Number of mating attempts","Low ATZ",0.763025860795626,0.516381244056162,17,NA,0.1252408477842,"se","mean_error"
+"3","shenoy_2012_fig2b.jpg","Number of mating attempts","High ATZ",0.545299463878477,0.460770956234729,17,NA,0.111753371868979,"se","mean_error"
