@@ -33,7 +33,10 @@ shinyDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fi
 data <- metaDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
 
 data
+
 write.csv(data,file="fish_soc_ma_shinydigitise.csv")
+
+
 ```
 
 
