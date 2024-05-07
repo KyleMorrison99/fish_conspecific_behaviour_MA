@@ -1,0 +1,7 @@
+species,Concentration,n_shoal,n_fish,mean,se
+barbel,0,3,12,0.813,0.207
+barbel,1.2,3,12,0.705,0.213
+barbel,2,3,12,0.711,0.211
+bleak,0,3,12,0.938,0.142
+bleak,1.2,3,12,0.958,0.142
+bleak,2,3,12,0.896,0.184
