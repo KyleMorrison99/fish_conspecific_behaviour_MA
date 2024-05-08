@@ -1,0 +1,47 @@
+---
+title: "The impacts of pesticide exposure on fish conspecific behavioural interactions:
+  a systematic review and meta-analysis"
+author: Kyle Morrison, Aneesh Bose, Rhiannon Eastment, Jack Manera, Gabriel Melhado, Marcus
+  Michelangeli, Shiho Ozeki, Bob Wong, Yefeng Yang, Malgorzata Lagisz, Shinichi Nakagawa
+date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+output: 
+  rmdformats::readthedown:
+    code_folding: show
+    code_download: true
+    toc_depth: 4
+editor_options: 
+  chunk_output_type: console
+---
+
+# **Knit Settings**
+
+```{r setup, include = FALSE}
+# knitr setting
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE, 
+  tidy = TRUE,
+  cache = TRUE,
+  echo=TRUE
+)
+```
+
+# **Load packages and data**
+
+## Load packages
+
+```{r}
+# rm(list = ls())
+pacman::p_load(tidyverse,
+               here)
+
+```
+
+## Load Data
+
+```{r}
+data <- read.csv(here("data", "fish_conspecific_behaviour_ma_data.csv")
+
+```
+

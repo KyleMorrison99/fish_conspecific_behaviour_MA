@@ -1,0 +1,25 @@
+,,mean ,se ,n
+sanchez_2021_exp_001_assay_003,control,215.91,72.04,20
+sanchez_2021_exp_002_assay_003,control,215.91,72.04,20
+sanchez_2021_exp_003_assay_003,control,215.91,72.04,20
+sanchez_2021_exp_001_assay_004,control,43.75,6.12,20
+sanchez_2021_exp_002_assay_004,control,43.75,6.12,20
+sanchez_2021_exp_003_assay_004,control,43.75,6.12,20
+sanchez_2021_exp_001_assay_005,control,74.71,18.02,20
+sanchez_2021_exp_002_assay_005,control,74.71,18.02,20
+sanchez_2021_exp_003_assay_005,control,74.71,18.02,20
+sanchez_2021_exp_001_assay_006,control,20.13,6.49,20
+sanchez_2021_exp_002_assay_006,control,20.13,6.49,20
+sanchez_2021_exp_003_assay_006,control,20.13,6.49,20
+sanchez_2021_exp_001_assay_003,treatment,274,80.1,20
+sanchez_2021_exp_002_assay_003,treatment,98.08,24.5,20
+sanchez_2021_exp_003_assay_003,treatment,158.26,42.12,20
+sanchez_2021_exp_001_assay_004,treatment,40.56,8.67,20
+sanchez_2021_exp_002_assay_004,treatment,21.38,6.09,20
+sanchez_2021_exp_003_assay_004,treatment,36.78,7.55,20
+sanchez_2021_exp_001_assay_005,treatment,62,12.67,20
+sanchez_2021_exp_002_assay_005,treatment,28.25,10.7,20
+sanchez_2021_exp_003_assay_005,treatment,40.22,9.6,20
+sanchez_2021_exp_001_assay_006,treatment,20,4.08,20
+sanchez_2021_exp_002_assay_006,treatment,6.5,1.98,20
+sanchez_2021_exp_003_assay_006,treatment,11,2.16,20
