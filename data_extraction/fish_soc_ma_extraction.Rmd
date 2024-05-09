@@ -11,30 +11,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 pacman::p_load(tidyverse,
-              here)
+              here,
+              shinyDigitise,
+              metaDigitise)
 ```
 
-
-```{r}
-rm(list = ls())
-#install.packages("devtools")
-# devtools::install_github("EIvimeyCook/ShinyDigitise")
-
-library(shinyDigitise)
-library(metaDigitise)
-
-```
 
 Opening Shiny digitise
 ```{r}
 shinyDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
 
 
-data <- metaDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
+metaD <- metaDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
 
-data
+MetaD
 
-write.csv(data,file="fish_soc_ma_shinydigitise.csv")
+write.csv(metaD,file="fish_soc_ma_shinydigitise.csv")
 
 
 ```
@@ -42,24 +34,24 @@ write.csv(data,file="fish_soc_ma_shinydigitise.csv")
 
 Mean and SD for faria et al., 2021 figure1ca
 ```{r}
-faria_2021 <- read.csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1ca.csv"))
+faria_2021 <- read_csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1ca_raw.csv"))
 
 # Calculate mean for each variable in Group
-faria_2021_mean <- tapply(faria_2021$Average.interfish.distance, faria_2021$Group, mean, na.rm = TRUE)
+faria_2021_mean <- tapply(faria_2021$average_interfish_distance, faria_2021$group, mean, na.rm = TRUE)
 
 # Calculate standard deviation for each variable in Group
-faria_2021_sd <- tapply(faria_2021$Average.interfish.distance, faria_2021$Group, sd, na.rm = TRUE)
+faria_2021_sd <- tapply(faria_2021$average_interfish_distance, faria_2021$group, sd, na.rm = TRUE)
 
 # Define a function to calculate SE
 calculate_se <- function(x) {
   sqrt(var(x, na.rm = TRUE) / length(x))
 }
 
-# Calculate standard error for each variable in Group
-faria_2021_se <- tapply(faria_2021$Average.interfish.distance, faria_2021$Group, function(x) calculate_se(x) / sqrt(length(x)))
+# Calculate standard error for each variable in group
+faria_2021_se <- tapply(faria_2021$average_interfish_distance, faria_2021$group, function(x) calculate_se(x) / sqrt(length(x)))
  
  
-faria_2021_sample_size <- tapply(faria_2021$Average.interfish.distance, faria_2021$Group, length)
+faria_2021_sample_size <- tapply(faria_2021$average_interfish_distance, faria_2021$group, length)
 
 # Combine the results into a data frame
 faria_2021_summary_stats <- data.frame(Group= names(faria_2021_mean),
@@ -72,5 +64,139 @@ faria_2021_summary_stats <- data.frame(Group= names(faria_2021_mean),
 
 ```
 
+```{r}
+ibrahim_2023_raw <- read_csv(here("data_extraction", "data_extraction_figures", "ibrahim_2023_table1_raw.csv"))
 
+ibrahim_2023_processed <- ibrahim_2023_raw %>%
+  mutate(sd = se * sqrt(n))
+
+# write.csv(ibrahim_2023_processed, file.path(here("data_extraction", "data_extraction_figures"), "ibrahim_2023_processed.csv"), row.names = FALSE)
+
+```
+
+```{r}
+leite_2023_raw <- read.csv(here("data_extraction", "data_extraction_figures", "leite_2023_in_text_raw.csv"))
+
+# three shoals of fish with twelve total fish  (using Rutowska et al., 2013 for effective sample size)
+
+leite_2023_processed <- leite_2023_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd = se * sqrt(n_effective))
+
+
+# write.csv(leite_2023_processed, file.path(here("data_extraction", "data_extraction_figures"), "leite_2023_processed.csv"), row.names = FALSE)
+
+
+```
+
+
+```{r}
+lei_2022_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lei_2022_sample_size_raw.csv"))
+
+# three shoals of fish with twenty four total fish (using Rutowska et al., 2013 for effective sample size)
+
+lei_2022_processed <- lei_2023_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect)
+
+# write.csv(lei_2022_processed, file.path(here("data_extraction", "data_extraction_figures"), "lei_2022_sample_size_processed.csv"), row.names = FALSE)
+
+```
+
+
+```{r}
+lin_2024_fig3c_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lin_2024_fig3c_sample_size_raw.csv"))
+
+# two shoals of fish with eight total fish (using Rutowska et al., 2013 for effective sample size)
+
+lin_2024_fig3c_processed <- lin_2024_fig3c_raw %>% 
+    mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect)
+
+# write.csv(lin_2024_fig3c_processed, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3c_processed.csv"), row.names = FALSE)
+
+```
+
+
+
+```{r}
+lin_2024_fig3d_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lin_2024_fig3d_sample_size_raw.csv"))
+
+# two shoals of fish with eight total fish (using Rutowska et al., 2013 for effective sample size)
+
+lin_2024_fig3d_processed <- lin_2024_fig3c_raw %>% 
+    mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect)
+
+# write.csv(lin_2024_fig3d_processed, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3d_processed.csv"), row.names = FALSE)
+
+```
+
+
+```{r}
+liu_2023a_fig3_raw <- read_csv(here("data_extraction", "data_extraction_figures", "liu_2023a_fig3_raw.csv"))
+
+
+liu_2023a_fig3_difference <-liu_2023a_fig3_raw %>%
+  group_by(group_id) %>%
+  mutate(diff_mean = mean(mean[zone == 2]) - mean(mean[zone == 1]))
+
+# write.csv(liu_2023a_fig3_difference, file.path(here("data_extraction", "data_extraction_figures"), "liu_2023a_fig3_difference.csv"), row.names = FALSE)
+
+
+```
+
+
+```{r}
+maclaren_2023_table1_raw <- read_csv(here("data_extraction", "data_extraction_figures", "maclaren_2023_table1_raw.csv"))
+
+
+maclaren_2023_table1_processed <- maclaren_2023_table1_raw %>%
+  mutate(sd = se * sqrt(n))
+
+write.csv(maclaren_2023_table1_processed, file.path(here("data_extraction", "data_extraction_figures"), "maclaren_2023_table1_processed.csv"), row.names = FALSE)
+
+```
+
+
+```{r}
+olsen_2020 <- read_csv(here("data_extraction", "data_extraction_figures", "olsen_2020_fig1_raw.csv"))
+
+# Calculate mean for each variable in Group
+olsen2020_mean <- tapply(olsen_2020$time_with_female, olsen_2020$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+olsen2020_sd <- tapply(olsen_2020$time_with_female, olsen_2020$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in Group
+olsen_2020_se <- tapply(olsen_2020$time_with_female, olsen_2020$group, function(x) calculate_se(x) / sqrt(length(x)))
+ 
+ 
+olsen_2020_sample_size <- tapply(olsen_2020$time_with_female, olsen_2020$group, length)
+
+# Combine the results into a data frame
+olsen_2020_summary_stats <- data.frame(Group= names(olsen2020_mean),
+                                       Mean = olsen2020_mean,
+                             SD = olsen2020_sd,
+                             SE = olsen_2020_se,
+                             Sample = olsen_2020_sample_size)
+
+# write.csv(olsen_2020_summary_stats, file.path(here("data_extraction", "data_extraction_figures"), "olsen_2020_summary_stats.csv"), row.names = FALSE)
+```
+
+```{r}
+sanchez_2021_table2_raw <- read_csv(here("data_extraction", "data_extraction_figures", "sanchez_2021_table2_raw.csv"))
+
+
+sanchez_2021_table2_raw_processed <- sanchez_2021_table2_raw %>%
+  mutate(sd = se * sqrt(n))
+
+#  write.csv(sanchez_2021_table2_raw_processed, file.path(here("data_extraction", "data_extraction_figures"), "sanchez_2021_table2_raw_processed.csv"), row.names = FALSE)
+
+```
 
