@@ -1,4 +1,4 @@
-"X","filename","variable","zone","group_id","mean","sd","se","error_type","plot_type","diff_mean"
+"...1","filename","variable","zone","group_id","mean","sd","se","error_type","plot_type","diff_mean"
 1,"liu_2023a_fig3e.jpg","Time spent in the different social zones",2,"control",300.8316162,31.07467126,8.305055233,"se","mean_error",258.30143426
 2,"liu_2023a_fig3e.jpg","Time spent in the different social zones",2,"1 ug/L",300.4541137,33.89964138,9.060060255,"se","mean_error",263.86015874
 3,"liu_2023a_fig3e.jpg","Time spent in the different social zones",2,"10 ug/L",291.016551,40.96206666,10.94757281,"se","mean_error",271.11823442
