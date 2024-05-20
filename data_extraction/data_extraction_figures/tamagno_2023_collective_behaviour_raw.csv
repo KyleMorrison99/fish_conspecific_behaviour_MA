@@ -1,0 +1,9 @@
+id ,group ,n_fish,n_shoal,n,mean,se
+tamagno_2023_exp_001_assay_002,control,4,1,4,10.89549911,0.514322917
+tamagno_2023_exp_002_assay_002,control,4,1,4,10.89549911,0.514322917
+tamagno_2023_exp_003_assay_002,control,4,1,4,10.89549911,0.514322917
+tamagno_2023_exp_004_assay_002,control,4,1,4,10.89549911,0.514322917
+tamagno_2023_exp_001_assay_002,treatment,4,1,4,16.05702015,0.763715278
+tamagno_2023_exp_002_assay_002,treatment,4,1,4,16.13528195,0.722222222
+tamagno_2023_exp_003_assay_002,treatment,4,1,4,15.35414172,0.74375
+tamagno_2023_exp_004_assay_002,treatment,4,1,4,16.31483688,0.666666667

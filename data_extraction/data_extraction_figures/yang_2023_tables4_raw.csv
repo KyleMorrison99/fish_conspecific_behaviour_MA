@@ -1,0 +1,33 @@
+Behavioral_endpoints,measurement_level,Treatment,Mean,SD,n,n_fish,n_shoal
+Average speed (cm/s),collective,0,5.91,0.98,24,24,6
+Average speed (cm/s),collective,0.1,5.8,0.98,24,24,6
+Average speed (cm/s),collective,10,6.24,0.77,24,24,6
+Average speed (cm/s),collective,1000,6.75,0.9,24,24,6
+Average inter-fish distance (cm),collective,0,6.31,0.81,24,24,6
+Average inter-fish distance (cm),collective,0.1,5.67,0.58,24,24,6
+Average inter-fish distance (cm),collective,10,5.87,0.62,24,24,6
+Average inter-fish distance (cm),collective,1000,4.84,1.04,24,24,6
+Maximum inter-fish distance (cm),collective,0,18.23,0.73,24,24,6
+Maximum inter-fish distance (cm),collective,0.1,17.64,0.72,24,24,6
+Maximum inter-fish distance (cm),collective,10,18.13,0.66,24,24,6
+Maximum inter-fish distance (cm),collective,1000,17.51,1.28,24,24,6
+Time spent in social zone (s),individual,0,482.7,92.81,18,NA,NA
+Time spent in social zone (s),individual,0.1,535.7,80.72,18,NA,NA
+Time spent in social zone (s),individual,10,675.1,85.58,18,NA,NA
+Time spent in social zone (s),individual,1000,495.1,96.28,18,NA,NA
+Time spent in familiar fish zone (s),individual,0,348,89.63,18,NA,NA
+Time spent in familiar fish zone (s),individual,0.1,312.1,61.59,18,NA,NA
+Time spent in familiar fish zone (s),individual,10,444.6,111.1,18,NA,NA
+Time spent in familiar fish zone (s),individual,1000,475.4,88.09,18,NA,NA
+Average distance to familiar fish zone (cm),individual,0,4.52,0.91,18,NA,NA
+Average distance to familiar fish zone (cm),individual,0.1,4.62,0.98,18,NA,NA
+Average distance to familiar fish zone (cm),individual,10,3.25,1.05,18,NA,NA
+Average distance to familiar fish zone (cm),individual,1000,2.72,0.97,18,NA,NA
+Numbers of transition,individual,0,51,20,24,NA,NA
+Numbers of transition,individual,0.1,55,18,24,NA,NA
+Numbers of transition,individual,10,51,18,24,NA,NA
+Numbers of transition,individual,1000,70,28,24,NA,NA
+Biting time (s),individual,0,104.7,73.21,24,NA,NA
+Biting time (s),individual,0.1,87.14,45.33,24,NA,NA
+Biting time (s),individual,10,82.6,59.26,24,NA,NA
+Biting time (s),individual,1000,155.8,111.9,24,NA,NA

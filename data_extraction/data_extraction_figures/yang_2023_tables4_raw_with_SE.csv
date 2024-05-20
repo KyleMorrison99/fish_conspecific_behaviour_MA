@@ -1,0 +1,33 @@
+"Behavioral_endpoints","measurement_level","Treatment","Mean","SD","n","n_fish","n_shoal","SE"
+"Average speed (cm/s)","collective",0,5.91,0.98,24,24,6,0.200041662327293
+"Average speed (cm/s)","collective",0.1,5.8,0.98,24,24,6,0.200041662327293
+"Average speed (cm/s)","collective",10,6.24,0.77,24,24,6,0.157175591828587
+"Average speed (cm/s)","collective",1000,6.75,0.9,24,24,6,0.183711730708738
+"Average inter-fish distance (cm)","collective",0,6.31,0.81,24,24,6,0.165340557637865
+"Average inter-fish distance (cm)","collective",0.1,5.67,0.58,24,24,6,0.11839200423452
+"Average inter-fish distance (cm)","collective",10,5.87,0.62,24,24,6,0.126556970043798
+"Average inter-fish distance (cm)","collective",1000,4.84,1.04,24,24,6,0.212289111041209
+"Maximum inter-fish distance (cm)","collective",0,18.23,0.73,24,24,6,0.14901062601931
+"Maximum inter-fish distance (cm)","collective",0.1,17.64,0.72,24,24,6,0.146969384566991
+"Maximum inter-fish distance (cm)","collective",10,18.13,0.66,24,24,6,0.134721935853075
+"Maximum inter-fish distance (cm)","collective",1000,17.51,1.28,24,24,6,0.261278905896872
+"Time spent in social zone (s)","individual",0,482.7,92.81,18,NA,NA,21.8755267873078
+"Time spent in social zone (s)","individual",0.1,535.7,80.72,18,NA,NA,19.025886459126
+"Time spent in social zone (s)","individual",10,675.1,85.58,18,NA,NA,20.1713994446482
+"Time spent in social zone (s)","individual",1000,495.1,96.28,18,NA,NA,22.6934136308803
+"Time spent in familiar fish zone (s)","individual",0,348,89.63,18,NA,NA,21.1259935992501
+"Time spent in familiar fish zone (s)","individual",0.1,312.1,61.59,18,NA,NA,14.5169022177598
+"Time spent in familiar fish zone (s)","individual",10,444.6,111.1,18,NA,NA,26.1865211299418
+"Time spent in familiar fish zone (s)","individual",1000,475.4,88.09,18,NA,NA,20.763012118241
+"Average distance to familiar fish zone (cm)","individual",0,4.52,0.91,18,NA,NA,0.214489056959919
+"Average distance to familiar fish zone (cm)","individual",0.1,4.62,0.98,18,NA,NA,0.230988215187606
+"Average distance to familiar fish zone (cm)","individual",10,3.25,1.05,18,NA,NA,0.247487373415292
+"Average distance to familiar fish zone (cm)","individual",1000,2.72,0.97,18,NA,NA,0.22863119258365
+"Numbers of transition","individual",0,51,20,24,NA,NA,4.08248290463863
+"Numbers of transition","individual",0.1,55,18,24,NA,NA,3.67423461417477
+"Numbers of transition","individual",10,51,18,24,NA,NA,3.67423461417477
+"Numbers of transition","individual",1000,70,28,24,NA,NA,5.71547606649408
+"Biting time (s)","individual",0,104.7,73.21,24,NA,NA,14.9439286724297
+"Biting time (s)","individual",0.1,87.14,45.33,24,NA,NA,9.25294750336346
+"Biting time (s)","individual",10,82.6,59.26,24,NA,NA,12.0963968464443
+"Biting time (s)","individual",1000,155.8,111.9,24,NA,NA,22.8414918514531

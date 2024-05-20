@@ -1,0 +1,13 @@
+"Behavioral_endpoints","measurement_level","Treatment","Mean","SD","n","n_fish","n_shoal","SE"
+"Average speed (cm/s)","collective",0,5.91,0.98,24,24,6,0.200041662327293
+"Average speed (cm/s)","collective",0.1,5.8,0.98,24,24,6,0.200041662327293
+"Average speed (cm/s)","collective",10,6.24,0.77,24,24,6,0.157175591828587
+"Average speed (cm/s)","collective",1000,6.75,0.9,24,24,6,0.183711730708738
+"Average inter-fish distance (cm)","collective",0,6.31,0.81,24,24,6,0.165340557637865
+"Average inter-fish distance (cm)","collective",0.1,5.67,0.58,24,24,6,0.11839200423452
+"Average inter-fish distance (cm)","collective",10,5.87,0.62,24,24,6,0.126556970043798
+"Average inter-fish distance (cm)","collective",1000,4.84,1.04,24,24,6,0.212289111041209
+"Maximum inter-fish distance (cm)","collective",0,18.23,0.73,24,24,6,0.14901062601931
+"Maximum inter-fish distance (cm)","collective",0.1,17.64,0.72,24,24,6,0.146969384566991
+"Maximum inter-fish distance (cm)","collective",10,18.13,0.66,24,24,6,0.134721935853075
+"Maximum inter-fish distance (cm)","collective",1000,17.51,1.28,24,24,6,0.261278905896872

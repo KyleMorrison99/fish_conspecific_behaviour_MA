@@ -17,7 +17,7 @@ pacman::p_load(tidyverse,
 ```
 
 
-Opening Shiny digitise
+# **Shinydigitise and Metadigitise** 
 ```{r}
 shinyDigitise(dir = "C:/Users/khtmo/OneDrive - UNSW/University/PhD_Chapters/4_fish_soc_ma/fish_conspecific_behaviour_MA/data_extraction/data_extraction_figures")
 
@@ -28,19 +28,40 @@ MetaD
 
 write.csv(metaD,file="fish_soc_ma_shinydigitise.csv")
 
+```
+
+# **Calculate median shoal size for each species** 
+```{r}
+dataset_collective_behaviour <- read_csv(here("data", "fish_conspecific_behaviour_ma_data.csv"))
+
+dataset_collective_behaviour <- dataset_collective_behaviour %>% 
+  filter(behaviour_measured_standardised == "collective behaviour") %>% 
+  select(c(study_id, species_english, behavioural_assay_standardised, control_shoal_n, treatment_shoal_n, control_fish_n, treatment_fish_n)) %>% 
+    mutate(control_shoal_n = as.numeric(control_shoal_n),
+    treatment_shoal_n = as.numeric(treatment_shoal_n)
+  )
+
+median_shoal_sample_size_per_species <- dataset_collective_behaviour %>%
+mutate(control_shoal_size = control_fish_n / control_shoal_n,
+         treatment_shoal_size = treatment_fish_n / treatment_shoal_n) %>% 
+  group_by(species_english) %>%
+  summarise(median_control_shoal_n = median(control_shoal_size, na.rm = TRUE),
+    median_treatment_shoal_n = median(treatment_shoal_size, na.rm = TRUE)
+  )
 
 ```
 
-
-Mean and SD for faria et al., 2021 figure1ca
+# **Faria et al., 2021**
+DOI: 10.1016/j.envint.2020.106253
+Figure1ca extraction
 ```{r}
-faria_2021 <- read_csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1ca_raw.csv"))
+faria_2021_1ca <- read_csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1ca_raw.csv"))
 
 # Calculate mean for each variable in Group
-faria_2021_mean <- tapply(faria_2021$average_interfish_distance, faria_2021$group, mean, na.rm = TRUE)
+faria_2021_1ca_mean <- tapply(faria_2021_1ca$average_interfish_distance, faria_2021_1ca$group, mean, na.rm = TRUE)
 
 # Calculate standard deviation for each variable in Group
-faria_2021_sd <- tapply(faria_2021$average_interfish_distance, faria_2021$group, sd, na.rm = TRUE)
+faria_2021_1ca_sd <- tapply(faria_2021_1ca$average_interfish_distance, faria_2021_1ca$group, sd, na.rm = TRUE)
 
 # Define a function to calculate SE
 calculate_se <- function(x) {
@@ -48,22 +69,118 @@ calculate_se <- function(x) {
 }
 
 # Calculate standard error for each variable in group
-faria_2021_se <- tapply(faria_2021$average_interfish_distance, faria_2021$group, function(x) calculate_se(x) / sqrt(length(x)))
- 
- 
-faria_2021_sample_size <- tapply(faria_2021$average_interfish_distance, faria_2021$group, length)
+faria_2021_1ca_se <- tapply(faria_2021_1ca$average_interfish_distance, faria_2021_1ca$group, function(x) calculate_se(x) / sqrt(length(x)))
+
+faria_2021_1ca_sample_size <- tapply(faria_2021_1ca$average_interfish_distance, faria_2021_1ca$group, length)
 
 # Combine the results into a data frame
-faria_2021_summary_stats <- data.frame(Group= names(faria_2021_mean),
-                                       Mean = faria_2021_mean,
-                             SD = faria_2021_sd,
-                             SE = faria_2021_se,
-                             Sample = faria_2021_sample_size)
+faria_2021_1ca_processed <- data.frame(Group= names(faria_2021_1ca_mean),
+                                       Mean = faria_2021_1ca_mean,
+                             SD = faria_2021_1ca_sd,
+                             SE = faria_2021_1ca_se,
+                             Sample = faria_2021_1ca_sample_size)
 
-# write.csv(faria_2021_summary_stats, file.path(here("data_extraction", "data_extraction_figures"), "faria_2021_summary_stats.csv"), row.names = FALSE)
+# write.csv(faria_2021_1ca_processed, file.path(here("data_extraction", "data_extraction_figures"), "faria_2021_1ca_processed.csv"), row.names = FALSE)
 
 ```
 
+Figure1ca extraction
+```{r}
+faria_2021_1cb <- read_csv(here("data_extraction", "data_extraction_figures", "faria_2021_fig1cb_raw.csv"))
+
+# Calculate mean for each variable in Group
+faria_2021_1cb_mean <- tapply(faria_2021_1cb$farthest_distance, faria_2021_1cb$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+faria_2021_1cb_sd <- tapply(faria_2021_1cb$farthest_distance, faria_2021_1cb$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+faria_2021_1cb_se <- tapply(faria_2021_1cb$farthest_distance, faria_2021_1cb$group, function(x) calculate_se(x) / sqrt(length(x)))
+
+faria_2021_1cb_sample_size <- tapply(faria_2021_1cb$farthest_distance, faria_2021_1cb$group, length)
+
+# Combine the results into a data frame
+faria_2021_1cb_processed <- data.frame(Group= names(faria_2021_1cb_mean),
+                                       Mean = faria_2021_1cb_mean,
+                                       SD = faria_2021_1cb_sd,
+                                       SE = faria_2021_1cb_se,
+                                       Sample = faria_2021_1cb_sample_size)
+
+# write.csv(faria_2021_1cb_processed, file.path(here("data_extraction", "data_extraction_figures"), "faria_2021_1cb_processed.csv"), row.names = FALSE)
+
+```
+
+Collective behaviour figures
+```{r}
+faria_2021_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "faria_2021_collective_behaviour_raw.csv"))
+
+faria_2021_collective_behaviour_raw_processed <- faria_2021_collective_behaviour_raw %>% 
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(faria_2021_collective_behaviour_raw_processed, file.path(here("data_extraction", "data_extraction_figures"), "faria_2021_collective_behaviour_raw_processed.csv"), row.names = FALSE)
+
+```
+
+# **Hawkey et al., 2020**
+DOI: 10.1016/j.ntt.2019.106853
+Collective behaviour figures
+```{r}
+hawkey_2020_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hawkey_2020_collective_behaviour_raw.csv"))
+
+hawkey_2020_collective_behaviour_processed <- hawkey_2020_collective_behaviour_raw %>% 
+ mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(hawkey_2020_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "hawkey_2020_collective_behaviour_processed.csv"), row.names = FALSE)
+
+```
+
+
+# **Hawkey et al., 2021**
+DOI: 10.1016/j.ntt.2021.106985
+Collective behaviour figures
+```{r}
+hawkey_2021_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hawkey_2021_collective_behaviour_raw.csv"))
+
+hawkey_2021_collective_behaviour_processed <- hawkey_2021_collective_behaviour_raw %>% 
+ mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(hawkey_2021_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "hawkey_2021_collective_behaviour_processed.csv"), row.names = FALSE)
+
+```
+
+
+# **Hussian et al., 2020**
+DOI:10.3390/ijerph17134632
+Collective behaviour figures
+```{r}
+hussian_2020_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hussian_2020_collective_behaviour_raw.csv"))
+
+hussian_2020_collective_behaviour_processed <- hussian_2020_collective_behaviour_raw %>% 
+ mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+
+# write.csv(hussian_2020_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_collective_behaviour_processed.csv"), row.names = FALSE)
+```
+
+# **Ibrahim et al., 2023**
+DOI: 10.1016/j.aquatox.2023.106630
+Table 1 extraction
 ```{r}
 ibrahim_2023_raw <- read_csv(here("data_extraction", "data_extraction_figures", "ibrahim_2023_table1_raw.csv"))
 
@@ -74,84 +191,107 @@ ibrahim_2023_processed <- ibrahim_2023_raw %>%
 
 ```
 
+# **Khalil et al., 2013**
+DOI: 10.1016/j.chemosphere.2013.02.042
+Collective behaviour figures
 ```{r}
-leite_2023_raw <- read.csv(here("data_extraction", "data_extraction_figures", "leite_2023_in_text_raw.csv"))
+khalil_2013_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "khalil_2013_collective_behaviour_raw.csv"))
 
-# three shoals of fish with twelve total fish  (using Rutowska et al., 2013 for effective sample size)
-
-leite_2023_processed <- leite_2023_raw %>%
+khalil_2013_collective_behaviour_processed <- khalil_2013_collective_behaviour_raw %>%
   mutate(mean_n = n_fish / n_shoal,
          design_effect = 1 + (mean_n - 1) * 0.5,
          n_effective = n_fish / design_effect,
-         sd = se * sqrt(n_effective))
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
 
-
-# write.csv(leite_2023_processed, file.path(here("data_extraction", "data_extraction_figures"), "leite_2023_processed.csv"), row.names = FALSE)
-
+# write.csv(khalil_2013_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "khalil_2013_collective_behaviour_processed.csv"), row.names = FALSE)
 
 ```
 
-
+# **Khalil et al., 2017**
+DOI: 10.1016/j.ecoenv.2017.07.007
+Collective behaviour figures
 ```{r}
-lei_2022_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lei_2022_sample_size_raw.csv"))
+khalil_2017_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "khalil_2017_collective_behaviour_raw.csv"))
 
-# three shoals of fish with twenty four total fish (using Rutowska et al., 2013 for effective sample size)
-
-lei_2022_processed <- lei_2023_raw %>%
+khalil_2017_collective_behaviour_processed <- khalil_2017_collective_behaviour_raw %>%
   mutate(mean_n = n_fish / n_shoal,
          design_effect = 1 + (mean_n - 1) * 0.5,
-         n_effective = n_fish / design_effect)
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
 
-# write.csv(lei_2022_processed, file.path(here("data_extraction", "data_extraction_figures"), "lei_2022_sample_size_processed.csv"), row.names = FALSE)
+# write.csv(khalil_2017_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "khalil_2017_collective_behaviour_processed.csv"), row.names = FALSE)
 
 ```
 
-
+# **Lei et al., 2022**
+DOI: 10.1016/j.scitotenv.2022.153623
+Collective behaviour figures
 ```{r}
-lin_2024_fig3c_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lin_2024_fig3c_sample_size_raw.csv"))
+lei_2022_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lei_2022_collective_behaviour_raw.csv"))
 
-# two shoals of fish with eight total fish (using Rutowska et al., 2013 for effective sample size)
+lei_2022_collective_behaviour_processed <- lei_2022_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
 
-lin_2024_fig3c_processed <- lin_2024_fig3c_raw %>% 
+# write.csv(lei_2022_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "lei_2022_collective_behaviour_processed.csv"), row.names = FALSE)
+
+```
+
+# **Leite et al., 2023**
+DOI: 10.3390/fishes8090462
+Collective behaviour figures
+```{r}
+leite_2023_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "leite_2023_collective_behaviour_raw.csv"))
+
+leite_2023_collective_behaviour_processed <- leite_2023_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(leite_2023_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "leite_2023_collective_behaviour_processed.csv"), row.names = FALSE)
+
+```
+
+# **Lin et al., 2024**
+DOI: 10.1016/j.ntt.2024.107323
+Collective behaviour figures
+```{r}
+lin_2024_fig3d_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lin_2024_fig3d_collective_behaviour_raw.csv"))
+
+lin_2024_fig3d_collective_behaviour_processed <- lin_2024_fig3d_collective_behaviour_raw %>% 
     mutate(mean_n = n_fish / n_shoal,
          design_effect = 1 + (mean_n - 1) * 0.5,
          n_effective = n_fish / design_effect)
 
-# write.csv(lin_2024_fig3c_processed, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3c_processed.csv"), row.names = FALSE)
+# write.csv(lin_2024_fig3d_collective_behaviour_raw, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3d_collective_behaviour_processed.csv"), row.names = FALSE)
 
 ```
 
-
-
-```{r}
-lin_2024_fig3d_raw <- read_csv(here("data_extraction", "data_extraction_figures", "lin_2024_fig3d_sample_size_raw.csv"))
-
-# two shoals of fish with eight total fish (using Rutowska et al., 2013 for effective sample size)
-
-lin_2024_fig3d_processed <- lin_2024_fig3c_raw %>% 
-    mutate(mean_n = n_fish / n_shoal,
-         design_effect = 1 + (mean_n - 1) * 0.5,
-         n_effective = n_fish / design_effect)
-
-# write.csv(lin_2024_fig3d_processed, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3d_processed.csv"), row.names = FALSE)
-
-```
-
-
+# **Liu et al., 2023**
+DOI: 10.1016/j.aquatox.2023.106756
+Figure 3 extraction
 ```{r}
 liu_2023a_fig3_raw <- read_csv(here("data_extraction", "data_extraction_figures", "liu_2023a_fig3_raw.csv"))
 
 
-liu_2023a_fig3_difference <-liu_2023a_fig3_raw %>%
+liu_2023a_fig3_processed <-liu_2023a_fig3_raw %>%
   group_by(group_id) %>%
   mutate(diff_mean = mean(mean[zone == 2]) - mean(mean[zone == 1]))
 
-# write.csv(liu_2023a_fig3_difference, file.path(here("data_extraction", "data_extraction_figures"), "liu_2023a_fig3_difference.csv"), row.names = FALSE)
-
+# write.csv(liu_2023a_fig3_processed, file.path(here("data_extraction", "data_extraction_figures"), "liu_2023a_fig3_processed.csv"), row.names = FALSE)
 
 ```
 
-
+# **Maclaren et al., 2023**
+DOI: 10.3390/w15020307
+Table 1 extraction
 ```{r}
 maclaren_2023_table1_raw <- read_csv(here("data_extraction", "data_extraction_figures", "maclaren_2023_table1_raw.csv"))
 
@@ -159,11 +299,13 @@ maclaren_2023_table1_raw <- read_csv(here("data_extraction", "data_extraction_fi
 maclaren_2023_table1_processed <- maclaren_2023_table1_raw %>%
   mutate(sd = se * sqrt(n))
 
-write.csv(maclaren_2023_table1_processed, file.path(here("data_extraction", "data_extraction_figures"), "maclaren_2023_table1_processed.csv"), row.names = FALSE)
+# write.csv(maclaren_2023_table1_processed, file.path(here("data_extraction", "data_extraction_figures"), "maclaren_2023_table1_processed.csv"), row.names = FALSE)
 
 ```
 
-
+# **Olsen et al., 2020**
+DOI: 10.1007/s10695-020-00803-x
+Figure 7c extraction
 ```{r}
 olsen_2020 <- read_csv(here("data_extraction", "data_extraction_figures", "olsen_2020_fig1_raw.csv"))
 
@@ -180,23 +322,104 @@ olsen_2020_se <- tapply(olsen_2020$time_with_female, olsen_2020$group, function(
 olsen_2020_sample_size <- tapply(olsen_2020$time_with_female, olsen_2020$group, length)
 
 # Combine the results into a data frame
-olsen_2020_summary_stats <- data.frame(Group= names(olsen2020_mean),
+olsen_2020_processed<- data.frame(Group= names(olsen2020_mean),
                                        Mean = olsen2020_mean,
                              SD = olsen2020_sd,
                              SE = olsen_2020_se,
                              Sample = olsen_2020_sample_size)
 
-# write.csv(olsen_2020_summary_stats, file.path(here("data_extraction", "data_extraction_figures"), "olsen_2020_summary_stats.csv"), row.names = FALSE)
+# write.csv(olsen_2020_processed, file.path(here("data_extraction", "data_extraction_figures"), "olsen_2020_processed.csv"), row.names = FALSE)
 ```
 
+# **Sanchez et al., 2021**
+DOI: 10.1007/s11356-020-11958-8
+Table 2 extraction
 ```{r}
 sanchez_2021_table2_raw <- read_csv(here("data_extraction", "data_extraction_figures", "sanchez_2021_table2_raw.csv"))
 
 
-sanchez_2021_table2_raw_processed <- sanchez_2021_table2_raw %>%
+sanchez_2021_table2_processed <- sanchez_2021_table2_raw %>%
   mutate(sd = se * sqrt(n))
 
-#  write.csv(sanchez_2021_table2_raw_processed, file.path(here("data_extraction", "data_extraction_figures"), "sanchez_2021_table2_raw_processed.csv"), row.names = FALSE)
+# write.csv(sanchez_2021_table2_processed, file.path(here("data_extraction", "data_extraction_figures"), "sanchez_2021_table2_processed.csv"), row.names = FALSE)
+
+```
+
+# **Schmidel et al., 2024**
+DOI: 10.1016/j.ntt.2014.05.006
+Collective behaviour figures
+```{r}
+schmidel_2014_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "schmidel_2014_collective_behaviour_raw.csv"))
+
+schmidel_2014_collective_behaviour_processed <- schmidel_2014_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(schmidel_2014_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "schmidel_2014_collective_behaviour_raw.csv"), row.names = FALSE)
+```
+
+# **Tamagno et al., 2023**
+DOI:10.1016/j.neuro.2023.02.011
+Collective behaviour figures
+```{r}
+tamagno_2023_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "tamagno_2023_collective_behaviour_raw.csv"))
+
+tamagno_2023_collective_behaviour_processed <- tamagno_2023_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(tamagno_2023_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "tamagno_2023_collective_behaviour_processed.csv"), row.names = FALSE)
+
+
+```
+
+# **Yang et al., 2023**
+DOI: 10.1016/j.scitotenv.2022.159883
+Collective behaviour figures
+```{r}
+yang_2023_tables4_raw <- read_csv(here("data_extraction", "data_extraction_figures", "yang_2023_tables4_raw.csv"))
+
+yang_2023_tables4_raw_with_SE <- yang_2023_tables4_raw %>% 
+  mutate(SE = SD/sqrt(n))
+
+# write.csv(yang_2023_tables4_raw_with_SE, file.path(here("data_extraction", "data_extraction_figures"), "yang_2023_tables4_raw_with_SE.csv"), row.names = FALSE)
+
+yang_2023_tables4_collective_behaviour_raw <- yang_2023_tables4_raw_with_SE %>%
+  filter(str_detect(measurement_level, "collective"))
+
+# write.csv(yang_2023_tables4_collective_behaviour_raw, file.path(here("data_extraction", "data_extraction_figures"), "yang_2023_tables4_collective_behaviour_raw.csv"), row.names = FALSE)
+
+yang_2023_tables4_collective_behaviour_processed <- yang_2023_tables4_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = SE * sqrt(n_shoal),
+         sd_fish = SE * sqrt(n_fish))
+
+# write.csv(yang_2023_tables4_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "yang_2023_tables4_collective_behaviour_processed.csv"), row.names = FALSE)
+
+```
+
+# **Zhou et al., 2021**
+DOI: 10.1016/j.aquatox.2021.105917
+Collective behaviour figures
+```{r}
+zhou_2021_collective_behaviour_raw <- read_csv(here("data_extraction", "data_extraction_figures", "zhou_2021_collective_behaviour_raw.csv"))
+
+zhou_2021_collective_behaviour_processed <- zhou_2021_collective_behaviour_raw %>%
+  mutate(mean_n = n_fish / n_shoal,
+         design_effect = 1 + (mean_n - 1) * 0.5,
+         n_effective = n_fish / design_effect,
+         sd_shoal = se * sqrt(n_shoal),
+         sd_fish = se * sqrt(n_fish))
+
+# write.csv(zhou_2021_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "zhou_2021_collective_behaviour_processed.csv"), row.names = FALSE)
 
 ```
 
