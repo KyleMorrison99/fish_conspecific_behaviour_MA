@@ -1,5 +1,5 @@
-"...1","filename","variable","group_id","mean","sd","se","n_shoal","n_fish","error_type","plot_type"
-1,"lin_2024_fig3d.jpg","Inter-individual distance","control female",26.87687208,0.660930736,0.467348605,2,8,"sd","mean_error"
-2,"lin_2024_fig3d.jpg","Inter-individual distance","5 nm female",22.74072489,0.682251082,0.482424367,2,8,"sd","mean_error"
-3,"lin_2024_fig3d.jpg","Inter-individual distance","control male",24.52768263,0.563632228,0.39854817,2,8,"sd","mean_error"
-4,"lin_2024_fig3d.jpg","Inter-individual distance","5 nm male",24.04573623,0.661655224,0.467860896,2,8,"sd","mean_error"
+"...1","filename","variable","group_id","mean","sd","se","n_shoal","n_fish","error_type","plot_type","mean_n","design_effect","n_effective"
+1,"lin_2024_fig3d.jpg","Inter-individual distance","control female",26.87687208,0.660930736,0.467348605,2,8,"sd","mean_error",4,2.5,3.2
+2,"lin_2024_fig3d.jpg","Inter-individual distance","5 nm female",22.74072489,0.682251082,0.482424367,2,8,"sd","mean_error",4,2.5,3.2
+3,"lin_2024_fig3d.jpg","Inter-individual distance","control male",24.52768263,0.563632228,0.39854817,2,8,"sd","mean_error",4,2.5,3.2
+4,"lin_2024_fig3d.jpg","Inter-individual distance","5 nm male",24.04573623,0.661655224,0.467860896,2,8,"sd","mean_error",4,2.5,3.2
