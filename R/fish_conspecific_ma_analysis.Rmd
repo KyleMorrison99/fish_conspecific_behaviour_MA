@@ -1,22 +1,20 @@
 ---
-title: "The impacts of pesticide exposure on fish conspecific behavioural interactions:
-  a systematic review and meta-analysis"
+title: "The impacts of pesticide exposure on fish conspecific behavioural interactions: a systematic review and meta-analysis"
 author: Kyle Morrison, Aneesh Bose, Rhiannon Eastment, Jack Manera, Gabriel Melhado, Marcus
   Michelangeli, Shiho Ozeki, Bob Wong, Yefeng Yang, Malgorzata Lagisz, Shinichi Nakagawa
 date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
-    rmdformats::readthedown:
-      code_folding: show
-      code_download: true
-      toc_depth: 4
+    toc: true
+    toc_float: true
+    code_folding: show
+    code_download: true
+    theme: flatly   # Options: cerulean, journal, flatly, readable, spacelab, united, cosmo, lumen, paper, sandstone, simplex, yeti
+    highlight: monochrome  # Options: default, tango, pygments, kate, monochrome, espresso, zenburn, haddock, textmate
 editor_options: 
   chunk_output_type: console
 
 ---
-
-# **Knit Settings**
-
 ```{r setup, include = FALSE}
 # knitr setting
 knitr::opts_chunk$set(
@@ -33,15 +31,12 @@ knitr::opts_chunk$set(
 ## Load packages
 
 ```{r}
-# rm(list = ls())
+rm(list = ls())
 pacman::p_load(tidyverse,
                here,
                kableExtra,
                magrittr, 
                patchwork)
-
-
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
@@ -60,20 +55,21 @@ data <- mutate_at(data,
 # Table of the dataset
  kable(data, "html") %>%
     kable_styling("bordered", position = "left") %>%
-    scroll_box(width = "100%", height = "800px")
+    scroll_box(width = "250%", height = "800px")
 
 
 # Summary of the data set
 kable(summary(data), "html") %>%
     kable_styling("bordered", position = "left") %>%
-    scroll_box(width = "100%", height = "800px")
+    scroll_box(width = "250%", height = "500px")
 ```
 
-# **Aim 0: Data exploration and reporting of methodological items**
+
+# **Data exploration and reporting of methodological items**
 ## Main text Figure 1
 b) A bubble plot showing the number of effect sizes of each pesticide class per conspecific behaviour described
 c) A bar chart showing the total number of effect sizes per species
-```{r,fig.width=12, fig.height=10}
+```{r,fig.width=8, fig.height=13}
 # Summarize data by grouping on pesticide chemical class and behavior measured, then count entries.
 pc_cb_summary <- data %>% 
   group_by(pesticide_chemical_class, behaviour_measured_standardised) %>% 
@@ -100,14 +96,18 @@ behaviour_pesticide_class_bubble_plot <- pc_cb_summary_filtered %>%
              y = fct_reorder(str_to_title(pesticide_chemical_class), n, .fun = 'sum'),
              size = n)) +
   geom_point(alpha = 0.5, color = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[3]) +
-  scale_size_continuous(range = c(2, 20)) +
+  scale_size_continuous(range = c(5, 20)) +
   theme_bw() +
   guides(size = "none") +
-  theme(legend.position="none") +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"))  +
   geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
   labs(caption = "The value in each cell is the number of effect sizes",
        x = "Behaviour Measured",
-       y = "Pesticide Chemical Class")
+       y = "Pesticide Chemical Class",
+       tag = "B")
 
 # Group data by species, count entries, and drop groups post-summary.
 sp_summary <- data %>% 
@@ -129,21 +129,25 @@ species_effect_size_count_bar_plot <- sp_summary %>%
   scale_x_continuous(expand = c(0, 0), limits = c(0, max(sp_summary$n) * 1.2)) +
   theme_bw() +
   guides(size = "none") +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
   labs(caption = "The value in each bar is the total number of effect sizes",
        x = "Total number of effect size estimates",
-       y = "Species")
+       y = "Species",
+       tag = "C")
 
 # Combine both plots into a single figure.
 main_text_figure_1 <- behaviour_pesticide_class_bubble_plot / species_effect_size_count_bar_plot
 
-# ggsave(here("figures", "main_text_figure_1.pdf"), width = 8, height = 12, units = "cm", scale = 2, dpi = 800)
-# ggsave(here("figures", "main_text_figure_1.jpg"), width = 8, height = 12, units = "cm", scale = 2, dpi = 800)
+print(main_text_figure_1)
+# ggsave(here("figures", "main_text_figure_1.pdf"), width = 8, height = 13, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "main_text_figure_1.jpg"), width = 8, height = 13, units = "cm", scale = 2, dpi = 800)
 ```
 
 
-
-```{r}
+```{r,fig.width=8, fig.height=8}
 # Group data by species, count entries, and drop groups post-summary.
 p_cb_summary <- data %>%
   group_by(pesticide, behaviour_measured_standardised) %>%
@@ -175,19 +179,23 @@ behaviour_pesticide_bubble_plot <- p_cb_summary %>% # can add _filtered if neede
   scale_size_continuous(range = c(4, 20)) +
   theme_bw() +
   guides(size = "none") +
-  theme(legend.position="none") +
+theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
   geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
   labs(caption = "The value in each cell is the number of effect sizes",
        x = "Behaviour Measured",
        y = "Pesticide Chemical Class") +
       scale_y_discrete(labels = function(x) ifelse(x %in% c("Ddt", "Dca", "Dcpmu"), toupper(x), x))
 
+print(behaviour_pesticide_bubble_plot)
+
 # ggsave(here("figures", "behaviour_pesticide_bubble_plot.pdf"), width = 8, height = 12, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "behaviour_pesticide_bubble_plot.jpg"), width = 8, height = 12, units = "cm", scale = 2, dpi = 800)
-
 ```
 
-```{r}
+```{r,fig.width=8, fig.height=6}
 # Group data by species, count entries, and drop groups post-summary.
 species_summary <- data %>%
   group_by(species_english, behaviour_measured_standardised) %>%
@@ -217,25 +225,27 @@ behaviour_species_bubble_plot <- species_summary %>% # can add _filtered if need
              y = fct_reorder(str_to_title(species_english), n, .fun = 'sum'),
              size = n)) +
   geom_point(alpha = 0.5, color = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[2]) +
-  scale_size_continuous(range = c(4, 20)) +
+  scale_size_continuous(range = c(8, 25)) +
   theme_bw() +
   guides(size = "none") +
-  theme(legend.position = "none") +
-  geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
+theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +  geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
   labs(caption = "The value in each cell is the number of effect sizes",
        x = "Behaviour Measured",
        y = "Species") +
   scale_color_brewer(palette = "Dark2", name = "Chemical Class")
 
-ggsave(here("figures", "behaviour_species_bubble_plot.pdf"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
-ggsave(here("figures", "behaviour_species_bubble_plot.jpg"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
+print(behaviour_species_bubble_plot)
 
-
+# ggsave(here("figures", "behaviour_species_bubble_plot.pdf"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "behaviour_species_bubble_plot.jpg"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
 ```
 
 ## Figure x
 A bar chart showing the reporting of the source of fish used in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Extracts unique records from the dataset based on 'study_id', retaining all other associated data.
 data_study <- data %>%
   distinct(study_id, .keep_all = TRUE) 
@@ -268,6 +278,7 @@ fish_source_study_count_bar_plot <- source_summary %>%
        x = "Total number of studies",
        y = "Source of fish") 
 
+print(fish_source_study_count_bar_plot)
 
 # ggsave(here("figures", "fish_source_study_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "fish_source_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
@@ -275,7 +286,7 @@ fish_source_study_count_bar_plot <- source_summary %>%
 
 ## Figure x
 A bar chart showing the sex of fish used in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Group data by 'sex of fish' and count entries, then drop grouping for further analysis.
 sex_summary <- data_study %>% 
   group_by(sex) %>% 
@@ -304,6 +315,7 @@ fish_sex_study_count_bar_plot <- sex_summary %>%
        x = "Total number of studies",
        y = "Sex of fish")
 
+print(fish_sex_study_count_bar_plot)
 
 # ggsave(here("figures", "fish_sex_study_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "fish_sex_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
@@ -311,7 +323,7 @@ fish_sex_study_count_bar_plot <- sex_summary %>%
 
 ## Figure x 
 A bar plot showing the control solvents used in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Group data by 'control solvent' and count entries, then drop the group structure for further analysis.
 solvent_summary <- data_study %>% 
   group_by(control_solvent) %>% 
@@ -342,6 +354,7 @@ control_solvent_study_count_bar_plot <- solvent_summary %>%
        y = "Control Solvent") +
   scale_y_discrete(labels = function(x) ifelse(x == "Dmso", toupper(x), ifelse(x == "Dtnb", toupper(x), x)))
 
+print(control_solvent_study_count_bar_plot)
 
 # ggsave(here("figures", "control_solvent_study_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "control_solvent_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
@@ -349,7 +362,7 @@ control_solvent_study_count_bar_plot <- solvent_summary %>%
 
 ## Figure x
 A bar plot showing the behavioural assays used to quantify soliality in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "sociality" in behaviour_measure_standardised
 sociality_data <- data %>% 
   filter(grepl("sociality", behaviour_measured_standardised, ignore.case = TRUE))
@@ -383,13 +396,15 @@ sociality_assay_effect_size_count_bar_plot <- sociality_assay_summary %>%
        x = "Total Number of Effect Sizes",
        y = "Sociality Assay")
 
+print(sociality_assay_effect_size_count_bar_plot)
+
 # ggsave(here("figures", "sociality_assay_effect_size_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "sociality_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
 ## Figure x
 A bar plot showing the behavioural assays used to quantify aggression in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "aggression" in behaviour_measure_standardised
 aggression_data <- data %>% 
   filter(grepl("aggression", behaviour_measured_standardised, ignore.case = TRUE))
@@ -423,13 +438,15 @@ aggression_assay_effect_size_count_bar_plot <- aggression_assay_summary %>%
        x = "Total Number of Effect Sizes",
        y = "Aggression Assay")
 
+print(aggression_assay_effect_size_count_bar_plot)
+
 # ggsave(here("figures", "aggression_assay_effect_size_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "aggression_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
 ## Figure x
 A bar plot showing the behavioural assays used to quantify courtship in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "courtship" in behaviour_measure_standardised
 courtship_data <- data %>% 
   filter(grepl("courtship", behaviour_measured_standardised, ignore.case = TRUE))
@@ -463,13 +480,15 @@ courtship_assay_effect_size_count_bar_plot <- courtship_assay_summary %>%
        x = "Total Number of Effect Sizes",
        y = "Courtship Assay")
 
+print(courtship_assay_effect_size_count_bar_plot)
+
 # ggsave(here("figures", "courtship_assay_effect_size_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "courtship_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
 ## Figure x
 A bar plot showing the behavioural assays used to quantify collective behaviour (i.e., behaviours measure at collective level) in the literature
-```{r}
+```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "collective behaviour" in behaviour_measure_standardised
 collective_behaviour_data <- data %>% 
   filter(grepl("collective behaviour", behaviour_measured_standardised, ignore.case = TRUE))
@@ -486,9 +505,9 @@ collective_behaviour_assay_pct <- collective_behaviour_assay_summary %>%
 
 # Create a bar plot visualizing the number of studies quantifying pesticide impacts on collective behaviour, annotated with counts and percentages.
 collective_behaviour_assay_effect_size_count_bar_plot <- collective_behaviour_assay_summary %>%
-  ggplot(aes(x = n, y = reorder(str_to_title(behavioural_assay_standardised), n))) +
+  ggplot(aes(x = n, y = reorder(str_to_sentence(behavioural_assay_standardised), n))) +
   geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[7]) +
-  geom_text(aes(label = ifelse(n < 9, "", n), x = n / 2, y = reorder(str_to_title(behavioural_assay_standardised), n)), 
+  geom_text(aes(label = ifelse(n < 9, "", n), x = n / 2, y = reorder(str_to_sentence(behavioural_assay_standardised), n)), 
             hjust = 0.5, size = 4, color = "black") +
   geom_text(data = collective_behaviour_assay_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n),
             hjust = -0.1, size = 4, color = "black", fontface = "bold") +
@@ -503,28 +522,23 @@ collective_behaviour_assay_effect_size_count_bar_plot <- collective_behaviour_as
        x = "Total Number of Effect Sizes",
        y = "Collective Behaviour Assay")
 
+print(collective_behaviour_assay_effect_size_count_bar_plot)
+
 # ggsave(here("figures", "collective_behaviour_assay_effect_size_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "collective_behaviour_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
+
+Box and violin plot illustrating the distribution of pesticide dosages used in the literature
 ```{r}
 # making dosages consistent for dosage comparisons
 data_dosage <- data %>%
   select(c(pesticide, pesticide_chemical_class,dosage, dosage_unit)) %>% 
-  
-  # Remove rows with NA values
-filter(dosage != "not reported") %>% 
-
+  filter(dosage != "not reported") %>% 
 filter(dosage_unit != "not reported") %>% 
-  
- # Exclude rows where dosage_unit is 'nm' or 'mm'
 filter(!dosage_unit %in% c("nm", "um", "nM")) %>%
-
-# Convert dosage_lowest to numeric and dosage_lowest_unit to character
   mutate(dosage = as.numeric(dosage),
          dosage_unit = as.character(dosage_unit),
-         
-         # Standardize dosage_unit_consistent based on dosage_unit
          dosage_unit_consistent = case_when(
            dosage_unit == "mg/L" ~ "ug/L", 
            dosage_unit == "ng/L" ~ "ug/L",
@@ -532,78 +546,101 @@ filter(!dosage_unit %in% c("nm", "um", "nM")) %>%
            dosage_unit == "ppb" ~ "ug/L", 
            dosage_unit == "ppm" ~ "ug/L", 
            TRUE ~ dosage_unit),
-         
-         # Convert dosage_lowest to ug/L based on dosage_lowest_unit
          dosage_convert_ugL = case_when(
            dosage_unit == "mg/L" ~ dosage * 1000,
            dosage_unit == "ng/L" ~ dosage / 1000,
            dosage_unit == "g/L" ~ dosage/1000000,
            dosage_unit == "ppm" ~ dosage*1000, 
            TRUE ~ dosage))
-         
-summary(data_dosage$dosage_convert_ugL)
-```
 
+# Summary table for the dosage converted
+summary_data_dosage <- summary(data_dosage$dosage_convert_ugL)
 
-Box and violin plot illustrating the distribution of pesticide dosages used in the literature
-```{r}
-# Summary statistics for the data
-summary(data_dosage$dosage_convert_ugL)
+# Filter the data for dosage_convert_ugL less than 5000
+filtered_data_dosage <- data_dosage %>%
+  filter(dosage_convert_ugL < 3000)
 
 # Create the violin plot
-pesticide_dosage_violin_plot <- ggplot(data_dosage, aes(y = dosage_unit_consistent, x = log(dosage_convert_ugL))) +
-  # Add a violin plot
-  geom_violin(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.4, color = NA, trim = FALSE) +
-  
-  # Add a boxplot
+pesticide_dosage_violin_plot <- ggplot(filtered_data_dosage, aes(y = dosage_unit_consistent, x = dosage_convert_ugL)) +
+    geom_violin(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.4, color = NA, trim = FALSE) +
   geom_boxplot(width = 0.1, fill = "white", color = RColorBrewer::brewer.pal(n = 8, name = "Set2")[2], outlier.shape = NA) +
-  
-  # Add jittered points
   geom_jitter(width = 0.3, height = 0.09, color = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.8) +
-
-  # Apply a consistent theme
   theme_bw() +
   theme(legend.position = "none",
         plot.title = element_text(face = "bold", hjust = 0.5),
         axis.title.x = element_blank(),
         axis.title.y = element_text(face = "bold"),
         axis.text.x = element_text(color = "black"),
-        axis.text.y = element_text(color = "black"),
+        axis.text.y = element_blank(),
         axis.ticks = element_line(color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
-  # Add axis and plot labels
-  labs(caption = "Median = 12, 1st Quantile = 1, 3rd Quantile = 500",
+  labs(caption = "Plot filtered for less than 3000 ug/L\nMedian = 12, 1st Quartile = 1, 3rd Quartile = 500",
        y = "Dosage Unit [ug/L]")
 
-# Save the plot
+print(pesticide_dosage_violin_plot)
+
 # ggsave(here("figures", "pesticide_dosage_violin_plot.pdf"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "pesticide_dosage_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-
 
 ```
 
 ```{r}
 data_duration <- data %>% 
     select(c(pesticide, pesticide_chemical_class, duration, duration_unit)) %>%
-
   filter(!is.na(duration), duration != "not reported") %>%
-  # Convert duration to numeric and duration_unit to character 
   mutate(duration = as.numeric(duration),
          duration_unit = as.character(duration_unit),
-         
-  # Standardize duration_unit_consistent based on dosage_unit 
-  duration_unit_consistent = case_when(
+           duration_unit_consistent = case_when(
           duration_unit == "minutes" ~ "hours",
           duration_unit == "days" ~ "hours",
           duration_unit == "weeks" ~ "hours",
            TRUE ~ duration_unit),
-  
-  # Convert duration to hours based on duration_unit
-  
-  duration_convert = case_when(
+ duration_convert = case_when(
     duration_unit == "minutes" ~ duration/ 60, 
     duration_unit == "days" ~ duration*24, 
     duration_unit == "weeks" ~ duration*168,
     TRUE ~ duration))
+
+summary(data_duration$duration_convert)
+
+# Create the violin plot for duration
+pesticide_duration_violin_plot <- ggplot(data_duration, aes(y = duration_unit_consistent, x = duration_convert)) +
+  geom_violin(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.4, color = NA, trim = FALSE) +
+  geom_boxplot(width = 0.1, fill = "white", color = RColorBrewer::brewer.pal(n = 8, name = "Set2")[2], outlier.shape = NA) +
+  geom_jitter(width = 0.3, height = 0.09, color = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.8) +
+  theme_bw() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face = "bold"),
+        axis.text.x = element_text(color = "black"),
+        axis.text.y = element_blank(),
+        axis.ticks = element_line(color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
+  labs(caption = "Median = 336, 1st Quartile = 96, 3rd Quartile = 960",
+       y = "Duration [hours]")
+
+print(pesticide_duration_violin_plot)
+
+# ggsave(here("figures", "pesticide_duration_violin_plot.pdf"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "pesticide_duration_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+```
+
+
+
+
+
+# Calculate effect sizes
+## Impute missing standard deviations
+We imputed the missing standard deviations using the formula provided in section 13.1 (p. 199) of the Handbook of Meta-analysis in Ecology and Evolution (Koricheva, Gurevitch, and Mengersen, 2013).
+
+To ensure consistency in treatments subjected to repeated stepwise multiple comparisons (i.e., the same data used multiple times to calculate different effect sizes), we maintained the same imputed standard deviations (or standard errors) for the repeated data.
+
+```{r}
+# Calculate the number of "not reported" values for control_sd and treatment_sd
+sum(data$control_sd == "not reported", na.rm = TRUE) # 18
+sum(data$treatment_sd == "not reported", na.rm = TRUE) # 18
+
+
 ```
 

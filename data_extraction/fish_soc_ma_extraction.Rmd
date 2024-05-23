@@ -270,7 +270,7 @@ lin_2024_fig3d_collective_behaviour_processed <- lin_2024_fig3d_collective_behav
          design_effect = 1 + (mean_n - 1) * 0.5,
          n_effective = n_fish / design_effect)
 
-# write.csv(lin_2024_fig3d_collective_behaviour_raw, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3d_collective_behaviour_processed.csv"), row.names = FALSE)
+# write.csv(lin_2024_fig3d_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "lin_2024_fig3d_collective_behaviour_processed.csv"), row.names = FALSE)
 
 ```
 
@@ -358,7 +358,7 @@ schmidel_2014_collective_behaviour_processed <- schmidel_2014_collective_behavio
          sd_shoal = se * sqrt(n_shoal),
          sd_fish = se * sqrt(n_fish))
 
-# write.csv(schmidel_2014_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "schmidel_2014_collective_behaviour_raw.csv"), row.names = FALSE)
+# write.csv(schmidel_2014_collective_behaviour_processed, file.path(here("data_extraction", "data_extraction_figures"), "schmidel_2014_collective_behaviour_processed.csv"), row.names = FALSE)
 ```
 
 # **Tamagno et al., 2023**
