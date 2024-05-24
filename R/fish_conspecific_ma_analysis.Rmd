@@ -36,7 +36,9 @@ pacman::p_load(tidyverse,
                here,
                kableExtra,
                magrittr, 
-               patchwork)
+               patchwork,
+               metafor,
+               metagear)
 
 ```
 
@@ -626,21 +628,212 @@ print(pesticide_duration_violin_plot)
 # ggsave(here("figures", "pesticide_duration_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-
-
-
-
-# Calculate effect sizes
+# **Calculate effect sizes and sampling variances**
 ## Impute missing standard deviations
 We imputed the missing standard deviations using the formula provided in section 13.1 (p. 199) of the Handbook of Meta-analysis in Ecology and Evolution (Koricheva, Gurevitch, and Mengersen, 2013).
 
 To ensure consistency in treatments subjected to repeated stepwise multiple comparisons (i.e., the same data used multiple times to calculate different effect sizes), we maintained the same imputed standard deviations (or standard errors) for the repeated data.
 
+### Find SD/Mean ratio
+A bar plot showing the SD/Mean ratio of the control and treatment groups in each primary study
 ```{r}
-# Calculate the number of "not reported" values for control_sd and treatment_sd
-sum(data$control_sd == "not reported", na.rm = TRUE) # 18
-sum(data$treatment_sd == "not reported", na.rm = TRUE) # 18
+sd_mean_ratio_bar_plot <- data %>%
+  mutate(
+    control_sd = as.numeric(control_sd),
+    treatment_sd = as.numeric(treatment_sd)
+  ) %>%
+  group_by(study_id) %>%
+  mutate(
+    within_study_control_mean = mean(control_mean, na.rm = TRUE),
+    within_study_treatment_mean = mean(treatment_mean, na.rm = TRUE),
+    within_study_control_sd = mean(control_sd, na.rm = TRUE),
+    within_study_treatment_sd = mean(treatment_sd, na.rm = TRUE),
+    sd_mean_ratio_control = within_study_control_sd / within_study_control_mean,
+    sd_mean_ratio_treatment = within_study_treatment_sd / within_study_treatment_mean
+  ) %>% 
+  ggplot() + 
+  geom_histogram(aes(x = sd_mean_ratio_control), fill = "blue", alpha = 0.4) + 
+  geom_histogram(aes(x = sd_mean_ratio_treatment), fill = "red", alpha = 0.4) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_bw() +
+  guides(size = "none") +
+  theme(
+    legend.position = "none",
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(face = "bold", color = "black"),
+    plot.caption = element_text(size = 10, color = "gray10", face = "italic")
+  ) +
+  labs(
+    caption = "Red = Control, Blue = Treatment, Purple = Both\nThe value in each bar is the total number of effect sizes",
+    x = "SD/Mean Ratio",
+    y = "Frequency"
+  )
 
+print(sd_mean_ratio_bar_plot)
+
+```
+
+## Plot imputed standard deviations
+```{r}
+# Indicate which individuals are used in more than one control or treatment to calculate sampling variances of non-independent observations differently. 
+data_shared_indiv <- group_by(data, exp_id ) %>% 
+  summarise(number_treatment= n())
+data_sd <- left_join(data, data_shared_indiv, by = "exp_id")
+
+
+# Calculate the within and between study impacts of pesticides on fish social behaviour
+data_sd <- data_sd %>% 
+  group_by(study_id) %>% 
+  mutate(
+    control_sd = as.numeric(control_sd),
+    treatment_sd = as.numeric(treatment_sd)) %>%
+  group_by(study_id) %>%
+  mutate(
+    within_study_control_mean = mean(control_mean, na.rm = TRUE),
+    within_study_treatment_mean = mean(treatment_mean, na.rm = TRUE),
+    within_study_control_sd = mean(control_sd, na.rm = TRUE),
+    within_study_treatment_sd = mean(treatment_sd, na.rm = TRUE),
+    sd_mean_ratio_control = within_study_control_sd / within_study_control_mean,
+    sd_mean_ratio_treatment = within_study_treatment_sd / within_study_treatment_mean) %>% 
+  ungroup() %>% 
+  mutate(between_study_control_mean=mean(within_study_control_mean, na.rm=T),  
+         between_study_treatment_mean=mean(within_study_treatment_mean, na.rm=T),
+         between_study_control_sd=mean(within_study_control_sd, na.rm=T), 
+         between_study_treatment_sd=mean(within_study_treatment_sd, na.rm=T)) 
+
+data_sd %>% select(control_sd, treatment_sd) %>% impute_missingness() # Missing SD == 3.9%, 36 imputations needed 
+
+dat_impSD <- as.data.frame(data_sd) # convert into dataframe
+dat_impSD <- impute_SD(dat_impSD, 
+                       columnSDnames = c("control_sd", "treatment_sd"), 
+                       columnXnames = c("control_mean", "treatment_mean"), 
+                       method = "Bracken1992")
+
+
+# label missing location
+dat_impSD$control_sd_report <- ifelse(is.na(data_sd$control_sd),"Yes","No")
+dat_impSD$treatment_sd_report <- ifelse(is.na(data_sd$treatment_sd),"Yes","No")
+
+# Convert sd columns to log10 and create a combined dataframe for plotting
+dat_impSD_long <- dat_impSD %>%
+  mutate(log_control_sd = log10(control_sd),
+         log_treatment_sd = log10(treatment_sd)) %>%
+  pivot_longer(cols = c(log_control_sd, log_treatment_sd), 
+               names_to = "type", 
+               values_to = "log_sd") %>%
+  mutate(reported = ifelse(type == "log_control_sd", control_sd_report, treatment_sd_report))
+
+# Create the plot
+imputed_sd_plot <- ggplot(dat_impSD_long, aes(x = factor(study_id), y = log_sd, color = reported)) +
+  geom_point(size = 2, alpha = 0.5) +
+  scale_color_manual(values = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[c(1, 2)]) +
+  theme_bw() +
+  theme(
+    legend.position = "none", 
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(face = "bold", color = "black"),
+    plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5) 
+  ) +
+  labs(
+    caption = "Points with 'red' indicate missing standard deviations that were imputed",
+    x = "Study ID",
+    y = "Log10(SD Value)",
+    color = "Reported"
+  )
+
+# Print the plot
+print(imputed_sd_plot)
+```
+
+
+## Calculate effect size estimates (lnRR & lnCVR)
+```{r}
+# Filter data for NA's
+data <- data %>%
+  filter(!is.na(treatment_mean) & !is.na(treatment_sd) & !is.na(treatment_n) &
+         !is.na(control_mean) & !is.na(control_sd) & !is.na(control_n))
+
+# Make sure all data is numeric 
+data <- data %>%
+  mutate(
+    treatment_mean = as.numeric(treatment_mean),
+    treatment_sd = as.numeric(treatment_sd),
+    treatment_n = as.numeric(treatment_n),
+    control_mean = as.numeric(control_mean),
+    control_sd = as.numeric(control_sd),
+    control_n = as.numeric(control_n)
+  )
+
+# Calculate log response ratio (lnRR)
+lnRR <- escalc(measure = "ROM", 
+               m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
+               m2i = control_mean, sd2i = control_sd, n2i = control_n, 
+               data = data)
+
+# Calculate log coefficient variation ratio (lnCVR)
+lnCVR <- escalc(measure = "CVR", 
+               m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
+               m2i = control_mean, sd2i = control_sd, n2i = control_n, 
+               data = data)
+
+# Calculate the standardised mean difference for sensitivity analysis
+SMD <- escalc(measure = "SMD", 
+               m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
+               m2i = control_mean, sd2i = control_sd, n2i = control_n, 
+               data = data)
+
+# Calculate the standardised mean difference with heteroscedacity for sensitivity analysis
+SMDH <- escalc(measure = "SMDH", 
+               m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
+               m2i = control_mean, sd2i = control_sd, n2i = control_n, 
+               data = data)
+
+# Calculate log variation ratio (lnVR)
+lnVR <- escalc(measure = "VR", 
+               m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
+               m2i = control_mean, sd2i = control_sd, n2i = control_n, 
+               data = data)
+
+# Summary statistics of effect size estimates
+effect_size_summaries <- list(
+  lnRR = summary(lnRR$vi),
+  lnCVR = summary(lnCVR$vi),
+  SMD = summary(SMD$vi),
+  SMDH = summary(SMDH$vi),
+  VR = summary(lnVR$vi)
+)
+
+# Summary statistics of sampling variances
+sampling_variance_summaries <- list(
+  lnRR = summary(lnRR$yi),
+  lnCVR = summary(lnCVR$yi),
+  SMD = summary(SMD$yi),
+  SMDH = summary(SMDH$yi),
+  VR = summary(lnVR$yi)
+
+)
+
+# Calculate precision for each effect size estimate
+lnRR$precision <- 1 / sqrt(lnRR$yi)
+lnCVR$precision <- 1 / sqrt(lnCVR$yi)
+SMD$precision <- 1 / sqrt(SMD$yi)
+SMDH$precision <- 1 / sqrt(SMDH$yi)
+lnVR$precision <- 1/ sqrt(lnVR$yi)
+
+# Merge each of the effect size stim
+effect_size_metrics_set <- data.frame(lnRR = lnRR$yi, lnRRv = lnRR$vi, lnVR = lnVR$yi, lnVRv = lnVR$vi, lnCVR = lnCVR$yi, lnCVRv = lnCVR$vi, SMD = SMD$yi, SMDv = SMD$vi, SMDH = SMDH$yi, SMDHv = SMDH$vi)
+
+data <- cbind(data, effect_size_metrics_set) # bind_cols()
+
+# s
+effect_size_metrics_set_kable <- data[,which(colnames(data) %in% c("study_id", "species_english", "pesticide", "lnRR", "lnRRV", "lnVR", "lnVRV", "lnCVR", "lnCVRV", "SMD", "SMDV", "SMDHV"))] %>% dfround(digits = 3)
+
+# Table of the effect sizes
+ kable(effect_size_metrics_set_kable, "html") %>%
+    kable_styling("bordered", position = "left") %>%
+    scroll_box(width = "250%", height = "800px")
 
 ```
 
