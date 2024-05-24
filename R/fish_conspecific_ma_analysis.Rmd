@@ -628,8 +628,8 @@ print(pesticide_duration_violin_plot)
 # ggsave(here("figures", "pesticide_duration_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-# **Calculate effect sizes and sampling variances**
-## Impute missing standard deviations
+
+# **Impute missing standard deviations**
 We imputed the missing standard deviations using the formula provided in section 13.1 (p. 199) of the Handbook of Meta-analysis in Ecology and Evolution (Koricheva, Gurevitch, and Mengersen, 2013).
 
 To ensure consistency in treatments subjected to repeated stepwise multiple comparisons (i.e., the same data used multiple times to calculate different effect sizes), we maintained the same imputed standard deviations (or standard errors) for the repeated data.
@@ -674,7 +674,7 @@ print(sd_mean_ratio_bar_plot)
 
 ```
 
-## Plot imputed standard deviations
+## Plot and imputed missing standard deviations
 ```{r}
 # Indicate which individuals are used in more than one control or treatment to calculate sampling variances of non-independent observations differently. 
 data_shared_indiv <- group_by(data, exp_id ) %>% 
@@ -747,16 +747,10 @@ imputed_sd_plot <- ggplot(dat_impSD_long, aes(x = factor(study_id), y = log_sd, 
 print(imputed_sd_plot)
 ```
 
-
-## Calculate effect size estimates (lnRR & lnCVR)
+# **Calculate effect sizes and sampling variances**
 ```{r}
-# Filter data for NA's
-data <- data %>%
-  filter(!is.na(treatment_mean) & !is.na(treatment_sd) & !is.na(treatment_n) &
-         !is.na(control_mean) & !is.na(control_sd) & !is.na(control_n))
-
 # Make sure all data is numeric 
-data <- data %>%
+data <- dat_impSD %>%
   mutate(
     treatment_mean = as.numeric(treatment_mean),
     treatment_sd = as.numeric(treatment_sd),
@@ -772,7 +766,7 @@ lnRR <- escalc(measure = "ROM",
                m2i = control_mean, sd2i = control_sd, n2i = control_n, 
                data = data)
 
-# Calculate log coefficient variation ratio (lnCVR)
+# Calculate log coeffidata# Calculate log coefficient variation ratio (lnCVR)
 lnCVR <- escalc(measure = "CVR", 
                m1i = treatment_mean, sd1i = treatment_sd, n1i = treatment_n, 
                m2i = control_mean, sd2i = control_sd, n2i = control_n, 
@@ -798,6 +792,15 @@ lnVR <- escalc(measure = "VR",
 
 # Summary statistics of effect size estimates
 effect_size_summaries <- list(
+  lnRR = summary(lnRR$yi),
+  lnCVR = summary(lnCVR$yi),
+  SMD = summary(SMD$yi),
+  SMDH = summary(SMDH$yi),
+  VR = summary(lnVR$yi)
+)
+
+# Summary statistics of sampling variances
+sampling_variance_summaries <- list(
   lnRR = summary(lnRR$vi),
   lnCVR = summary(lnCVR$vi),
   SMD = summary(SMD$vi),
@@ -805,30 +808,35 @@ effect_size_summaries <- list(
   VR = summary(lnVR$vi)
 )
 
-# Summary statistics of sampling variances
-sampling_variance_summaries <- list(
-  lnRR = summary(lnRR$yi),
-  lnCVR = summary(lnCVR$yi),
-  SMD = summary(SMD$yi),
-  SMDH = summary(SMDH$yi),
-  VR = summary(lnVR$yi)
+# Calculate precision for each effect size estimate with checks
+lnRR$precision <- ifelse(lnRR$vi > 0, 1 / sqrt(lnRR$vi), NA)
+lnCVR$precision <- ifelse(lnCVR$vi > 0, 1 / sqrt(lnCVR$vi), NA)
+SMD$precision <- ifelse(SMD$vi > 0, 1 / sqrt(SMD$vi), NA)
+SMDH$precision <- ifelse(SMDH$vi > 0, 1 / sqrt(SMDH$vi), NA)
+lnVR$precision <- ifelse(lnVR$vi > 0, 1 / sqrt(lnVR$vi), NA)
 
-)
+# Merge each of the effect size with precision
+effect_size_metrics_set <- data.frame(
+  lnRR = lnRR$yi, lnRRv = lnRR$vi, lnRR_precision = lnRR$precision,
+  lnVR = lnVR$yi, lnVRv = lnVR$vi, lnVR_precision = lnVR$precision,
+  lnCVR = lnCVR$yi, lnCVRv = lnCVR$vi, lnCVR_precision = lnCVR$precision,
+  SMD = SMD$yi, SMDv = SMD$vi, SMD_precision = SMD$precision,
+  SMDH = SMDH$yi, SMDHv = SMDH$vi, SMDH_precision = SMDH$precision, control_imputed = dat_impSD$control_sd_report, treatment_imputed = dat_impSD$treatment_sd_report)
 
-# Calculate precision for each effect size estimate
-lnRR$precision <- 1 / sqrt(lnRR$yi)
-lnCVR$precision <- 1 / sqrt(lnCVR$yi)
-SMD$precision <- 1 / sqrt(SMD$yi)
-SMDH$precision <- 1 / sqrt(SMDH$yi)
-lnVR$precision <- 1/ sqrt(lnVR$yi)
+ # Bind the effect size metrics set to the main data
+data <- cbind(data, effect_size_metrics_set)
 
-# Merge each of the effect size stim
-effect_size_metrics_set <- data.frame(lnRR = lnRR$yi, lnRRv = lnRR$vi, lnVR = lnVR$yi, lnVRv = lnVR$vi, lnCVR = lnCVR$yi, lnCVRv = lnCVR$vi, SMD = SMD$yi, SMDv = SMD$vi, SMDH = SMDH$yi, SMDHv = SMDH$vi)
+# Select specific columns including the new precision columns
+effect_size_metrics_set_kable <- data[, which(colnames(data) %in% c(
+  "study_id", "exp_id", "assay_id", "species_english", "pesticide",
+  "lnRR", "lnRRv", "lnRR_precision", 
+  "lnCVR", "lnCVRv", "lnCVR_precision", 
+  "lnVR", "lnVRv", "lnVR_precision", 
+  "SMD", "SMDv", "SMD_precision", 
+  "SMDH", "SMDHv", "SMDH_precision",
+  "control_imputed", "treatment_imputed"
+))] %>% dfround(digits = 3)
 
-data <- cbind(data, effect_size_metrics_set) # bind_cols()
-
-# s
-effect_size_metrics_set_kable <- data[,which(colnames(data) %in% c("study_id", "species_english", "pesticide", "lnRR", "lnRRV", "lnVR", "lnVRV", "lnCVR", "lnCVRV", "SMD", "SMDV", "SMDHV"))] %>% dfround(digits = 3)
 
 # Table of the effect sizes
  kable(effect_size_metrics_set_kable, "html") %>%
