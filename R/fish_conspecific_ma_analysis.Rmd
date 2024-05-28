@@ -69,7 +69,7 @@ kable(summary(data), "html") %>%
 
 # **Data exploration and reporting of methodological items**
 ## Main text Figure 1
-b) A bubble plot showing the number of effect sizes of each pesticide class per conspecific behaviour described
+b) A bubble plot showing the number of effect sizes of each pesticide class per conspecific interaction behaviour described
 c) A bar chart showing the total number of effect sizes per species
 ```{r,fig.width=8, fig.height=13}
 # Summarize data by grouping on pesticide chemical class and behavior measured, then count entries.
@@ -77,14 +77,14 @@ pc_cb_summary <- data %>%
   group_by(pesticide_chemical_class, behaviour_measured_standardised) %>% 
   summarise(n = n(), .groups = "drop")
 
-# Determine the top 8 pesticide classes based on the number of records.
+# Determine the top 9 pesticide classes based on the number of records.
 top_pesticide_class <- pc_cb_summary %>%
   group_by(pesticide_chemical_class) %>%
   summarise(total_count = sum(n)) %>%
   top_n(9, total_count) %>%
   pull(pesticide_chemical_class)
 
-# Adjust category names to 'Other' for all but the top pesticide classes, then re-summarize.
+# Adjust category names to 'Other pesticide classes' for those pesticide classes not in the top 9
 pc_cb_summary_filtered <- pc_cb_summary %>%
   mutate(pesticide_chemical_class = ifelse(pesticide_chemical_class %in% top_pesticide_class,
                                            pesticide_chemical_class,
@@ -92,7 +92,7 @@ pc_cb_summary_filtered <- pc_cb_summary %>%
   group_by(pesticide_chemical_class, behaviour_measured_standardised) %>%
   summarise(n = sum(n), .groups = "drop")
 
-# Create a bubble plot showing standardized behavior vs. pesticide class, sized by count.
+# Create the bubble plot
 behaviour_pesticide_class_bubble_plot <- pc_cb_summary_filtered %>%
    ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
              y = fct_reorder(str_to_title(pesticide_chemical_class), n, .fun = 'sum'),
@@ -121,7 +121,7 @@ species_pct <- sp_summary %>%
   mutate(proportion = n / sum(n), 
          percentage = proportion * 100)
 
-# Create a bar plot for species, labeling bars with count and percentage of total.
+# Create the bar plot
 species_effect_size_count_bar_plot <- sp_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_title(species_english), n))) + 
   geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[2]) +
@@ -148,7 +148,8 @@ print(main_text_figure_1)
 # ggsave(here("figures", "main_text_figure_1.jpg"), width = 8, height = 13, units = "cm", scale = 2, dpi = 800)
 ```
 
-
+# Supplementary figure xx
+A bubble plot showing the number of effect sizes of each pesticide per conspecific interaction behaviour described
 ```{r,fig.width=8, fig.height=8}
 # Group data by species, count entries, and drop groups post-summary.
 p_cb_summary <- data %>%
@@ -165,7 +166,7 @@ top_pesticides <- p_cb_summary %>%
   top_n(20, total_count) %>%
   pull(pesticide)
 
-# Adjust category names to 'Other' for all but the top pesticide classes, then re-summarize.
+# Adjust category names to 'Other Pesticides' for all but the top pesticide, then re-summarize.
 # p_cb_summary_filtered <- p_cb_summary %>%
 # mutate(pesticide = ifelse(pesticide %in% top_pesticides,
 #                                          pesticide,
@@ -173,6 +174,8 @@ top_pesticides <- p_cb_summary %>%
 #  group_by(pesticide, behaviour_measured_standardised) %>%
 #  summarise(n = sum(n), .groups = "drop")
 
+
+# Create the bubble plot for the behaviours assessed per pesticide (effect size as count)
 behaviour_pesticide_bubble_plot <- p_cb_summary %>% # can add _filtered if needed
    ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
              y = fct_reorder(str_to_title(pesticide), n, .fun = 'sum'),
@@ -222,6 +225,7 @@ top_species <- species_summary %>%
 #   group_by(species_english, behaviour_measured_standardised) %>%
 #   summarise(n = sum(n), .groups = "drop")
 
+# Create the bubble plot the behaviours assessed per species (number of effect size as count)
 behaviour_species_bubble_plot <- species_summary %>% # can add _filtered if needed
   ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
              y = fct_reorder(str_to_title(species_english), n, .fun = 'sum'),
@@ -233,7 +237,8 @@ behaviour_species_bubble_plot <- species_summary %>% # can add _filtered if need
 theme(legend.position = "none",
         axis.text = element_text(color = "black"),
         axis.title = element_text(face = "bold", color = "black"),
-        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +  geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) + 
+  geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
   labs(caption = "The value in each cell is the number of effect sizes",
        x = "Behaviour Measured",
        y = "Species") +
@@ -245,7 +250,7 @@ print(behaviour_species_bubble_plot)
 # ggsave(here("figures", "behaviour_species_bubble_plot.jpg"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x
+## Supplementary figure x
 A bar chart showing the reporting of the source of fish used in the literature
 ```{r,fig.width=10, fig.height=5}
 # Extracts unique records from the dataset based on 'study_id', retaining all other associated data.
@@ -262,7 +267,7 @@ source_pct <- source_summary %>%
   mutate(proportion = n / sum(n),  # number of studies
          percentage = proportion * 100)
 
-# Creates a bar plot representing the number of studies per source of fish, annotated with study counts and percentages.
+# Create the bar plot for the source of fish study count
 fish_source_study_count_bar_plot <- source_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_title(source), n))) + 
   geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[1]) +
@@ -323,7 +328,7 @@ print(fish_sex_study_count_bar_plot)
 # ggsave(here("figures", "fish_sex_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x 
+## Supplementary Figure x 
 A bar plot showing the control solvents used in the literature
 ```{r,fig.width=10, fig.height=5}
 # Group data by 'control solvent' and count entries, then drop the group structure for further analysis.
@@ -335,7 +340,6 @@ solvent_summary <- data_study %>%
 solvent_pct <- solvent_summary %>% 
   mutate(proportion = n / sum(n), 
          percentage = proportion * 100)
-
 
 # Create a bar plot visualizing the number of studies per control solvent, annotated with counts and percentages.
 control_solvent_study_count_bar_plot <- solvent_summary %>%
@@ -362,7 +366,7 @@ print(control_solvent_study_count_bar_plot)
 # ggsave(here("figures", "control_solvent_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x
+## Supplementary Figure x
 A bar plot showing the behavioural assays used to quantify soliality in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "sociality" in behaviour_measure_standardised
@@ -404,7 +408,7 @@ print(sociality_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "sociality_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x
+## Supplementary Figure x
 A bar plot showing the behavioural assays used to quantify aggression in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "aggression" in behaviour_measure_standardised
@@ -446,7 +450,7 @@ print(aggression_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "aggression_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x
+## Supplementary Figure x
 A bar plot showing the behavioural assays used to quantify courtship in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "courtship" in behaviour_measure_standardised
@@ -488,7 +492,7 @@ print(courtship_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "courtship_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## Figure x
+## Supplementary Figure x
 A bar plot showing the behavioural assays used to quantify collective behaviour (i.e., behaviours measure at collective level) in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "collective behaviour" in behaviour_measure_standardised
@@ -530,8 +534,8 @@ print(collective_behaviour_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "collective_behaviour_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-
-Box and violin plot illustrating the distribution of pesticide dosages used in the literature
+# Supplentmentary Figure x
+A box and violin plot showing the distribution of pesticide dosages used in the literature
 ```{r}
 # making dosages consistent for dosage comparisons
 data_dosage <- data %>%
@@ -583,9 +587,11 @@ print(pesticide_dosage_violin_plot)
 
 # ggsave(here("figures", "pesticide_dosage_violin_plot.pdf"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 # ggsave(here("figures", "pesticide_dosage_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-
 ```
 
+
+# Supplementary Figure x
+A box and violin plot the distribution of durations of pesticide exposure 
 ```{r}
 data_duration <- data %>% 
     select(c(pesticide, pesticide_chemical_class, duration, duration_unit)) %>%
@@ -629,7 +635,7 @@ print(pesticide_duration_violin_plot)
 ```
 
 
-# **Impute missing standard deviations**
+# **Impute missing standard deviations and calculate effect size estimates**
 We imputed the missing standard deviations using the formula provided in section 13.1 (p. 199) of the Handbook of Meta-analysis in Ecology and Evolution (Koricheva, Gurevitch, and Mengersen, 2013).
 
 To ensure consistency in treatments subjected to repeated stepwise multiple comparisons (i.e., the same data used multiple times to calculate different effect sizes), we maintained the same imputed standard deviations (or standard errors) for the repeated data.
@@ -747,7 +753,7 @@ imputed_sd_plot <- ggplot(dat_impSD_long, aes(x = factor(study_id), y = log_sd, 
 print(imputed_sd_plot)
 ```
 
-# **Calculate effect sizes and sampling variances**
+## **Calculate effect sizes and sampling variances**
 ```{r}
 # Make sure all data is numeric 
 data <- dat_impSD %>%
