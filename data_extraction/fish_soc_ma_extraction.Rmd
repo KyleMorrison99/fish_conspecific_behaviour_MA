@@ -32,7 +32,7 @@ write.csv(metaD,file="fish_soc_ma_shinydigitise.csv")
 
 # **Calculate median shoal size for each species** 
 ```{r}
-dataset_collective_behaviour <- read_csv(here("data", "fish_conspecific_behaviour_ma_data.csv"))
+dataset_collective_behaviour <- read_csv(here("data", "fish_conspecific_behaviour_ma_data_pre_check.csv"))
 
 dataset_collective_behaviour <- dataset_collective_behaviour %>% 
   filter(behaviour_measured_standardised == "collective behaviour") %>% 
@@ -142,9 +142,6 @@ hawkey_2020_collective_behaviour_processed <- hawkey_2020_collective_behaviour_r
 
 ```
 
-
-# **Hawkey et al., 2021**
-DOI: 10.1016/j.ntt.2021.106985
 Collective behaviour figures
 ```{r}
 hawkey_2021_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hawkey_2021_collective_behaviour_raw.csv"))
@@ -160,11 +157,320 @@ hawkey_2021_collective_behaviour_processed <- hawkey_2021_collective_behaviour_r
 
 ```
 
-
 # **Hussian et al., 2020**
 DOI:10.3390/ijerph17134632
+Figure 6a extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig6a <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig6a_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig6a_mean <- tapply(hussian_2020_fig6a$value, hussian_2020_fig6a$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig6a_sd <- tapply(hussian_2020_fig6a$value, hussian_2020_fig6a$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig6a_se <- tapply(hussian_2020_fig6a$value, hussian_2020_fig6a$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig6a_sample_size <- tapply(hussian_2020_fig6a$value, hussian_2020_fig6a$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig6a_processed <- data.frame(Group= names(hussian_2020_fig6a_mean),
+                                           Mean = hussian_2020_fig6a_mean,
+                                           SD = hussian_2020_fig6a_sd,
+                                           SE = hussian_2020_fig6a_se,
+                                           Sample = hussian_2020_fig6a_sample_size)
+
+# write.csv(hussian_2020_fig6a_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig6a_processed.csv"), row.names = FALSE)
+
+
+```
+
+Figure 6f extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig6f <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig6f_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig6f_mean <- tapply(hussian_2020_fig6f$value, hussian_2020_fig6f$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig6f_sd <- tapply(hussian_2020_fig6f$value, hussian_2020_fig6f$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig6f_se <- tapply(hussian_2020_fig6f$value, hussian_2020_fig6f$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig6f_sample_size <- tapply(hussian_2020_fig6f$value, hussian_2020_fig6f$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig6f_processed <- data.frame(Group= names(hussian_2020_fig6f_mean),
+                                           Mean = hussian_2020_fig6f_mean,
+                                           SD = hussian_2020_fig6f_sd,
+                                           SE = hussian_2020_fig6f_se,
+                                           Sample = hussian_2020_fig6f_sample_size)
+
+# write.csv(hussian_2020_fig6f_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig6f_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 8a extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig8a <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig8a_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig8a_mean <- tapply(hussian_2020_fig8a$value, hussian_2020_fig8a$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig8a_sd <- tapply(hussian_2020_fig8a$value, hussian_2020_fig8a$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig8a_se <- tapply(hussian_2020_fig8a$value, hussian_2020_fig8a$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig8a_sample_size <- tapply(hussian_2020_fig8a$value, hussian_2020_fig8a$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig8a_processed <- data.frame(Group= names(hussian_2020_fig8a_mean),
+                                           Mean = hussian_2020_fig8a_mean,
+                                           SD = hussian_2020_fig8a_sd,
+                                           SE = hussian_2020_fig8a_se,
+                                           Sample = hussian_2020_fig8a_sample_size)
+
+# write.csv(hussian_2020_fig8a_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig8a_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 8b extraction
+```{r}
+# Load the CSV file and remove the unnecessary column
+hussian_2020_fig8b <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig8b_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig8b_mean <- tapply(hussian_2020_fig8b$value, hussian_2020_fig8b$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig8b_sd <- tapply(hussian_2020_fig8b$value, hussian_2020_fig8b$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig8b_se <- tapply(hussian_2020_fig8b$value, hussian_2020_fig8b$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig8b_sample_size <- tapply(hussian_2020_fig8b$value, hussian_2020_fig8b$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig8b_processed <- data.frame(Group= names(hussian_2020_fig8b_mean),
+                                           Mean = hussian_2020_fig8b_mean,
+                                           SD = hussian_2020_fig8b_sd,
+                                           SE = hussian_2020_fig8b_se,
+                                           Sample = hussian_2020_fig8b_sample_size)
+
+# write.csv(hussian_2020_fig8b_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig8b_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 8c extraction
+```{r}
+# Load the CSV file and remove the unnecessary column
+hussian_2020_fig8c <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig8c_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig8c_mean <- tapply(hussian_2020_fig8c$value, hussian_2020_fig8c$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig8c_sd <- tapply(hussian_2020_fig8c$value, hussian_2020_fig8c$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig8c_se <- tapply(hussian_2020_fig8c$value, hussian_2020_fig8c$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig8c_sample_size <- tapply(hussian_2020_fig8c$value, hussian_2020_fig8c$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig8c_processed <- data.frame(Group= names(hussian_2020_fig8c_mean),
+                                           Mean = hussian_2020_fig8c_mean,
+                                           SD = hussian_2020_fig8c_sd,
+                                           SE = hussian_2020_fig8c_se,
+                                           Sample = hussian_2020_fig8c_sample_size)
+
+# write.csv(hussian_2020_fig8c_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig8c_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9a extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9a <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9a_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9a_mean <- tapply(hussian_2020_fig9a$value, hussian_2020_fig9a$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9a_sd <- tapply(hussian_2020_fig9a$value, hussian_2020_fig9a$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9a_se <- tapply(hussian_2020_fig9a$value, hussian_2020_fig9a$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9a_sample_size <- tapply(hussian_2020_fig9a$value, hussian_2020_fig9a$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9a_processed <- data.frame(Group= names(hussian_2020_fig9a_mean),
+                                           Mean = hussian_2020_fig9a_mean,
+                                           SD = hussian_2020_fig9a_sd,
+                                           SE = hussian_2020_fig9a_se,
+                                           Sample = hussian_2020_fig9a_sample_size)
+
+# write.csv(hussian_2020_fig9a_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9a_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9b extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9b <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9b_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9b_mean <- tapply(hussian_2020_fig9b$value, hussian_2020_fig9b$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9b_sd <- tapply(hussian_2020_fig9b$value, hussian_2020_fig9b$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9b_se <- tapply(hussian_2020_fig9b$value, hussian_2020_fig9b$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9b_sample_size <- tapply(hussian_2020_fig9b$value, hussian_2020_fig9b$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9b_processed <- data.frame(Group= names(hussian_2020_fig9b_mean),
+                                           Mean = hussian_2020_fig9b_mean,
+                                           SD = hussian_2020_fig9b_sd,
+                                           SE = hussian_2020_fig9b_se,
+                                           Sample = hussian_2020_fig9b_sample_size)
+
+# write.csv(hussian_2020_fig9b_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9b_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9c extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9c <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9c_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9c_mean <- tapply(hussian_2020_fig9c$value, hussian_2020_fig9c$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9c_sd <- tapply(hussian_2020_fig9c$value, hussian_2020_fig9c$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9c_se <- tapply(hussian_2020_fig9c$value, hussian_2020_fig9c$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9c_sample_size <- tapply(hussian_2020_fig9c$value, hussian_2020_fig9c$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9c_processed <- data.frame(Group= names(hussian_2020_fig9c_mean),
+                                           Mean = hussian_2020_fig9c_mean,
+                                           SD = hussian_2020_fig9c_sd,
+                                           SE = hussian_2020_fig9c_se,
+                                           Sample = hussian_2020_fig9c_sample_size)
+
+# write.csv(hussian_2020_fig9c_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9c_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9d extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9d <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9d_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9d_mean <- tapply(hussian_2020_fig9d$value, hussian_2020_fig9d$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9d_sd <- tapply(hussian_2020_fig9d$value, hussian_2020_fig9d$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9d_se <- tapply(hussian_2020_fig9d$value, hussian_2020_fig9d$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9d_sample_size <- tapply(hussian_2020_fig9d$value, hussian_2020_fig9d$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9d_processed <- data.frame(Group= names(hussian_2020_fig9d_mean),
+                                           Mean = hussian_2020_fig9d_mean,
+                                           SD = hussian_2020_fig9d_sd,
+                                           SE = hussian_2020_fig9d_se,
+                                           Sample = hussian_2020_fig9d_sample_size)
+
+# write.csv(hussian_2020_fig9d_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9d_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9e extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9e <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9e_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9e_mean <- tapply(hussian_2020_fig9e$value, hussian_2020_fig9e$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9e_sd <- tapply(hussian_2020_fig9e$value, hussian_2020_fig9e$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9e_se <- tapply(hussian_2020_fig9e$value, hussian_2020_fig9e$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9e_sample_size <- tapply(hussian_2020_fig9e$value, hussian_2020_fig9e$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9e_processed <- data.frame(Group= names(hussian_2020_fig9e_mean),
+                                           Mean = hussian_2020_fig9e_mean,
+                                           SD = hussian_2020_fig9e_sd,
+                                           SE = hussian_2020_fig9e_se,
+                                           Sample = hussian_2020_fig9e_sample_size)
+
+# write.csv(hussian_2020_fig9e_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9e_processed.csv"), row.names = FALSE)
+
+```
+
+Figure 9f extraction
+```{r}
+# Load the CSV file
+hussian_2020_fig9f <- read_csv(here("data_extraction", "data_extraction_figures", "hussian_2020_fig9f_raw.csv"))
+
+# Calculate mean for each variable in Group
+hussian_2020_fig9f_mean <- tapply(hussian_2020_fig9f$value, hussian_2020_fig9f$group, mean, na.rm = TRUE)
+
+# Calculate standard deviation for each variable in Group
+hussian_2020_fig9f_sd <- tapply(hussian_2020_fig9f$value, hussian_2020_fig9f$group, sd, na.rm = TRUE)
+
+# Calculate standard error for each variable in group
+hussian_2020_fig9f_se <- tapply(hussian_2020_fig9f$value, hussian_2020_fig9f$group, function(x) sd(x) / sqrt(length(x)))
+
+hussian_2020_fig9f_sample_size <- tapply(hussian_2020_fig9f$value, hussian_2020_fig9f$group, length)
+
+# Combine the results into a data frame
+hussian_2020_fig9f_processed <- data.frame(Group= names(hussian_2020_fig9f_mean),
+                                           Mean = hussian_2020_fig9f_mean,
+                                           SD = hussian_2020_fig9f_sd,
+                                           SE = hussian_2020_fig9f_se,
+                                           Sample = hussian_2020_fig9f_sample_size)
+
+# write.csv(hussian_2020_fig9f_processed, file.path(here("data_extraction", "data_extraction_figures"), "hussian_2020_fig9f_processed.csv"), row.names = FALSE)
+
+```
+
+
+
+
+
 Collective behaviour figures
 ```{r}
+hussian
+
+
+
+
+
+
+
 hussian_2020_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hussian_2020_collective_behaviour_raw.csv"))
 
 hussian_2020_collective_behaviour_processed <- hussian_2020_collective_behaviour_raw %>% 
