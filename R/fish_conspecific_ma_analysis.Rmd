@@ -38,7 +38,10 @@ pacman::p_load(tidyverse,
                magrittr, 
                patchwork,
                metafor,
-               metagear)
+               metagear,
+               ape,
+               rotl,
+               orchaRd)
 
 ```
 
@@ -590,7 +593,7 @@ print(pesticide_dosage_violin_plot)
 ```
 
 
-# Supplementary Figure x
+## Supplementary Figure x
 A box and violin plot the distribution of durations of pesticide exposure 
 ```{r}
 data_duration <- data %>% 
@@ -821,6 +824,7 @@ SMD$precision <- ifelse(SMD$vi > 0, 1 / sqrt(SMD$vi), NA)
 SMDH$precision <- ifelse(SMDH$vi > 0, 1 / sqrt(SMDH$vi), NA)
 lnVR$precision <- ifelse(lnVR$vi > 0, 1 / sqrt(lnVR$vi), NA)
 
+
 # Merge each of the effect size with precision
 effect_size_metrics_set <- data.frame(
   lnRR = lnRR$yi, lnRRv = lnRR$vi, lnRR_precision = lnRR$precision,
@@ -829,12 +833,22 @@ effect_size_metrics_set <- data.frame(
   SMD = SMD$yi, SMDv = SMD$vi, SMD_precision = SMD$precision,
   SMDH = SMDH$yi, SMDHv = SMDH$vi, SMDH_precision = SMDH$precision, control_imputed = dat_impSD$control_sd_report, treatment_imputed = dat_impSD$treatment_sd_report)
 
+
+
  # Bind the effect size metrics set to the main data
 data <- cbind(data, effect_size_metrics_set)
 
+
+
+# Check if `effect_direction` is "change" and not NA, then multiply `lnRR` by -1; otherwise, keep original `lnRR`
+data$lnRR <- ifelse(!is.na(data$effect_direction) & data$effect_direction == "change", 
+                    -1 * data$lnRR, 
+                    data$lnRR)
+
+
 # Select specific columns including the new precision columns
 effect_size_metrics_set_kable <- data[, which(colnames(data) %in% c(
-  "study_id", "exp_id", "assay_id", "species_english", "pesticide",
+  "study_id", "exp_id", "assay_id", "species_english", "pesticide", "behaviour_assay","effect_direction",
   "lnRR", "lnRRv", "lnRR_precision", 
   "lnCVR", "lnCVRv", "lnCVR_precision", 
   "lnVR", "lnVRv", "lnVR_precision", 
@@ -848,6 +862,534 @@ effect_size_metrics_set_kable <- data[, which(colnames(data) %in% c(
  kable(effect_size_metrics_set_kable, "html") %>%
     kable_styling("bordered", position = "left") %>%
     scroll_box(width = "250%", height = "800px")
+
+# Plot the distribution of effect size estimates (lnRR)
+lnRR_dist_plot <- effect_size_metrics_set_kable %>%
+  ggplot(aes(lnRR)) +
+  geom_histogram(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[2], col = "black", binwidth = 0.1, alpha = 0.4) +
+  theme_bw() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(color = "black"),
+        axis.ticks = element_line(color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
+  labs(caption = "Distribution of Effect Size Estimates (lnRR)",
+       x = "lnRR",
+       y = "Frequency")
+
+print(lnRR_dist_plot)
+
+
+ # Plot the distribution of effect size estimates (lnCVR)
+lnCVR_dist_plot <- effect_size_metrics_set_kable %>%
+  ggplot(aes(lnCVR)) +
+  geom_histogram(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[3], col = "black", binwidth = 0.1, alpha = 0.4) +
+  theme_bw() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(color = "black"),
+        axis.ticks = element_line(color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
+  labs(caption = "Distribution of Effect Size Estimates (lnCVR)",
+       x = "lnCVR",
+       y = "Frequency")
+
+print(lnCVR_dist_plot)
+```
+
+## **Dependent effect size estimates**
+
+### Create phylogentic tree
+Using *rotl* package to retrieve synthetic species tree from Open Tree of Life
+Rotl is an R package (https://peerj.com/preprints/1471/) allowing access to synthetic phylogenetic tree available at Open Tree of Life database (https://opentreeoflife.org/). 
+```{r}
+data <- as.data.frame(data)
+
+data$species_latin = as.factor(data$species_latin)
+
+taxa <- tnrs_match_names(names = levels(data$species_latin), context = "Animals")  # Match species names to the Open Tree of Life taxonomy
+
+kable(taxa)  # Display matched species, ensuring each species has a unique match in the Open Tree of Life
+
+taxa$unique_name <- gsub(" ", "_", taxa$unique_name)  # Replace spaces in species names with underscores
+
+phylo_tree <- tol_induced_subtree(ott_ids = taxa$ott_id, label_format = "name")  # Generate a phylogenetic tree based on the Open Tree of Life taxonomy
+
+ott_in_tree <- ott_id(taxa)[is_in_tree(ott_id(taxa))]  # Ensure all identifiers are present in the taxonomy
+
+phylo_tree <- tol_induced_subtree(ott_ids = ott_in_tree)  # Generate a phylogenetic tree including all species present in the taxonomy
+
+is.binary(phylo_tree)  # Check if tree is binary 
+
+
+# Plot for the phylogenetic tree
+plot(phylo_tree,
+     cex= 1, #font size
+     label.offset =.1,
+     no.margin = TRUE)
+
+# Compute branch length
+phylo_branched <- compute.brlen(phylo_tree, method = "Grafen", power = 1)  # compute branch lengths using Grafen's method
+
+phylo_branched$tip.label <- strip_ott_ids(phylo_branched$tip.label, remove_underscores = FALSE)  # remove ott ID from species name to match it to the data set
+
+phylo_matrix <- vcv(phylo_branched, cor = T)  # Generate variance covariance matrix to correlate species relatedness 
+
+data <- as.data.frame(data)
+
+# Convert species_latin to lowercase
+data <- mutate(data, search_string = tolower(species_latin))
+
+data <- left_join(data, select(taxa, search_string, unique_name, ott_id), by = "search_string")  # Join data sets
+
+data <- data[data$unique_name %in% phylo_branched$tip.label, ]  # Check that species names are well matched with the phylogenetic tree
+
+
+data$phylogeny <- data$unique_name  # Rename 'unique_name' to 'phylogeny' for the models
+
+
+```
+
+## Variance covariance matrices
+```{r}
+# account for sampling covariance, assuming effect size within studies are correlated with rho = 0.5
+#------------------------------lnRR------------------------------#
+data <- data[!is.na(data$lnRRv),]
+lnRRVCV <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
+lnRRVCV2 <- metafor::vcalc(vi = lnRRv, cluster = exp2_id, obs = assay2_id, data = data, rho = 0.5) # Sensitivity analysis with alternative VCV
+
+#------------------------------lnCVR------------------------------#
+data <- data[!is.na(data$lnCVRv),]
+lnCVRVCV <- metafor::vcalc(vi = lnCVRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
+lnCVRVCV2 <- metafor::vcalc(vi = lnCVRv, cluster = exp2_id, obs = assay2_id, data = data, rho = 0.5) # Sensitivity analysis with alternative VCV
+
+#------------------------------lnVR------------------------------#
+lnVRVCV <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
+
+#------------------------------SMD------------------------------#
+SMDVCV <- metafor::vcalc(vi = SMDv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
+
+#------------------------------SMDH------------------------------#
+SMDHVCV <- metafor::vcalc(vi = SMDHv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
+```
+
+# **Selection of random-effect structure**
+
+Select the "most appropriate" structure for the subsequent statistical modelling.
+
+The potential random effect were:
+
+- 1) Observation (*assay_id*) - A unique id for each pairwise comparison for effect size calculation
+
+- 2) Cohort (*exp_id*) - A unique id for each exposure group in each primary study
+
+- 3) Study (*study_id*) - A unique id for each included primary study
+
+- 4) Pesticide  (*pesticide*) - Each pesticide used in the primary study
+
+- 5) Species (*species*) - Each species used in the primary study
+
+- 6) Phylogeny (*species*) - The phylogenetic relatedness for each species in the primary studies
+
+We start from fitting a null model without including the above random effects candidates as the default reduced model, and build upon more complex models by adding random-effects a candidate one time. We use the likelihood ratio test to compare the quality of two nested models in terms of information criteria indices (AIC, BIC, AICc). 
+
+## Null model with no random effects (lnRR)
+```{r}
+# fit a null model as default model
+null_mod_lnRR <- rma.mv(yi = lnRR, 
+                        V = lnRRVCV, 
+                        method = "ML", 
+                        test = "t", 
+                        data = data, 
+                        sparse = TRUE ) # Use ML to compare information criteria
+
+summary(null_mod_lnRR)
+
+```
+
+## Add *assay_id* as a random effect and compare with the null model (lnRR)
+```{r}
+mod_lnRR.assay_id <- rma.mv(yi = lnRR, 
+                            V = lnRRVCV,
+                            random =  ~1 | assay_id,
+                            method = "ML", 
+                            test = "t", 
+                            data = data, 
+                            sparse = T)
+
+summary(mod_lnRR.assay_id)
+
+anova(null_mod_lnRR,mod_lnRR.assay_id)
+```
+
+Adding *assay_id* as a random effect improved model quality
+
+## Add *study_id* as a random effect to the above better model (that used *obs_ID* a random effect) (lnRR)
+```{r}
+mod_lnRR.assay_id.study_id <- rma.mv(yi = lnRR,
+                                     V = lnRRVCV,
+                                     random = list(~1 | study_id, 
+                                                   ~1 | assay_id),
+                                     method = "ML",
+                                     test = "t", 
+                                     data = data, 
+                                     sparse = T)
+
+summary(mod_lnRR.assay_id.study_id)
+
+anova(mod_lnRR.assay_id,mod_lnRR.assay_id.study_id)
+
+```
+
+Adding study *study_id* as a random effect improved model quality
+
+## Add *exp_id* as a random effect to the above better model (that used *assau_id* and *study_id* as random effets) (lnRR)
+```{r}
+mod_lnRR.assay_id.study_id.exp_id <- rma.mv(yi = lnRR,
+                                            V = lnRRVCV,
+                                            random = list(~1 | study_id,
+                                                          ~1 | exp_id,
+                                                          ~1 | assay_id),
+                                            method = "ML",
+                                            test = "t", 
+                                            data = data,
+                                            sparse = T)
+
+summary(mod_lnRR.assay_id.study_id.exp_id)
+
+anova(mod_lnRR.assay_id.study_id,mod_lnRR.assay_id.study_id.exp_id)
+
+```
+
+Adding study *study_id* as a random effect did not improve model quality
+
+## Add *species* as a random effect to the above better model (that used *assay_id* and *study_id* as random effets) (lnRR)
+```{r}
+mod_lnRR.assay_id.study_id.species <- rma.mv(yi = lnRR,
+                                             V = lnRRVCV,
+                                             random = list(~1 | study_id, 
+                                                           ~1 | assay_id,
+                                                           ~1 | species_latin),
+                                             method = "ML",
+                                             test = "t", 
+                                             data = data,
+                                             sparse = T)
+
+summary(mod_lnRR.assay_id.study_id.species)
+
+anova(mod_lnRR.assay_id.study_id,mod_lnRR.assay_id.study_id.species)
+
+```
+
+Adding study *species* as a random effect did not improve model quality however is biologically relevant and thus we included in the model
+
+## Add *phylogeny* as a random effect to the above better model (that used *assay_id* , *study_id* and *species* as random effects) (lnRR)
+```{r}
+mod_lnRR.assay_id.study_id.species.phylogeny <- rma.mv(yi = lnRR,
+                                                       V = lnRRVCV,
+                                                       random = list(~1 | study_id,
+                                                                     ~1 | assay_id,
+                                                                     ~1 | species_latin,
+                                                                     ~1 | phylogeny),
+                                                       method = "ML",
+                                                       test = "t", 
+                                                       data = data, 
+                                                       sparse = T,
+                                                       R = list(phylogeny = phylo_matrix))
+
+summary(mod_lnRR.assay_id.study_id.species.phylogeny)
+
+anova(mod_lnRR.assay_id.study_id.species, mod_lnRR.assay_id.study_id.species.phylogeny)
+
+```
+
+Adding *phylogeny* as a random effect did not improve model quality however is biologically relevant and thus we included in the model
+
+## Add *pesticide* as a random effect to the above better model (that used *assay_id* , *study_id*, *species* and *phylogeny* as random effects) (lnRR)
+```{r}
+mod_lnRR.assay_id.study_id.species.phylogeny.pesticide <- rma.mv(yi = lnRR,
+                                                       V = lnRRVCV,
+                                                       random = list(~1 | study_id,
+                                                                     ~1 | assay_id,
+                                                                     ~1 | species_latin,
+                                                                     ~1 | phylogeny,
+                                                                     ~1 | pesticide),
+                                                       method = "ML",
+                                                       test = "t", 
+                                                       data = data, 
+                                                       sparse = T,
+                                                       R = list(phylogeny = phylo_matrix))
+
+summary(mod_lnRR.assay_id.study_id.species.phylogeny.pesticide)
+
+anova(mod_lnRR.assay_id.study_id.species.phylogeny, mod_lnRR.assay_id.study_id.species.phylogeny.pesticide)
+
+```
+
+Adding *pesticide* as a random effect did not improve model quality, and the number of levels overlaps significantly with the study.
+
+## Null model with no random effects (lnCVR)
+```{r}
+# fit a null model as default model
+null_mod_lnCVR <- rma.mv(yi = lnCVR, 
+                         V = lnCVRVCV, 
+                         method = "ML", 
+                         test = "t", 
+                         data = data, 
+                         sparse = TRUE ) # Use ML to compare information criteria
+
+summary(null_mod_lnCVR)
+
+```
+
+## Add *assay_id* as a random effect and compare with the null model (lnCVR)
+```{r}
+mod_lnCVR.assay_id <- rma.mv(yi = lnCVR, 
+                             V = lnCVRVCV,
+                             random =  ~1 | assay_id,
+                             method = "ML", 
+                             test = "t", 
+                             data = data, 
+                             sparse = T)
+
+summary(mod_lnCVR.assay_id)
+
+anova(null_mod_lnCVR, mod_lnCVR.assay_id)
+
+```
+
+Adding *assay_id* as a random effect improved model quality
+
+## Add *study_id* as a random effect to the above better model (that used *assay_id* a random effect) (lnCVR)
+```{r}
+mod_lnCVR.assay_id.study_id <- rma.mv(yi = lnCVR,
+                                      V = lnCVRVCV,
+                                      random = list(~1 | study_id, 
+                                                    ~1 | assay_id),
+                                      method = "ML",
+                                      test = "t", 
+                                      data = data, 
+                                      sparse = T)
+
+summary(mod_lnCVR.assay_id.study_id)
+
+anova(mod_lnCVR.assay_id, mod_lnCVR.assay_id.study_id)
+
+```
+
+Adding *study_id* as a random effect improved model quality
+
+## Add *exp_id* as a random effect to the above better model (that used *assay_id* and *study_id* as random effets) (lnCVR)
+```{r}
+mod_lnCVR.assay_id.study_id.exp_id <- rma.mv(yi = lnCVR,
+                                             V = lnCVRVCV,
+                                             random = list(~1 | study_id,
+                                                           ~1 | exp_id,
+                                                           ~1 | assay_id),
+                                             method = "ML",
+                                             test = "t", 
+                                             data = data,
+                                             sparse = T)
+
+summary(mod_lnCVR.assay_id.study_id.exp_id)
+
+anova(mod_lnCVR.assay_id.study_id, mod_lnCVR.assay_id.study_id.exp_id)
+
+```
+
+Adding *exp_id* as a random effect did not improve model quality
+
+## Add *species* as a random effect to the above better model (that used *assay_id* and *study_id* as random effets) (lnCVR)
+```{r}
+mod_lnCVR.assay_id.study_id.species <- rma.mv(yi = lnCVR,
+                                              V = lnCVRVCV,
+                                              random = list(~1 | study_id, 
+                                                            ~1 | assay_id,
+                                                            ~1 | species_latin),
+                                              method = "ML",
+                                              test = "t", 
+                                              data = data,
+                                              sparse = T)
+
+summary(mod_lnCVR.assay_id.study_id.species)
+
+anova(mod_lnCVR.assay_id.study_id, mod_lnCVR.assay_id.study_id.species)
+
+```
+
+Adding study *species* as a random effect did not improve model quality however is biologically relevant and thus we included in the model
+
+## Add *phylogeny* as a random effect to the above better model (that used *assay_id* , *study_id* and *species* as random effects) (lnCVR)
+```{r}
+mod_lnCVR.assay_id.study_id.species.phylogeny <- rma.mv(yi = lnCVR,
+                                                        V = lnCVRVCV,
+                                                        random = list(~1 | study_id,
+                                                                      ~1 | assay_id,
+                                                                      ~1 | species_latin,
+                                                                      ~1 | phylogeny),
+                                                        method = "ML",
+                                                        test = "t", 
+                                                        data = data, 
+                                                        sparse = T,
+                                                        R = list(phylogeny = phylo_matrix))
+
+summary(mod_lnCVR.assay_id.study_id.species.phylogeny)
+
+anova(mod_lnCVR.assay_id.study_id.species, mod_lnCVR.assay_id.study_id.species.phylogeny)
+
+```
+
+Adding *phylogeny* as a random effect did not improve model quality however is biologically relevant and thus we included in the model
+
+## Add *pesticide* as a random effect to the above better model (that used *assay_id* , *study_id*, *species* and *phylogeny* as random effects) (lnCVR)
+```{r}
+mod_lnCVR.assay_id.study_id.species.phylogeny.pesticide <- rma.mv(yi = lnCVR,
+                                                                  V = lnCVRVCV,
+                                                                  random = list(~1 | study_id,
+                                                                                ~1 | assay_id,
+                                                                                ~1 | species_latin,
+                                                                                ~1 | phylogeny,
+                                                                                ~1 | pesticide),
+                                                                  method = "ML",
+                                                                  test = "t", 
+                                                                  data = data, 
+                                                                  sparse = T,
+                                                                  R = list(phylogeny = phylo_matrix))
+
+summary(mod_lnCVR.assay_id.study_id.species.phylogeny.pesticide)
+
+anova(mod_lnCVR.assay_id.study_id.species.phylogeny, mod_lnCVR.assay_id.study_id.species.phylogeny.pesticide)
+
+```
+
+Adding *pesticide* as a random effect did not improve model quality, and the number of levels overlaps significantly with the study.
+
+
+# Intercept only meta-analysis model
+
+## lnRR intercept only model
+```{r}
+lnRR_intercept_only <- rma.mv(yi = lnRR,
+                              V = lnRRVCV,
+                              random = list(~1 | study_id,
+                                            ~1 | assay_id,
+                                            ~1 | species_latin,
+                                            ~1 | phylogeny),
+                              method = "REML",
+                              test = "t", 
+                              data = data,
+                              sparse = T,
+                              R = list(phylogeny = phylo_matrix))
+  
+summary(lnRR_intercept_only)
+
+lnRR_intercept_only_robust <- robust(lnRR_intercept_only, data$study_id)
+
+summary(lnRR_intercept_only_robust)
+
+i2_ml(lnRR_intercept_only)
+  
+```
+
+### Intercept only model lnRR orchard plot
+```{r}
+orchaRd::orchard_plot(lnRR_intercept_only,
+             group = "behaviour_measured_standardised", 
+             xlab = "lnRR",
+             data = data,
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE) 
+```
+
+
+```{r}
+## lnCVR intercept only model
+lnCVR_intercept_only <- rma.mv(yi = lnCVR,
+                               V = lnCVRVCV,
+                               random = list(~1 | study_id,
+                                             ~1 | assay_id),
+                                       #      ~1 | species_latin,
+                                         #    ~1 | phylogeny),
+                               mods = ~ data$behaviour_measured_standardised -1,
+                               method = "REML",
+                               test = "t", 
+                               data = data,
+                               sparse = T)
+                             #  R = list(phylogeny = phylo_matrix))
+
+
+
+summary(lnCVR_intercept_only)
+
+lnCVR_intercept_only_robust <- robust(lnCVR_intercept_only, data$study_id)
+
+summary(lnCVR_intercept_only_robust)
+
+i2_ml(lnCVR_intercept_only)
+
+```
+
+
+```{r}
+orchaRd::orchard_plot(lnCVR_intercept_only,
+             group = "study_id", 
+             mod = "behaviour_measured_standardised",
+             xlab = "lnRR",
+             data = data,
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE) 
+```
+
+
+
+## model plot pilot
+```{r}
+
+data <- data[!is.na(data$lnRRv),]
+lnRRVCV2 <- metafor::vcalc(vi = lnRRv, cluster = study_id, obs = assay_id, data = data2, rho = 0.5)
+
+
+null_mod_lnRR <- rma.mv(yi = lnRR, 
+                        V = lnRRVCV, 
+              mods = ~ data2$behaviour_measured_standardised - 1,
+                        method = "ML", 
+                        test = "t", 
+                        data = data2,
+                        sparse = TRUE )
+
+orchaRd::orchard_plot(null_mod_lnRR,
+                      mod = "behaviour_measured_standardised",
+                      group = "study_id", 
+                      xlab = "lnRR",
+                      alpha = 0.7,
+                      data = data2)
+
+data3 <- data[!is.na(data$lnCVRv),]
+lnRRVCV <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data3, rho = 0.5)
+
+
+null_mod_lnCVR <- rma.mv(yi = lnCVR, 
+                        V = lnRRVCV, 
+                        mods = ~ data3$behaviour_measured_standardised - 1,
+                        method = "ML", 
+                        test = "t", 
+                        data = data2,
+                        sparse = TRUE )
+
+orchaRd::orchard_plot(null_mod_lnCVR,
+                      mod = "behaviour_measured_standardised",
+                      group = "study_id", 
+                      xlab = "lnCVR",
+                      alpha = 0.7,
+                      data = data2)
 
 ```
 

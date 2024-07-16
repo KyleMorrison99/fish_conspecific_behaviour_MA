@@ -1,5 +1,6 @@
-,filename,variable,group_id,mean,sd,se,error_type,plot_type
-1,lin_2024_fig3d.jpg,Inter-individual distance ,control female,26.87687208,0.660930736,0.467348605,sd,mean_error
-2,lin_2024_fig3d.jpg,Inter-individual distance ,5 nm female,22.74072489,0.682251082,0.482424367,sd,mean_error
-3,lin_2024_fig3d.jpg,Inter-individual distance ,control male,24.52768263,0.563632228,0.39854817,sd,mean_error
-4,lin_2024_fig3d.jpg,Inter-individual distance ,5 nm male,24.04573623,0.661655224,0.467860896,sd,mean_error
+"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
+"1","zhou_2021_fig6b.jpg","Time spent closest to the separator (s)","control ",167.465076226327,67.9064631602129,20,NA,15.1843467737821,"se","mean_error"
+"2","zhou_2021_fig6b.jpg","Time spent closest to the separator (s)","5 ng/L",160.488484465401,64.235843529931,20,NA,14.3635712724966,"se","mean_error"
+"3","zhou_2021_fig6b.jpg","Time spent closest to the separator (s)","50 ng/L",144.278168315011,55.0592944542269,20,NA,12.3116325192829,"se","mean_error"
+"4","zhou_2021_fig6b.jpg","Time spent closest to the separator (s)","500 ng/L",124.374362408838,57.8122591769379,20,NA,12.9272141452469,"se","mean_error"
+"5","zhou_2021_fig6b.jpg","Time spent closest to the separator (s)","5000 ng/L",165.002749722471,87.1772162191923,20,NA,19.4934181555311,"se","mean_error"

@@ -457,19 +457,8 @@ hussian_2020_fig9f_processed <- data.frame(Group= names(hussian_2020_fig9f_mean)
 
 ```
 
-
-
-
-
 Collective behaviour figures
 ```{r}
-hussian
-
-
-
-
-
-
 
 hussian_2020_collective_behaviour_raw <- read.csv(here("data_extraction", "data_extraction_figures", "hussian_2020_collective_behaviour_raw.csv"))
 
