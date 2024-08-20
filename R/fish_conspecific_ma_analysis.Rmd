@@ -33,9 +33,6 @@ knitr::opts_chunk$set(
 ```{r}
 rm(list = ls())
 
-
-
-
 pacman::p_load(tidyverse,
                here,
                kableExtra,
@@ -964,7 +961,7 @@ data$phylogeny <- data$unique_name  # Rename 'unique_name' to 'phylogeny' for th
 ```{r}
 # account for sampling covariance, assuming effect size within studies are correlated with rho = 0.5
 #------------------------------lnRR------------------------------#
-data <- data[!is.na(data$lnRRv),] 
+data<- data[!is.na(data$lnRRv),] 
 
 lnRRVCV <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
 
@@ -1277,9 +1274,10 @@ anova(mod_lnCVR.assay_id.study_id.species.phylogeny, mod_lnCVR.assay_id.study_id
 
 Adding *pesticide* as a random effect did not improve model quality, and the number of levels overlaps significantly with the study.
 
+
 # Intercept only meta-analysis model
 
-## lnRR intercept only model (lnRR)
+## Intercept only model (lnRR)
 ```{r}
 # Model
 lnRR_intercept_only <- rma.mv(yi = lnRR,
@@ -1298,6 +1296,8 @@ summary(lnRR_intercept_only)
 
 mod_results(lnRR_intercept_only, mod = "1", data = data, group = "study_id")  # For prediction intervals
 
+r2_ml(lnRR_intercept_only)
+
 i2_ml(lnRR_intercept_only)
   
 # orchaRd plot
@@ -1307,7 +1307,10 @@ orchaRd::orchard_plot(lnRR_intercept_only,
              data = data,
              k.pos = "right",
              colour = FALSE,
-             fill = FALSE) 
+             fill = TRUE,  
+             trunk.size = 4,
+             branch.size = 2,
+             twig.size = 1) 
 ```
 
 ## Intercept only model (lnCVR)
@@ -1339,7 +1342,10 @@ orchaRd::orchard_plot(lnCVR_intercept_only,
              data = data,
              k.pos = "right",
              colour = FALSE,
-             fill = FALSE) 
+             fill = FALSE,
+             trunk.size = 4,
+             branch.size = 2,
+             twig.size = 1) 
 ```
 
 # **Single moderator meta-regression**
@@ -1369,13 +1375,14 @@ r2_ml(lnRR_mod_behaviour_class)
 
 # orchaRd plot
 orchaRd::orchard_plot(lnRR_mod_behaviour_class,
-             group = "pesticide_chemical_class", 
+             group = "species_latin", 
              xlab = "lnRR",
              data = data,
              mod = "behaviour_measured_standardised",
              k.pos = "right",
              colour = TRUE,
-             fill = TRUE) 
+             fill = TRUE)
+             
 
 ```
 
@@ -1413,7 +1420,6 @@ orchaRd::orchard_plot(lnCVR_mod_behaviour_class,
 
 ```
 
-
 ## Moderate by concentration of pesticide (lnRR)
 ```{r}
 # Create dataframe for model with consistent dosage units
@@ -1437,8 +1443,7 @@ filter(!dosage_unit %in% c("nm", "um", "nM")) %>%
            dosage_unit == "ppm" ~ dosage*1000, 
            TRUE ~ dosage)) %>% 
    filter(!is.na(dosage_convert_ugL)) %>% 
-    mutate(log_dosage_convert_ugL = log(dosage_convert_ugL)) # NOTE TO SELF THAT THIS NEEDS ADJSUTED FOR SOME TOXICITY METRIC - at the moment it does not show much 
-   
+    mutate(log_dosage_convert_ugL = log(dosage_convert_ugL)) 
 
 # Recalculate the VCV matrix based on the new data frame 
 lnRRVCV_dosage <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data_dosage_model, rho = 0.5)
@@ -1678,7 +1683,6 @@ orchaRd::orchard_plot(lnCVR_mod_species,
              fill = FALSE)
 ```
 
-
 ## Moderate by sex (lnRR)
 ```{r}
 # Model
@@ -1814,7 +1818,6 @@ orchaRd::orchard_plot(lnCVR_mod_pesticide,
 
 
 ```
-
 
 ## Moderate by control solvent used (lnRR)
 ```{r}
@@ -2081,10 +2084,6 @@ funnel(lnRR_intercept_only,
 
 # Adding title and x-axis label for completeness
 title(main = "Funnel Plot", xlab = "Effect Size (lnRR)")
-
-       
-       
-       
 ```
 
 ## Time lag bias
@@ -2151,7 +2150,6 @@ qplot(y = sqrt(residuals(time_lag_bias_model)^2), x = fitted(time_lag_bias_model
 
 ## Egger's regression
 ```{r}
-
 eggers_regression <- rma.mv(yi = lnRR,
                           V = lnRRVCV,
                           random = list(~1 | study_id,
@@ -2193,18 +2191,15 @@ ggplot(aes(x = sqrt(lnRRv), y = lnRR)) +
           panel.border=element_rect(colour="black", fill=NA, size=1.2))
 ```
 
-# Sensitivity analysis
+# **Sensitivity Analysis** 
 
-## Alternative effect sizes
+## *Alternative effect sizes*
 
 
 ADD DESCRIPTION HERE
 
 
-
-# Intercept only meta-analysis model
-
-## Intercept only model (SMDH)
+### Intercept only model (SMDH)
 ```{r}
 # Model
 SMDH_intercept_only <- rma.mv(yi = SMDH,
@@ -2235,7 +2230,7 @@ orchaRd::orchard_plot(SMDH_intercept_only,
              fill = FALSE) 
 ```
 
-## Intercept only model (lnVR)
+### Intercept only model (lnVR)
 ```{r}
 # Model
 lnVR_intercept_only <- rma.mv(yi = lnVR,
@@ -2266,10 +2261,6 @@ orchaRd::orchard_plot(lnVR_intercept_only,
              colour = FALSE,
              fill = FALSE) 
 ```
-
-# Single moderator meta-regression
-
-## Moderate by behaviour class
 
 ### Moderate by behaviour class (SMDH)
 ```{r}
@@ -2340,8 +2331,6 @@ orchaRd::orchard_plot(lnVR_mod_behaviour_class,
 
 ```
 
-## Moderate by species 
-
 ### Moderate by species (SMDH)
 ```{r}
 # Model
@@ -2408,8 +2397,6 @@ orchaRd::orchard_plot(lnVR_mod_species,
              fill = FALSE)
 ```
 
-## Moderate by pesticide chemical class 
-
 ### Moderate by pesticide chemical class (SMDH)
 ```{r}
 # Model
@@ -2443,7 +2430,7 @@ orchaRd::orchard_plot(SMDH_mod_pesticide,
              fill = FALSE)
 ```
 
-### Moderate by pesticide chemical class (lnCVR)
+### Moderate by pesticide chemical class (lnVR)
 ```{r}
 # Model
 lnVR_mod_pesticide <- rma.mv(yi = lnVR,
@@ -2477,12 +2464,9 @@ orchaRd::orchard_plot(lnVR_mod_pesticide,
 
 ```
 
+## *Alternative variance-covariance matrices*
 
-## Alternative variance-covariance matrices
-
-# Intercept only meta-analysis model
-
-## lnRR intercept only model (lnRR)
+### Intercept only model (lnRR)
 ```{r}
 # Model
 lnRR_intercept_only2 <- rma.mv(yi = lnRR,
@@ -2513,7 +2497,7 @@ orchaRd::orchard_plot(lnRR_intercept_only2,
              fill = FALSE) 
 ```
 
-## Intercept only model (lnCVR)
+### Intercept only model (lnCVR)
 ```{r}
 # Model
 lnCVR_intercept_only2 <- rma.mv(yi = lnCVR,
@@ -2544,10 +2528,6 @@ orchaRd::orchard_plot(lnCVR_intercept_only2,
              colour = FALSE,
              fill = FALSE) 
 ```
-
-# Single moderator meta-regression
-
-## Moderate by behaviour class
 
 ### Moderate by behaviour class (lnRR)
 ```{r}
@@ -2618,8 +2598,6 @@ orchaRd::orchard_plot(lnCVR_mod_behaviour_class2,
 
 ```
 
-## Moderate by species 
-
 ### Moderate by species (lnRR)
 ```{r}
 # Model
@@ -2685,8 +2663,6 @@ orchaRd::orchard_plot(lnCVR_mod_species2,
              colour = FALSE,
              fill = FALSE)
 ```
-
-## Moderate by pesticide chemical class 
 
 ### Moderate by pesticide chemical class (lnRR)
 ```{r}
@@ -2755,58 +2731,56 @@ orchaRd::orchard_plot(lnCVR_mod_pesticide2,
 
 
 ```
+## *Leave-one-out analysis*
 
+### *Leave one study out*
 
-## Leave-one-out analysis
-
-### Leave one study out
-
+#### Intercept only model (lnRR) leaving one study out each model
 ```{r}
 data$leave_study <- as.factor(data$study_id)
 
 ### create a list to contain model estimates
-leave_study_out_model <- list()
-VCV_leave_study_out <- list()
+leave_study_out_model_lnRR <- list()
+VCV_leave_study_out_lnRR <- list()
 
 ### repeatedly run the multilevel model, leaving out one study at a time
 for(i in 1:length(levels(data$leave_study))){
-### create the data with one study removed at a time
-data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
-### create a list of VCV matrices for following model fitting
-VCV_leave_study_out[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnRRv, cluster = data_study_leave$study_id, r = 0.5) 
-### model fitting
-leave_study_out_model[[i]] <- rma.mv(yi = lnRR,V = VCV_leave_study_out[[i]], 
-                                   random = list(~1 | study_id,
-                                                   ~1 | assay_id,
-                                                   ~1 | species_latin,
-                                                   ~1 | pesticide),
-                                    method = "REML", 
-                                   test = "t",
-                                   data = data_study_leave,
-                                   sparse = TRUE)}
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_lnRR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnRRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_lnRR[[i]] <- rma.mv(yi = lnRR, V = VCV_leave_study_out_lnRR[[i]], 
+                                            random = list(~1 | study_id,
+                                                          ~1 | assay_id,
+                                                          ~1 | species_latin,
+                                                          ~1 | pesticide),
+                                            method = "REML", 
+                                            test = "t",
+                                            data = data_study_leave,
+                                            sparse = TRUE)
+}
 
+results.leave_study_out_model_lnRR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
 
-
-results.leave_study_out_model <-as.data.frame(cbind(
-                                           sapply(leave_study_out_model, function(x) summary(x)$beta), # extract the beta coefficient from all models
-                                           sapply(leave_study_out_model, function(x) summary(x)$se), # extract the standard error from all models
-                                           sapply(leave_study_out_model, function(x) summary(x)$zval),  # extract the z value from all models
-                                           sapply(leave_study_out_model, function(x) summary(x)$pval), # extract the p value from all models
-                                           sapply(leave_study_out_model, function(x) summary(x)$ci.lb), # extract the lower confidence interval for all models
-                                           sapply(leave_study_out_model, function(x) summary(x)$ci.ub))) # extract the upper confidence interval for all models
-
-colnames(results.leave_study_out_model)=c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names 
-
-# Add the study_id as the index for the plot
-results.leave_study_out_model$study_id <- unique(data$study_id)
+colnames(results.leave_study_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_lnRR$study_id <- unique(data$study_id)
 
 # Display the results table
-kable(results.leave_study_out_model) %>%
+kable(results.leave_study_out_model_lnRR) %>%
   kable_styling("striped", position = "left") %>%
   scroll_box(width = "100%", height = "500px")
 
-
-leave_one_study_out_forest_plot <- ggplot(results.leave_study_out_model, 
+leave_one_study_out_lnRR_forest_plot <- ggplot(results.leave_study_out_model_lnRR, 
                       aes(x = fct_reorder(as.factor(study_id), Estimate), 
                           y = Estimate, 
                           ymin = ci.lb, 
@@ -2825,30 +2799,581 @@ leave_one_study_out_forest_plot <- ggplot(results.leave_study_out_model,
        y = "Estimate") +
   coord_flip()
 
-print(leave_one_study_out_forest_plot)
+print(leave_one_study_out_lnRR_forest_plot)
 
-
-results.leave_study_out_model %>% 
-                          summarise(estimate= mean(Estimate), # calculate the mean coefficients across the models generated
-                                    se=mean(SE), 
-                                    zval=mean(zval), 
-                                    pval=mean(pval), 
-                                    ci.lb=mean(ci.lb), 
-                                    ci.ub=mean(ci.ub)) %>% 
-                                                          kable()%>% kable_styling("striped", position="left")
-
-
+results.leave_study_out_model_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
 
 ```
 
+#### Intercept only model (lnCVR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
 
+### create a list to contain model estimates
+leave_study_out_model_lnCVR <- list()
+VCV_leave_study_out_lnCVR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_lnCVR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnCVRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_lnCVR[[i]] <- rma.mv(yi = lnCVR, V = VCV_leave_study_out_lnCVR[[i]], 
+                                             random = list(~1 | study_id,
+                                                           ~1 | assay_id,
+                                                           ~1 | species_latin,
+                                                           ~1 | pesticide),
+                                             method = "REML", 
+                                             test = "t",
+                                             data = data_study_leave,
+                                             sparse = TRUE)
+}
+
+results.leave_study_out_model_lnCVR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_lnCVR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_one_study_out_lnCVR_forest_plot <- ggplot(results.leave_study_out_model_lnCVR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_one_study_out_lnCVR_forest_plot)
+
+results.leave_study_out_model_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by behaviour (lnRR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_behaviour_lnRR <- list()
+VCV_leave_study_out_behaviour_lnRR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_behaviour_lnRR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnRRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_behaviour_lnRR[[i]] <- rma.mv(yi = lnRR,
+                               V =  VCV_leave_study_out_behaviour_lnRR[[i]],
+                               random = list(~1 | study_id,
+                                             ~1 | assay_id,
+                                             ~1 | species_latin,
+                                             ~1 | pesticide),
+                              mods = ~behaviour_measured_standardised -1,
+                               method = "REML",
+                               test = "t", 
+                               data = data_study_leave,
+                               sparse = T)
+
+}
+
+results.leave_study_out_model_behaviour_lnRR <- as.data.frame(cbind(
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_behaviour_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_behaviour_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_behaviour_lnRR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_behaviour_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_behaviour_lnRR_forest_plot <- ggplot(results.leave_study_out_model_behaviour_lnRR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_behaviour_lnRR_forest_plot)
+
+results.leave_study_out_model_behaviour_lnRR %>% 
+  summarise(estimate = mean(lnRR), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by behaviour (lnCVR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_behaviour_lnCVR <- list()
+VCV_leave_study_out_behaviour_lnCVR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_behaviour_lnCVR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnCVRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_behaviour_lnCVR[[i]] <- rma.mv(yi = data_study_leave$lnCVR,
+                                                      V = VCV_leave_study_out_behaviour_lnCVR[[i]],
+                                                      random = list(~1 | study_id,
+                                                                    ~1 | assay_id,
+                                                                    ~1 | species_latin,
+                                                                    ~1 | pesticide),
+                                                       mods = ~behaviour_measured_standardised -1,
+                                                      method = "REML",
+                                                      test = "t", 
+                                                      data = data_study_leave,
+                                                      sparse = TRUE)
+}
+
+results.leave_study_out_model_behaviour_lnCVR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_behaviour_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_behaviour_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_behaviour_lnCVR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_behaviour_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_behaviour_lnCVR_forest_plot <- ggplot(results.leave_study_out_model_behaviour_lnCVR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_behaviour_lnCVR_forest_plot)
+
+results.leave_study_out_model_behaviour_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by species (lnRR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_species_lnRR <- list()
+VCV_leave_study_out_species_lnRR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_species_lnRR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnRRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_species_lnRR[[i]] <- rma.mv(yi = data_study_leave$lnRR,
+                                                     V = VCV_leave_study_out_species_lnRR[[i]],
+                                                     random = list(~1 | study_id,
+                                                                   ~1 | assay_id,
+                                                                   ~1 | species_latin,
+                                                                   ~1 | pesticide),
+                                                      mods = ~species_latin -1,
+                                                     method = "REML",
+                                                     test = "t", 
+                                                     data = data_study_leave,
+                                                     sparse = TRUE)
+}
+
+results.leave_study_out_model_species_lnRR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_species_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_species_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_species_lnRR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_species_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_species_lnRR_forest_plot <- ggplot(results.leave_study_out_model_species_lnRR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_species_lnRR_forest_plot)
+
+results.leave_study_out_model_species_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by species (lnCVR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_species_lnCVR <- list()
+VCV_leave_study_out_species_lnCVR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_species_lnCVR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnCVRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_species_lnCVR[[i]] <- rma.mv(yi = data_study_leave$lnCVR,
+                                                     V = VCV_leave_study_out_species_lnCVR[[i]],
+                                                     random = list(~1 | study_id,
+                                                                   ~1 | assay_id,
+                                                                   ~1 | species_latin,
+                                                                   ~1 | pesticide),
+                                                     # mods = ~species_latin -1,
+                                                     method = "REML",
+                                                     test = "t", 
+                                                     data = data_study_leave,
+                                                     sparse = TRUE)
+}
+
+results.leave_study_out_model_species_lnCVR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_species_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_species_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_species_lnCVR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_species_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_species_lnCVR_forest_plot <- ggplot(results.leave_study_out_model_species_lnCVR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_species_lnCVR_forest_plot)
+
+results.leave_study_out_model_species_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by pesticide chemical class (lnRR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_pesticide_lnRR <- list()
+VCV_leave_study_out_pesticide_lnRR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_pesticide_lnRR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnRRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_pesticide_lnRR[[i]] <- rma.mv(yi = data_study_leave$lnRR,
+                                                      V = VCV_leave_study_out_pesticide_lnRR[[i]],
+                                                      random = list(~1 | study_id,
+                                                                    ~1 | assay_id,
+                                                                    ~1 | species_latin,
+                                                                    ~1 | pesticide),
+                                                      mods = ~pesticide_chemical_class -1,
+                                                      method = "REML",
+                                                      test = "t", 
+                                                      data = data_study_leave,
+                                                      sparse = TRUE)
+}
+
+results.leave_study_out_model_pesticide_lnRR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_pesticide_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_pesticide_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_pesticide_lnRR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_pesticide_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_pesticide_lnRR_forest_plot <- ggplot(results.leave_study_out_model_pesticide_lnRR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_pesticide_lnRR_forest_plot)
+
+results.leave_study_out_model_pesticide_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by pesticide chemical class (lnCVR) leaving one study out each model
+```{r}
+data$leave_study <- as.factor(data$study_id)
+
+### create a list to contain model estimates
+leave_study_out_model_pesticide_lnCVR <- list()
+VCV_leave_study_out_pesticide_lnCVR <- list()
+
+### repeatedly run the multilevel model, leaving out one study at a time
+for(i in 1:length(levels(data$leave_study))){
+  ### create the data with one study removed at a time
+  data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
+  
+  ### create a list of VCV matrices for following model fitting
+  VCV_leave_study_out_pesticide_lnCVR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnCVRv, cluster = data_study_leave$study_id, r = 0.5)
+  
+  ### model fitting
+  leave_study_out_model_pesticide_lnCVR[[i]] <- rma.mv(yi = data_study_leave$lnCVR,
+                                                      V = VCV_leave_study_out_pesticide_lnCVR[[i]],
+                                                      random = list(~1 | study_id,
+                                                                    ~1 | assay_id,
+                                                                    ~1 | species_latin,
+                                                                    ~1 | pesticide),
+                                                      mods = ~pesticide_chemical_class -1,
+                                                      method = "REML",
+                                                      test = "t", 
+                                                      data = data_study_leave,
+                                                      sparse = TRUE)
+}
+
+results.leave_study_out_model_pesticide_lnCVR <- as.data.frame(cbind(
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_study_out_model_pesticide_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_study_out_model_pesticide_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_study_out_model_pesticide_lnCVR$study_id <- unique(data$study_id)
+
+# Display the results table
+kable(results.leave_study_out_model_pesticide_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_study_out_model_pesticide_lnCVR_forest_plot <- ggplot(results.leave_study_out_model_pesticide_lnCVR, 
+                      aes(x = fct_reorder(as.factor(study_id), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one study at a time",
+       x = "Study ID",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_study_out_model_pesticide_lnCVR_forest_plot)
+
+results.leave_study_out_model_pesticide_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+### *Leave one species out*
+
+#### Intercept only model (lnRR) leaving one species out each model
 ```{r}
 # Convert species_latin to a factor and create a new column for the leave-one-out procedure
 data$leave_species <- as.factor(data$species_latin)
 
 # Initialize lists to contain the model estimates and VCV matrices
-leave_species_out_mod <- list()
-VCV_leave_species_out <- list()
+leave_species_out_model_lnRR <- list()
+VCV_leave_species_out_lnRR <- list()
 
 # Iteratively run the multilevel model, leaving out one species at a time
 for(i in 1:length(levels(data$leave_species))){
@@ -2857,11 +3382,11 @@ for(i in 1:length(levels(data$leave_species))){
   
   
   # Create a VCV matrix for the subset data
-  VCV_leave_species_out[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnRRv, cluster = data_species_leave$study_id, r = 0.5)
+  VCV_leave_species_out_lnRR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnRRv, cluster = data_species_leave$study_id, r = 0.5)
   
     # Model fitting
-    leave_species_out_mod[[i]] <- rma.mv(yi = data_species_leave$lnRR,
-                                         V = VCV_leave_species_out[[i]],
+    leave_species_out_model_lnRR[[i]] <- rma.mv(yi = data_species_leave$lnRR,
+                                         V = VCV_leave_species_out_lnRR[[i]],
                                          random = list(~1 | study_id,
                                                        ~1 | assay_id,
                                                        ~1 | species_latin,
@@ -2873,24 +3398,24 @@ for(i in 1:length(levels(data$leave_species))){
 } 
 
 
-results.leave_species_out_model <- as.data.frame(cbind(
-  sapply(leave_species_out_mod, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_species_out_mod, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_species_out_mod, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_species_out_mod, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_species_out_mod, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_species_out_mod, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+results.leave_species_out_model_lnRR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
 ))
 
-colnames(results.leave_species_out_model) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
-results.leave_species_out_model$species_latin <- unique(data$species_latin)
+colnames(results.leave_species_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+results.leave_species_out_model_lnRR$species_latin <- unique(data$species_latin)
 
 # Display the results table
-kable(results.leave_species_out_model) %>%
+kable(results.leave_species_out_model_lnRR) %>%
   kable_styling("striped", position = "left") %>%
   scroll_box(width = "100%", height = "500px")
 
-leave_one_species_out_forest_plot <- ggplot(results.leave_species_out_model, 
+leave_one_species_out_lnRR_forest_plot <- ggplot(results.leave_species_out_model_lnRR, 
                       aes(x = fct_reorder(as.factor(species_latin), Estimate), 
                           y = Estimate, 
                           ymin = ci.lb, 
@@ -2909,17 +3434,413 @@ leave_one_species_out_forest_plot <- ggplot(results.leave_species_out_model,
        y = "Estimate") +
   coord_flip()
 
-print(leave_one_species_out_forest_plot)
+print(leave_one_species_out_lnRR_forest_plot)
 ```
 
+#### Intercept only model (lnCVR) leaving one species out each model
+```{r}
+# Convert species_latin to a factor and create a new column for the leave-one-out procedure
+data$leave_species <- as.factor(data$species_latin)
 
+# Initialize lists to contain the model estimates and VCV matrices
+leave_species_out_model_lnCVR <- list()
+VCV_leave_species_out_lnCVR <- list()
+
+# Iteratively run the multilevel model, leaving out one species at a time
+for(i in 1:length(levels(data$leave_species))){
+  # Create the data with one species removed at a time
+  data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_species_out_lnCVR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnCVRv, cluster = data_species_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_species_out_model_lnCVR[[i]] <- rma.mv(yi = data_species_leave$lnCVR,
+                                               V = VCV_leave_species_out_lnCVR[[i]],
+                                               random = list(~1 | study_id,
+                                                             ~1 | assay_id,
+                                                             ~1 | species_latin,
+                                                             ~1 | pesticide),
+                                               method = "REML", 
+                                               test = "t",
+                                               data = data_species_leave,
+                                               sparse = TRUE)
+} 
+
+results.leave_species_out_model_lnCVR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_species_out_model_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+results.leave_species_out_model_lnCVR$species_latin <- unique(data$species_latin)
+
+# Display the results table
+kable(results.leave_species_out_model_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_one_species_out_lnCVR_forest_plot <- ggplot(results.leave_species_out_model_lnCVR, 
+                      aes(x = fct_reorder(as.factor(species_latin), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one species at a time",
+       x = "Species Latin",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_one_species_out_lnCVR_forest_plot)
+
+
+```
+
+#### Moderate by behaviour (lnRR) leaving one species out each model
+```{r}
+# Convert species_latin to a factor and create a new column for the leave-one-out procedure
+data$leave_species <- as.factor(data$species_latin)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_species_out_model_behaviour_lnRR <- list()
+VCV_leave_species_out_behaviour_lnRR <- list()
+
+# Iteratively run the multilevel model, leaving out one species at a time
+for(i in 1:length(levels(data$leave_species))){
+  # Create the data with one species removed at a time
+  data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_species_out_behaviour_lnRR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnRRv, cluster = data_species_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_species_out_model_behaviour_lnRR[[i]] <- rma.mv(yi = data_species_leave$lnRR,
+                                                        V = VCV_leave_species_out_behaviour_lnRR[[i]],
+                                                        random = list(~1 | study_id,
+                                                                      ~1 | assay_id,
+                                                                      ~1 | species_latin,
+                                                                      ~1 | pesticide),
+                                                        mods = ~behaviour_measured_standardised -1,
+                                                        method = "REML",
+                                                        test = "t", 
+                                                        data = data_species_leave,
+                                                        sparse = TRUE)
+}
+
+results.leave_species_out_model_behaviour_lnRR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_behaviour_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_species_out_model_behaviour_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_species_out_model_behaviour_lnRR$species_latin <- unique(data$species_latin)
+
+# Display the results table
+kable(results.leave_species_out_model_behaviour_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_species_out_model_behaviour_lnRR_forest_plot <- ggplot(results.leave_species_out_model_behaviour_lnRR, 
+                      aes(x = fct_reorder(as.factor(species_latin), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one species at a time",
+       x = "Species Latin",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_species_out_model_behaviour_lnRR_forest_plot)
+
+results.leave_species_out_model_behaviour_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+
+```
+
+#### Moderate by behaviour (lnCVR) leaving one species out each model
+```{r}
+# Convert species_latin to a factor and create a new column for the leave-one-out procedure
+data$leave_species <- as.factor(data$species_latin)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_species_out_model_behaviour_lnCVR <- list()
+VCV_leave_species_out_behaviour_lnCVR <- list()
+
+# Iteratively run the multilevel model, leaving out one species at a time
+for(i in 1:length(levels(data$leave_species))){
+  # Create the data with one species removed at a time
+  data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_species_out_behaviour_lnCVR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnCVRv, cluster = data_species_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_species_out_model_behaviour_lnCVR[[i]] <- rma.mv(yi = data_species_leave$lnCVR,
+                                                        V = VCV_leave_species_out_behaviour_lnCVR[[i]],
+                                                        random = list(~1 | study_id,
+                                                                      ~1 | assay_id,
+                                                                      ~1 | species_latin,
+                                                                      ~1 | pesticide),
+                                                        mods = ~behaviour_measured_standardised -1,
+                                                        method = "REML",
+                                                        test = "t", 
+                                                        data = data_species_leave,
+                                                        sparse = TRUE)
+}
+
+results.leave_species_out_model_behaviour_lnCVR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_behaviour_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_species_out_model_behaviour_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_species_out_model_behaviour_lnCVR$species_latin <- unique(data$species_latin)
+
+# Display the results table
+kable(results.leave_species_out_model_behaviour_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_species_out_model_behaviour_lnCVR_forest_plot <- ggplot(results.leave_species_out_model_behaviour_lnCVR, 
+                      aes(x = fct_reorder(as.factor(species_latin), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one species at a time",
+       x = "Species Latin",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_species_out_model_behaviour_lnCVR_forest_plot)
+
+results.leave_species_out_model_behaviour_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+
+
+```
+
+#### Moderate by pesticide chemical class (lnRR) leaving one species out each model
+```{r}
+# Convert species_latin to a factor and create a new column for the leave-one-out procedure
+data$leave_species <- as.factor(data$species_latin)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_species_out_model_pesticide_lnRR <- list()
+VCV_leave_species_out_pesticide_lnRR <- list()
+
+# Iteratively run the multilevel model, leaving out one species at a time
+for(i in 1:length(levels(data$leave_species))){
+  # Create the data with one species removed at a time
+  data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_species_out_pesticide_lnRR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnRRv, cluster = data_species_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_species_out_model_pesticide_lnRR[[i]] <- rma.mv(yi = data_species_leave$lnRR,
+                                                        V = VCV_leave_species_out_pesticide_lnRR[[i]],
+                                                        random = list(~1 | study_id,
+                                                                      ~1 | assay_id,
+                                                                      ~1 | species_latin,
+                                                                      ~1 | pesticide),
+                                                        mods = ~pesticide_chemical_class -1,
+                                                        method = "REML",
+                                                        test = "t", 
+                                                        data = data_species_leave,
+                                                        sparse = TRUE)
+}
+
+results.leave_species_out_model_pesticide_lnRR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_pesticide_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_species_out_model_pesticide_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_species_out_model_pesticide_lnRR$species_latin <- unique(data$species_latin)
+
+# Display the results table
+kable(results.leave_species_out_model_pesticide_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_species_out_model_pesticide_lnRR_forest_plot <- ggplot(results.leave_species_out_model_pesticide_lnRR, 
+                      aes(x = fct_reorder(as.factor(species_latin), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one species at a time",
+       x = "Species Latin",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_species_out_model_pesticide_lnRR_forest_plot)
+
+results.leave_species_out_model_pesticide_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by pesticide chemical class (lnCVR) leaving one species out each model
+```{r}
+# Convert species_latin to a factor and create a new column for the leave-one-out procedure
+data$leave_species <- as.factor(data$species_latin)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_species_out_model_pesticide_lnCVR <- list()
+VCV_leave_species_out_pesticide_lnCVR <- list()
+
+# Iteratively run the multilevel model, leaving out one species at a time
+for(i in 1:length(levels(data$leave_species))){
+  # Create the data with one species removed at a time
+  data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_species_out_pesticide_lnCVR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnCVRv, cluster = data_species_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_species_out_model_pesticide_lnCVR[[i]] <- rma.mv(yi = data_species_leave$lnCVR,
+                                                         V = VCV_leave_species_out_pesticide_lnCVR[[i]],
+                                                         random = list(~1 | study_id,
+                                                                       ~1 | assay_id,
+                                                                       ~1 | species_latin,
+                                                                       ~1 | pesticide),
+                                                         mods = ~pesticide_chemical_class -1,
+                                                         method = "REML",
+                                                         test = "t", 
+                                                         data = data_species_leave,
+                                                         sparse = TRUE)
+}
+
+results.leave_species_out_model_pesticide_lnCVR <- as.data.frame(cbind(
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_species_out_model_pesticide_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_species_out_model_pesticide_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_species_out_model_pesticide_lnCVR$species_latin <- unique(data$species_latin)
+
+# Display the results table
+kable(results.leave_species_out_model_pesticide_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_species_out_model_pesticide_lnCVR_forest_plot <- ggplot(results.leave_species_out_model_pesticide_lnCVR, 
+                      aes(x = fct_reorder(as.factor(species_latin), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
+  labs(caption = "The value in each point is the point estimate excluding one species at a time",
+       x = "Species Latin",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_species_out_model_pesticide_lnCVR_forest_plot)
+
+results.leave_species_out_model_pesticide_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+### *Leave one pesticide out*
+
+#### Intercept only model (lnRR) leaving one pesticide out each model
 ```{r}
 # Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
 data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
 
 # Initialize lists to contain the model estimates and VCV matrices
-leave_pesticide_out_mod <- list()
-VCV_leave_pesticide_out <- list()
+leave_pesticide_out_model_lnRR <- list()
+VCV_leave_pesticide_out_lnRR <- list()
 
 # Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
 for(i in 1:length(levels(data$leave_pesticide))){
@@ -2927,40 +3848,39 @@ for(i in 1:length(levels(data$leave_pesticide))){
   data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
   
   # Create a VCV matrix for the subset data
-  VCV_leave_pesticide_out[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnRRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  VCV_leave_pesticide_out_lnRR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnRRv, cluster = data_pesticide_leave$study_id, r = 0.5)
   
   # Model fitting
-  leave_pesticide_out_mod[[i]] <- rma.mv(yi = data_pesticide_leave$lnRR,
-                                         V = VCV_leave_pesticide_out[[i]],
-                                         random = list(~1 | study_id,
-                                                       ~1 | assay_id,
-                                                       ~1 | species_latin,
-                                                       ~1 | pesticide),
-                                         method = "REML", 
-                                         test = "t",
-                                         data = data_pesticide_leave,
-                                         sparse = TRUE)
-}
+  leave_pesticide_out_model_lnRR[[i]] <- rma.mv(yi = data_pesticide_leave$lnRR,
+                                                V = VCV_leave_pesticide_out_lnRR[[i]],
+                                                random = list(~1 | study_id,
+                                                              ~1 | assay_id,
+                                                              ~1 | species_latin,
+                                                              ~1 | pesticide),
+                                                method = "REML", 
+                                                test = "t",
+                                                data = data_pesticide_leave,
+                                                sparse = TRUE)
+} 
 
-
-results.leave_pesticide_out_model <- as.data.frame(cbind(
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_pesticide_out_mod, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+results.leave_pesticide_out_model_lnRR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
 ))
 
-colnames(results.leave_pesticide_out_model) <- c("lnRR", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
-results.leave_pesticide_out_model$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+colnames(results.leave_pesticide_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+results.leave_pesticide_out_model_lnRR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
 
 # Display the results table
-kable(results.leave_pesticide_out_model) %>%
+kable(results.leave_pesticide_out_model_lnRR) %>%
   kable_styling("striped", position = "left") %>%
   scroll_box(width = "100%", height = "500px")
 
-leave_one_pesticide_out_forest_plot <- ggplot(results.leave_pesticide_out_model, 
+leave_one_pesticide_out_lnRR_forest_plot <- ggplot(results.leave_pesticide_out_model_lnRR, 
                       aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
                           y = Estimate, 
                           ymin = ci.lb, 
@@ -2973,20 +3893,889 @@ leave_one_pesticide_out_forest_plot <- ggplot(results.leave_pesticide_out_model,
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(lnRR, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
   labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
        x = "Pesticide Chemical Class",
-       y = "lnRR") +
+       y = "Estimate") +
   coord_flip()
 
-print(leave_one_pesticide_out_forest_plot)
+print(leave_one_pesticide_out_lnRR_forest_plot)
 
 
 ```
 
+#### Intercept only model (lnCVR) leaving one pesticide out each model
+```{r}
+# Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
+data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
 
-## Leave imputed SD out
+# Initialize lists to contain the model estimates and VCV matrices
+leave_pesticide_out_model_lnCVR <- list()
+VCV_leave_pesticide_out_lnCVR <- list()
 
+# Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
+for(i in 1:length(levels(data$leave_pesticide))){
+  # Create the data with one pesticide removed at a time
+  data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_pesticide_out_lnCVR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnCVRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_pesticide_out_model_lnCVR[[i]] <- rma.mv(yi = data_pesticide_leave$lnCVR,
+                                                V = VCV_leave_pesticide_out_lnCVR[[i]],
+                                                random = list(~1 | study_id,
+                                                              ~1 | assay_id,
+                                                              ~1 | species_latin,
+                                                              ~1 | pesticide),
+                                                method = "REML", 
+                                                test = "t",
+                                                data = data_pesticide_leave,
+                                                sparse = TRUE)
+} 
+
+results.leave_pesticide_out_model_lnCVR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_pesticide_out_model_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+results.leave_pesticide_out_model_lnCVR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+
+# Display the results table
+kable(results.leave_pesticide_out_model_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_one_pesticide_out_lnCVR_forest_plot <- ggplot(results.leave_pesticide_out_model_lnCVR, 
+                      aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
+       x = "Pesticide Chemical Class",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_one_pesticide_out_lnCVR_forest_plot)
+
+```
+
+#### Moderate by behaviour (lnRR) leaving one pesticide out each model
+```{r}
+# Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
+data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_pesticide_out_model_behaviour_lnRR <- list()
+VCV_leave_pesticide_out_behaviour_lnRR <- list()
+
+# Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
+for(i in 1:length(levels(data$leave_pesticide))){
+  # Create the data with one pesticide removed at a time
+  data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_pesticide_out_behaviour_lnRR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnRRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_pesticide_out_model_behaviour_lnRR[[i]] <- rma.mv(yi = data_pesticide_leave$lnRR,
+                                                          V = VCV_leave_pesticide_out_behaviour_lnRR[[i]],
+                                                          random = list(~1 | study_id,
+                                                                        ~1 | assay_id,
+                                                                        ~1 | species_latin,
+                                                                        ~1 | pesticide),
+                                                          mods = ~behaviour_measured_standardised - 1,
+                                                          method = "REML",
+                                                          test = "t", 
+                                                          data = data_pesticide_leave,
+                                                          sparse = TRUE)
+}
+
+results.leave_pesticide_out_model_behaviour_lnRR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_behaviour_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_pesticide_out_model_behaviour_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_pesticide_out_model_behaviour_lnRR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+
+# Display the results table
+kable(results.leave_pesticide_out_model_behaviour_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_pesticide_out_model_behaviour_lnRR_forest_plot <- ggplot(results.leave_pesticide_out_model_behaviour_lnRR, 
+                      aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
+       x = "Pesticide Chemical Class",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_pesticide_out_model_behaviour_lnRR_forest_plot)
+
+results.leave_pesticide_out_model_behaviour_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by behaviour (lnCVR) leaving one pesticide out each model
+```{r}
+# Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
+data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_pesticide_out_model_behaviour_lnCVR <- list()
+VCV_leave_pesticide_out_behaviour_lnCVR <- list()
+
+# Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
+for(i in 1:length(levels(data$leave_pesticide))){
+  # Create the data with one pesticide removed at a time
+  data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_pesticide_out_behaviour_lnCVR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnCVRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_pesticide_out_model_behaviour_lnCVR[[i]] <- rma.mv(yi = data_pesticide_leave$lnCVR,
+                                                           V = VCV_leave_pesticide_out_behaviour_lnCVR[[i]],
+                                                           random = list(~1 | study_id,
+                                                                         ~1 | assay_id,
+                                                                         ~1 | species_latin,
+                                                                         ~1 | pesticide),
+                                                           mods = ~behaviour_measured_standardised - 1,
+                                                           method = "REML",
+                                                           test = "t", 
+                                                           data = data_pesticide_leave,
+                                                           sparse = TRUE)
+}
+
+results.leave_pesticide_out_model_behaviour_lnCVR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_behaviour_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_pesticide_out_model_behaviour_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_pesticide_out_model_behaviour_lnCVR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+
+# Display the results table
+kable(results.leave_pesticide_out_model_behaviour_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_pesticide_out_model_behaviour_lnCVR_forest_plot <- ggplot(results.leave_pesticide_out_model_behaviour_lnCVR, 
+                      aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
+       x = "Pesticide Chemical Class",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_pesticide_out_model_behaviour_lnCVR_forest_plot)
+
+results.leave_pesticide_out_model_behaviour_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by species (lnRR) leaving one pesticide out each model
+```{r}
+# Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
+data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_pesticide_out_model_species_lnRR <- list()
+VCV_leave_pesticide_out_species_lnRR <- list()
+
+# Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
+for(i in 1:length(levels(data$leave_pesticide))){
+  # Create the data with one pesticide removed at a time
+  data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_pesticide_out_species_lnRR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnRRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_pesticide_out_model_species_lnRR[[i]] <- rma.mv(yi = data_pesticide_leave$lnRR,
+                                                        V = VCV_leave_pesticide_out_species_lnRR[[i]],
+                                                        random = list(~1 | study_id,
+                                                                      ~1 | assay_id,
+                                                                      ~1 | species_latin,
+                                                                      ~1 | pesticide),
+                                                        mods = ~species_latin - 1,
+                                                        method = "REML",
+                                                        test = "t", 
+                                                        data = data_pesticide_leave,
+                                                        sparse = TRUE)
+}
+
+results.leave_pesticide_out_model_species_lnRR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_species_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_pesticide_out_model_species_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_pesticide_out_model_species_lnRR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+
+# Display the results table
+kable(results.leave_pesticide_out_model_species_lnRR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_pesticide_out_model_species_lnRR_forest_plot <- ggplot(results.leave_pesticide_out_model_species_lnRR, 
+                      aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
+       x = "Pesticide Chemical Class",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_pesticide_out_model_species_lnRR_forest_plot)
+
+results.leave_pesticide_out_model_species_lnRR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+#### Moderate by species (lnCVR) leaving one pesticide out each model
+```{r}
+# Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
+data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
+
+# Initialize lists to contain the model estimates and VCV matrices
+leave_pesticide_out_model_species_lnCVR <- list()
+VCV_leave_pesticide_out_species_lnCVR <- list()
+
+# Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
+for(i in 1:length(levels(data$leave_pesticide))){
+  # Create the data with one pesticide removed at a time
+  data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
+  
+  # Create a VCV matrix for the subset data
+  VCV_leave_pesticide_out_species_lnCVR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnCVRv, cluster = data_pesticide_leave$study_id, r = 0.5)
+  
+  # Model fitting
+  leave_pesticide_out_model_species_lnCVR[[i]] <- rma.mv(yi = data_pesticide_leave$lnCVR,
+                                                         V = VCV_leave_pesticide_out_species_lnCVR[[i]],
+                                                         random = list(~1 | study_id,
+                                                                       ~1 | assay_id,
+                                                                       ~1 | species_latin,
+                                                                       ~1 | pesticide),
+                                                         mods = ~species_latin - 1,
+                                                         method = "REML",
+                                                         test = "t", 
+                                                         data = data_pesticide_leave,
+                                                         sparse = TRUE)
+}
+
+results.leave_pesticide_out_model_species_lnCVR <- as.data.frame(cbind(
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$se),   # extract the standard error from all models
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$zval), # extract the z value from all models
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$pval), # extract the p value from all models
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
+  sapply(leave_pesticide_out_model_species_lnCVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+))
+
+colnames(results.leave_pesticide_out_model_species_lnCVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
+results.leave_pesticide_out_model_species_lnCVR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
+
+# Display the results table
+kable(results.leave_pesticide_out_model_species_lnCVR) %>%
+  kable_styling("striped", position = "left") %>%
+  scroll_box(width = "100%", height = "500px")
+
+leave_pesticide_out_model_species_lnCVR_forest_plot <- ggplot(results.leave_pesticide_out_model_species_lnCVR, 
+                      aes(x = fct_reorder(as.factor(pesticide_chemical_class), Estimate), 
+                          y = Estimate, 
+                          ymin = ci.lb, 
+                          ymax = ci.ub)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
+        axis.text.y = element_text(size = 8)) +
+  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
+  labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
+       x = "Pesticide Chemical Class",
+       y = "Estimate") +
+  coord_flip()
+
+print(leave_pesticide_out_model_species_lnCVR_forest_plot)
+
+results.leave_pesticide_out_model_species_lnCVR %>% 
+  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
+```
+
+## *Leave studies with imputed errors out*
+
+### Intercept only model (lnRR) leaving out studies with imputed errors
+```{r}
+data_no_imputed <- data %>%  filter(data$control_imputed == "No")
+
+lnRRVCV_no_imputed <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data_no_imputed, rho = 0.5)
+
+# Model
+lnRR_intercept_only_no_imputed <- rma.mv(yi = lnRR,
+                              V = lnRRVCV_no_imputed,
+                              random = list(~1 | study_id,
+                                            ~1 | assay_id,
+                                            ~1 | species_latin,
+                                            ~1 | pesticide),
+                              method = "REML",
+                              test = "t", 
+                              data = data_no_imputed,
+                              sparse = T)
+
+# Summary statistics 
+summary(lnRR_intercept_only_no_imputed)
+
+mod_results(lnRR_intercept_only_no_imputed, mod = "1", data = data, group = "study_id")  # For prediction intervals
+
+i2_ml(lnRR_intercept_only_no_imputed)
+  
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_intercept_only_no_imputed,
+             group = "study_id",
+             xlab = "lnRR",
+             data = data,
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE) 
+```
+
+### Intercept only model (lnCVR) leaving out studies with imputed errors
+```{r}
+# Calculate the variance-covariance matrix
+lnCVRVCV_no_imputed <- metafor::vcalc(vi = lnCVRv, cluster = exp_id, obs = assay_id, data = data_no_imputed, rho = 0.5)
+
+# Model
+lnCVR_intercept_only_no_imputed <- rma.mv(yi = lnCVR,
+                              V = lnCVRVCV_no_imputed,
+                              random = list(~1 | study_id,
+                                            ~1 | assay_id,
+                                            ~1 | species_latin,
+                                            ~1 | pesticide),
+                              method = "REML",
+                              test = "t", 
+                              data = data_no_imputed,
+                              sparse = T)
+
+# Summary statistics 
+summary(lnCVR_intercept_only_no_imputed)
+
+mod_results(lnCVR_intercept_only_no_imputed, mod = "1", data = data, group = "study_id")  # For prediction intervals
+
+i2_ml(lnCVR_intercept_only_no_imputed)
+  
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_intercept_only_no_imputed,
+             group = "study_id",
+             xlab = "lnCVR",
+             data = data_no_imputed,
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE)
+
+```
+
+### Moderate by behaviour class (lnRR) leaving out studies with imputed errors
+```{r}
+lnRR_mod_behaviour_class_no_imputed <- rma.mv(yi = lnRR,
+                               V = lnRRVCV,
+                               random = list(~1 | study_id,
+                                             ~1 | assay_id,
+                                             ~1 | species_latin,
+                                             ~1 | pesticide),
+                               mods = ~behaviour_measured_standardised -1,
+                               method = "REML",
+                               test = "t", 
+                               data = data_no_imputed,
+                               sparse = T)
+
+
+# Summary results
+summary(lnRR_mod_behaviour_class_no_imputed)
+
+mod_results(lnRR_mod_behaviour_class_no_imputed, mod = "behaviour_measured_standardised", data = data_no_imputed, group = "study_id")  # For prediction intervals
+
+r2_ml(lnRR_mod_behaviour_class_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_mod_behaviour_class_no_imputed,
+             group = "pesticide_chemical_class", 
+             xlab = "lnRR",
+             data = data_no_imputed,
+             mod = "behaviour_measured_standardised",
+             k.pos = "right",
+             colour = TRUE,
+             fill = FALSE) 
+
+
+```
+
+### Moderate by behaviour class (lnCVR) leaving out studies with imputed errors
+```{r}
+lnCVR_mod_behaviour_class_no_imputed <- rma.mv(yi = lnCVR,
+                               V = lnCVRVCV,
+                               random = list(~1 | study_id,
+                                             ~1 | assay_id,
+                                             ~1 | species_latin,
+                                             ~1 | pesticide),
+                               mods = ~behaviour_measured_standardised -1,
+                               method = "REML",
+                               test = "t", 
+                               data = data_no_imputed,
+                               sparse = T)
+
+# Summary results
+summary(lnCVR_mod_behaviour_class_no_imputed)
+
+mod_results(lnCVR_mod_behaviour_class_no_imputed, mod = "behaviour_measured_standardised", data = data_no_imputed, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_behaviour_class_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_behaviour_class_no_imputed,
+             group = "pesticide_chemical_class", 
+             xlab = "lnCVR",
+             data = data_no_imputed,
+             mod = "behaviour_measured_standardised",
+             k.pos = "right",
+             colour = TRUE,
+             fill = FALSE) 
+
+```
+
+### Moderate by species (lnRR) leaving out studies with imputed errors
+```{r}
+# Model
+lnRR_mod_species_no_imputed<- rma.mv(yi = lnRR,
+                               V = lnRRVCV,
+                               random = list(~1 | study_id,
+                                             ~1 | assay_id,
+                                             ~1 | species_latin,
+                                             ~1 | pesticide),
+                               mods = ~species_latin -1,
+                               method = "REML",
+                               test = "t", 
+                               data = data_no_imputed,
+                               sparse = T)
+
+# Summary results
+summary(lnRR_mod_species_no_imputed)
+
+mod_results(lnRR_mod_species_no_imputed, mod = "species_latin", data = data, group = "study_id")  # For prediction intervals
+
+r2_ml(lnRR_mod_species_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_mod_species_no_imputedlnRR_mod_species_no_imputed,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data_no_imputed,
+             mod = "species_latin",
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE) 
+```
+
+### Moderate by species (lnCVR) leaving out studies with imputed errors
+```{r}
+# Model
+lnCVR_mod_species_no_imputed <- rma.mv(yi = lnCVR,
+                                       V = lnCVRVCV2,
+                                       random = list(~1 | study_id,
+                                                     ~1 | assay_id,
+                                                     ~1 | species_latin,
+                                                     ~1 | pesticide),
+                                       mods = ~species_latin -1,
+                                       method = "REML",
+                                       test = "t", 
+                                       data = data_no_imputed,
+                                       sparse = TRUE)
+
+# Summary results
+summary(lnCVR_mod_species_no_imputed)
+
+mod_results(lnCVR_mod_species_no_imputed, mod = "species_latin", data = data, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_species_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_species_no_imputed,
+             group = "study_id", 
+             xlab = "lnCVR",
+             data = data_no_imputeddata_no_imputed,
+             mod = "species_latin",
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE)
+
+```
+
+### Moderate by pesticide chemical class (lnRR) leaving out studies with imputed errors
+```{r}
+# Model
+lnCVR_mod_pesticide_no_imputed <- rma.mv(yi = lnCVR,
+                                         V = lnCVRVCV,
+                                         random = list(~1 | study_id,
+                                                       ~1 | assay_id,
+                                                       ~1 | species_latin,
+                                                       ~1 | pesticide),
+                                         mods = ~pesticide_chemical_class -1,
+                                         method = "REML",
+                                         test = "t", 
+                                         data = data_no_imputed,
+                                         sparse = TRUE)
+
+# Summary results
+summary(lnCVR_mod_pesticide_no_imputed)
+
+mod_results(lnCVR_mod_pesticide_no_imputed, mod = "pesticide_chemical_class", data = data_no_imputed, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_pesticide_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_pesticide_no_imputed,
+             group = "study_id", 
+             xlab = "lnCVR",
+             data = data,
+             mod = "pesticide_chemical_class",
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE)
+
+```
+
+### Moderate by pesticide chemical class (lnCVR) leaving out studies with imputed errors
+```{r}
+# Model
+lnCVR_mod_pesticide_no_imputed <- rma.mv(yi = lnCVR,
+                                         V = lnCVRVCV,
+                                         random = list(~1 | study_id,
+                                                       ~1 | assay_id,
+                                                       ~1 | species_latin,
+                                                       ~1 | pesticide),
+                                         mods = ~pesticide_chemical_class -1,
+                                         method = "REML",
+                                         test = "t", 
+                                         data = data_no_imputed,
+                                         sparse = TRUE)
+
+# Summary results
+summary(lnCVR_mod_pesticide_no_imputed)
+
+mod_results(lnCVR_mod_pesticide_no_imputed, mod = "pesticide_chemical_class", data = data_no_imputed, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_pesticide_no_imputed)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_pesticide_no_imputed,
+             group = "study_id", 
+             xlab = "lnCVR",
+             data = data_no_imputed,
+             mod = "pesticide_chemical_class",
+             k.pos = "right",
+             colour = FALSE,
+             fill = FALSE)
+
+
+
+```
+
+## *Create models with only Zebrafish*
+
+### Intercept only models (lnRR) only including studies using zebrafish
+```{r}
+
+data_zebrafish <- data %>% filter(species_english == "zebrafish")
+
+lnRRVCV_zebrafish <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data_zebrafish, rho = 0.5)
+
+# Model
+lnRR_intercept_only_zebrafish <- rma.mv(yi = lnRR,
+                                        V = lnRRVCV_zebrafish,
+                                        random = list(~1 | study_id,
+                                                      ~1 | assay_id,
+                                                      ~1 | species_latin,
+                                                      ~1 | pesticide),
+                                        method = "REML",
+                                        test = "t", 
+                                        data = data_zebrafish,
+                                        sparse = T)
+
+# Summary statistics 
+summary(lnRR_intercept_only_zebrafish)
+
+mod_results(lnRR_intercept_only_zebrafish, mod = "1", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+i2_ml(lnRR_intercept_only_zebrafish)
+  
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_intercept_only_zebrafish,
+                      group = "study_id",
+                      xlab = "lnRR",
+                      data = data_zebrafish,
+                      k.pos = "right",
+                      colour = FALSE,
+                      fill = FALSE)
+
+
+```
+
+### Intercept only models (lnCVR) only including studies using zebrafish
+```{r}
+lnCVRVCV_zebrafish <- metafor::vcalc(vi = lnCVRv, cluster = exp_id, obs = assay_id, data = data_zebrafish, rho = 0.5)
+
+# Model
+lnCVR_intercept_only_zebrafish <- rma.mv(yi = lnCVR,
+                                         V = lnCVRVCV_zebrafish,
+                                         random = list(~1 | study_id,
+                                                       ~1 | assay_id,
+                                                       ~1 | species_latin,
+                                                       ~1 | pesticide),
+                                         method = "REML",
+                                         test = "t", 
+                                         data = data_zebrafish,
+                                         sparse = T)
+
+# Summary statistics 
+summary(lnCVR_intercept_only_zebrafish)
+
+mod_results(lnCVR_intercept_only_zebrafish, mod = "1", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+i2_ml(lnCVR_intercept_only_zebrafish)
+  
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_intercept_only_zebrafish,
+                      group = "study_id",
+                      xlab = "lnCVR",
+                      data = data_zebrafish,
+                      k.pos = "right",
+                      colour = FALSE,
+                      fill = FALSE)
+```
+
+### Moderate by behavioural class (lnRR) only including studies using zebrafish
+```{r}
+# Model
+lnRR_mod_behaviour_class_zebrafish <- rma.mv(yi = lnRR,
+                                             V = lnRRVCV_zebrafish,
+                                             random = list(~1 | study_id,
+                                                           ~1 | assay_id,
+                                                           ~1 | species_latin,
+                                                           ~1 | pesticide),
+                                             mods = ~behaviour_measured_standardised -1,
+                                             method = "REML",
+                                             test = "t", 
+                                             data = data_zebrafish,
+                                             sparse = T)
+
+# Summary results
+summary(lnRR_mod_behaviour_class_zebrafish)
+
+mod_results(lnRR_mod_behaviour_class_zebrafish, mod = "behaviour_measured_standardised", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+r2_ml(lnRR_mod_behaviour_class_zebrafish)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_mod_behaviour_class_zebrafish,
+                      group = "pesticide_chemical_class", 
+                      xlab = "lnRR",
+                      data = data_zebrafish,
+                      mod = "behaviour_measured_standardised",
+                      k.pos = "right",
+                      colour = TRUE,
+                      fill = FALSE)
+```
+
+### Moderate by behavioural class (lnCVR) only including studies using zebrafish
+```{r}
+# Model
+lnCVR_mod_behaviour_class_zebrafish <- rma.mv(yi = lnCVR,
+                                              V = lnCVRVCV_zebrafish,
+                                              random = list(~1 | study_id,
+                                                            ~1 | assay_id,
+                                                            ~1 | species_latin,
+                                                            ~1 | pesticide),
+                                              mods = ~behaviour_measured_standardised -1,
+                                              method = "REML",
+                                              test = "t", 
+                                              data = data_zebrafish,
+                                              sparse = T)
+
+# Summary results
+summary(lnCVR_mod_behaviour_class_zebrafish)
+
+mod_results(lnCVR_mod_behaviour_class_zebrafish, mod = "behaviour_measured_standardised", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_behaviour_class_zebrafish)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_behaviour_class_zebrafish,
+                      group = "pesticide_chemical_class", 
+                      xlab = "lnCVR",
+                      data = data_zebrafish,
+                      mod = "behaviour_measured_standardised",
+                      k.pos = "right",
+                      colour = TRUE,
+                      fill = FALSE)
+```
+
+### Moderate by pesticide chemical class (lnRR) only including studies using zebrafish
+```{r}
+# Model
+lnRR_mod_pesticide_zebrafish <- rma.mv(yi = lnRR,
+                                       V = lnRRVCV_zebrafish,
+                                       random = list(~1 | study_id,
+                                                     ~1 | assay_id,
+                                                     ~1 | species_latin,
+                                                     ~1 | pesticide),
+                                       mods = ~pesticide_chemical_class -1,
+                                       method = "REML",
+                                       test = "t", 
+                                       data = data_zebrafish,
+                                       sparse = TRUE)
+
+# Summary results
+summary(lnRR_mod_pesticide_zebrafish)
+
+mod_results(lnRR_mod_pesticide_zebrafish, mod = "pesticide_chemical_class", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+r2_ml(lnRR_mod_pesticide_zebrafish)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnRR_mod_pesticide_zebrafish,
+                      group = "study_id", 
+                      xlab = "lnRR",
+                      data = data_zebrafish,
+                      mod = "pesticide_chemical_class",
+                      k.pos = "right",
+                      colour = FALSE,
+                      fill = FALSE)
+
+```
+
+### Moderate by pesticide chemcial class (lnCVR) only including studies using zebrafish
+```{r}
+# Model
+lnCVR_mod_pesticide_zebrafish <- rma.mv(yi = lnCVR,
+                                        V = lnCVRVCV_zebrafish,
+                                        random = list(~1 | study_id,
+                                                      ~1 | assay_id,
+                                                      ~1 | species_latin,
+                                                      ~1 | pesticide),
+                                        mods = ~pesticide_chemical_class -1,
+                                        method = "REML",
+                                        test = "t", 
+                                        data = data_zebrafish,
+                                        sparse = TRUE)
+
+# Summary results
+summary(lnCVR_mod_pesticide_zebrafish)
+
+mod_results(lnCVR_mod_pesticide_zebrafish, mod = "pesticide_chemical_class", data = data_zebrafish, group = "study_id")  # For prediction intervals
+
+r2_ml(lnCVR_mod_pesticide_zebrafish)
+
+# orchaRd plot
+orchaRd::orchard_plot(lnCVR_mod_pesticide_zebrafish,
+                      group = "study_id", 
+                      xlab = "lnCVR",
+                      data = data_zebrafish,
+                      mod = "pesticide_chemical_class",
+                      k.pos = "right",
+                      colour = FALSE,
+                      fill = FALSE)
+```
 
 ```{r}
 sessionInfo()
