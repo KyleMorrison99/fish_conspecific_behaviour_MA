@@ -286,7 +286,6 @@ print(fish_source_study_count_bar_plot)
 # ggsave(here("figures", "fish_source_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-
 ## *Figure sx*
 A bubble plot showing the number of effect sizes of each pesticide per conspecific interaction behaviour described
 ```{r,fig.width=8, fig.height=8}
@@ -1503,7 +1502,9 @@ behav_mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_behaviour_class,
              branch.size = 1.5,
              twig.size = 1,
              angle = 45) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2"))
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
+  theme(axis.text.y = element_blank())
+
 
 
 main_text_figure_3 <- behav_mod.lnRR + behav_mod.lnVR 
@@ -1631,7 +1632,7 @@ lnRR_mod_pesticide <- rma.mv(yi = lnRR,
 # Summary results
 summary(lnRR_mod_pesticide)
 
-mod_results(lnRR_mod_pesticide, mod = "pesticide_chemical_class", data = data, group = "study_id")  # For prediction intervals
+lnRR_pesticide_mod_results <- mod_results(lnRR_mod_pesticide, mod = "pesticide_chemical_class", data = data, group = "study_id") 
 
 r2_ml(lnRR_mod_pesticide)
 
@@ -1655,7 +1656,7 @@ lnVR_mod_pesticide <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_pesticide)
 
-mod_results(lnVR_mod_pesticide, mod = "pesticide_chemical_class", data = data, group = "study_id")  # For prediction intervals
+lnVR_pesticide_mod_results <- mod_results(lnVR_mod_pesticide, mod = "pesticide_chemical_class", data = data, group = "study_id")  
 
 r2_ml(lnVR_mod_pesticide)
 
@@ -1663,8 +1664,37 @@ r2_ml(lnVR_mod_pesticide)
 
 
 ```{r}
+# Filter the mod_table for specific pesticide chemical classes
+lnRR_pesticide_mod_results_filter <- dplyr::filter(
+  lnRR_pesticide_mod_results$mod_table,
+    name == "Triazole" |
+    name == "Triazine" |
+    name == "Pyrethroid" |
+    name == "Organophosphate" |
+    name == "Organochlorine" 
+)
 
-pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_mod_pesticide,
+# Filter the data for the same pesticide chemical classes
+lnRR_pesticide_data_filter <- dplyr::filter(
+  lnRR_pesticide_mod_results$data,
+    moderator == "Triazole" |
+    moderator == "Triazine" |
+    moderator == "Pyrethroid" |
+    moderator == "Organophosphate" |
+    moderator == "Organochlorine" 
+)
+
+# Create the lnRR_pesticide_orchard object
+lnRR_pesticide_orchard <- list(
+  mod_table = lnRR_pesticide_mod_results_filter,
+  data = lnRR_pesticide_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnRR_pesticide_orchard) <- c("orchard", "data.frame")
+
+
+pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_pesticide_orchard,
                       group = "study_id", 
                       xlab = "lnRR",
                       data = data,
@@ -1676,10 +1706,66 @@ pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_mod_pesticide,
                       branch.size = 1.5,
                       twig.size = 1,
                       angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854"))
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2")))
 
-pesticide.mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_pesticide,
+# Filter the mod_table for lnVR_pesticide_mod_results
+lnVR_pesticide_mod_results_filter <- dplyr::filter(
+  lnVR_pesticide_mod_results$mod_table,
+    name == "Triazole" |
+    name == "Triazine" |
+    name == "Pyrethroid" |
+    name == "Organophosphate" |
+    name == "Organochlorine" 
+)
+
+# Filter the data for lnVR_pesticide_mod_results
+lnVR_pesticide_data_filter <- dplyr::filter(
+  lnVR_pesticide_mod_results$data,
+    moderator == "Triazole" |
+    moderator == "Triazine" |
+    moderator == "Pyrethroid" |
+    moderator == "Organophosphate" |
+    moderator == "Organochlorine" 
+)
+
+# Create the lnVR_pesticide_orchard object
+lnVR_pesticide_orchard <- list(
+  mod_table = lnVR_pesticide_mod_results_filter,
+  data = lnVR_pesticide_data_filter
+)
+class(lnVR_pesticide_orchard) <- c("orchard", "data.frame")
+
+pesticide.mod.lnVR <- orchaRd::orchard_plot(lnVR_pesticide_orchard,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "pesticide_chemical_class",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"))) +
+  theme(axis.text.y = element_blank())
+
+pesticide.mod.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_pesticide,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "pesticide_chemical_class",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+pesticide.mod.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_pesticide,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
@@ -1695,16 +1781,13 @@ pesticide.mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_pesticide,
                                "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
   theme(axis.text.y = element_blank())
 
-pesticide.mod.lnVR <- pesticide.mod.lnRR + pesticide.mod.lnVR 
+main_text_figure_4 <- pesticide.mod.lnRR + pesticide.mod.lnVR 
 
 
- ggsave(here("figures", "main_text_figure_4.jpg"),width = 24, height = 28, units = "cm", dpi = 800)
- ggsave(here("figures", "main_text_figure_4.pdf"),width = 24, height = 28, units = "cm", dpi = 800)
-
+# ggsave(here("figures", "main_text_figure_4.jpg"),width = 24, height = 17, units = "cm", dpi = 800)
+# ggsave(here("figures", "main_text_figure_4.pdf"),width = 24, height = 17, units = "cm", dpi = 800)
 
 ```
-
-
 
 ## *Moderate by concentration of pesticide (lnRR)*
 ```{r}
@@ -2073,6 +2156,7 @@ orchaRd::orchard_plot(lnVR_mod_solvent2,
 
 ## *Moderate by species (lnRR)*
 ```{r}
+
 # Model
 lnRR_mod_species <- rma.mv(yi = lnRR,
                                V = lnRRVCV,
@@ -2092,7 +2176,7 @@ summary(lnRR_mod_species)
 r2_ml(lnRR_mod_species)
 
 
-mod_results(lnRR_mod_species, mod = "species_english", data = data, group = "study_id")  # For prediction intervals
+lnRR_species_mod_results <- mod_results(lnRR_mod_species, mod = "species_english", data = data, group = "study_id")  
 
 
 ```
@@ -2117,18 +2201,61 @@ lnVR_mod_species <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_species)
 
-mod_results(lnVR_mod_species, mod = "species_english", data = data, group = "study_id")  # For prediction intervals
+lnVR_species_mod_results <- mod_results(lnVR_mod_species, mod = "species_english", data = data, group = "study_id")
 
 r2_ml(lnVR_mod_species)
-
-
 
 ```
 
 
 ```{r}
+# Filter the mod_table for specific pesticide chemical classes
+lnRR_species_mod_results_filter <- dplyr::filter(
+  lnRR_species_mod_results$mod_table,
+  name == "Zebrafish" |
+    name == "Sailfin mollie" |
+    name == "Marine Medaka" |
+    name == "Killifish" |
+    name == "Japanese medaka")
+
+# Filter the data for the same pesticide chemical classes
+lnRR_species_data_filter <- dplyr::filter(
+  lnRR_species_mod_results$data,
+ moderator == "Zebrafish" |
+    moderator == "Sailfin mollie" |
+    moderator == "Marine Medaka" |
+    moderator == "Killifish" |
+    moderator == "Japanese medaka")
+
+
+# Create the lnRR_pesticide_orchard object
+lnRR_species_orchard <- list(
+  mod_table = lnRR_species_mod_results_filter,
+  data = lnRR_species_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnRR_species_orchard) <- c("orchard", "data.frame")
+
 # First plot (lnRR_mod_species)
-species.mod.lnRR <- orchaRd::orchard_plot(lnRR_mod_species,
+species.mod.lnRR <- orchaRd::orchard_plot(lnRR_species_orchard,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  # Set fill to TRUE to match the style
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+
+# First plot (lnRR_mod_species)
+species.mod.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_species,
              group = "study_id", 
              xlab = "lnRR",
              data = data,
@@ -2143,8 +2270,36 @@ species.mod.lnRR <- orchaRd::orchard_plot(lnRR_mod_species,
   scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
                                "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854"))
 
-# Second plot (lnVR_mod_species)
-species.mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_species,
+# Filter the mod_table for specific pesticide chemical classes
+lnVR_species_mod_results_filter <- dplyr::filter(
+  lnVR_species_mod_results$mod_table,
+  name == "Zebrafish" |
+    name == "Sailfin mollie" |
+    name == "Marine Medaka" |
+    name == "Killifish" |
+    name == "Japanese medaka")
+
+# Filter the data for the same pesticide chemical classes
+lnVR_species_data_filter <- dplyr::filter(
+  lnVR_species_mod_results$data,
+ moderator == "Zebrafish" |
+    moderator == "Sailfin mollie" |
+    moderator == "Marine Medaka" |
+    moderator == "Killifish" |
+    moderator == "Japanese medaka")
+
+# Create the lnVR_pesticide_orchard object
+lnVR_species_orchard <- list(
+  mod_table = lnVR_species_mod_results_filter,
+  data = lnVR_species_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnVR_species_orchard) <- c("orchard", "data.frame")
+
+
+# First plot (lnRR_mod_species)
+species.mod.lnVR <- orchaRd::orchard_plot(lnVR_species_orchard,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
@@ -2160,12 +2315,29 @@ species.mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_species,
                                "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
   theme(axis.text.y = element_blank())
 
-# Combine the plots (if needed)
-main_text_figure_4 <- species.mod.lnRR + species.mod.lnVR
+# Second plot (lnVR_mod_species)
+species.mod.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_species,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  # Set fill to TRUE to match the style
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank())
+
+# Combine the plots
+main_text_figure_5 <- species.mod.lnRR + species.mod.lnVR
 
 # Save the plots
-ggsave(here("figures", "species_plot_figure.jpg"), plot = main_text_figure_4, width = 24, height = 28, units = "cm", dpi = 800)
-ggsave(here("figures", "species_plot_figure.pdf"), plot = main_text_figure_4, width = 24, height = 28, units = "cm", dpi = 800)
+# ggsave(here("figures", "species_plot_figure.jpg"), plot = main_text_figure_5,width = 24, height = 14, units = "cm", dpi = 800)
+# ggsave(here("figures", "species_plot_figure.pdf"), plot = main_text_figure_5, width = 24, height = 14, units = "cm", dpi = 800)
 
 ```
 
