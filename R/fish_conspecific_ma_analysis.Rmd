@@ -1,7 +1,6 @@
 ---
 title: "The impacts of pesticide exposure on fish conspecific behavioural interactions: a systematic review and meta-analysis"
-author: Kyle Morrison, Aneesh Bose, Rhiannon Eastment, Jack Manera, Gabriel Melhado, Marcus
-  Michelangeli, Shiho Ozeki, Bob Wong, Yefeng Yang, Malgorzata Lagisz, Shinichi Nakagawa
+author: Kyle Morrison
 date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
@@ -74,9 +73,9 @@ kable(summary(data), "html") %>%
 
 
 # **Data exploration and reporting of methodological items**
-## *Figure 1b & 1c*
-b) A bubble plot showing the number of effect sizes of each pesticide class per conspecific interaction behaviour described
-c) A bar chart showing the total number of effect sizes per species
+## *Figure 1B & 1C*
+B) A bubble plot showing the number of effect sizes of each pesticide class per conspecific interaction behaviour described
+C) A bar chart showing the total number of effect sizes per species
 ```{r,fig.width=8, fig.height=13}
 # Summarize data by grouping on pesticide chemical class and behavior measured, then count entries.
 pc_cb_summary <- data %>% 
@@ -100,22 +99,28 @@ pc_cb_summary_filtered <- pc_cb_summary %>%
 
 # Create the bubble plot
 behaviour_pesticide_class_bubble_plot <- pc_cb_summary_filtered %>%
-   ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
-             y = fct_reorder(str_to_title(pesticide_chemical_class), n, .fun = 'sum'),
-             size = n)) +
+   ggplot(aes(
+       x = fct_rev(fct_reorder(str_wrap(str_to_title(behaviour_measured_standardised), width = 15), n, .fun = 'sum')),
+       y = fct_reorder(str_to_title(pesticide_chemical_class), n, .fun = 'sum'),
+       size = n
+   )) +
   geom_point(alpha = 0.5, color = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[3]) +
   scale_size_continuous(range = c(5, 20)) +
   theme_bw() +
   guides(size = "none") +
-  theme(legend.position = "none",
-        axis.text = element_text(color = "black"),
-        axis.title = element_text(face = "bold", color = "black"),
-        plot.caption = element_text(size = 10, color = "gray10", face = "italic"))  +
-  geom_text(aes(label = as.character(n)), size = 4, color = "gray10") +
-  labs(caption = "The value in each cell is the total number of effect sizes",
-       x = "Behaviour Measured",
-       y = "Pesticide Chemical Class",
-       tag = "B")
+  theme(
+    legend.position = "none",
+    axis.text = element_text(size = 12,color = "black"),
+    axis.title = element_text(size = 12,face = "bold", color = "black"),
+    plot.caption = element_text(size = 12, color = "gray10", face = "italic")
+  ) +
+  geom_text(aes(label = as.character(n)), size = 5, color = "gray10") +
+  labs(
+    caption = "The value in each cell is the total number of effect sizes",
+    x = "Behaviour Measured",
+    y = "Pesticide Chemical Class",
+    tag = "B"
+  )
 
 # Group data by species, count entries, and drop groups post-summary.
 sp_summary <- data %>% 
@@ -131,16 +136,16 @@ species_pct <- sp_summary %>%
 species_effect_size_count_bar_plot <- sp_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_title(species_english), n))) + 
   geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[2]) +
-  geom_text(aes(label = ifelse(n < 9, "", n), x = n / 2, y = reorder(str_to_title(species_english), n)), hjust = 0.5, size = 4, color = "black") +
+  geom_text(aes(label = ifelse(n < 9, "", n), x = n / 2, y = reorder(str_to_title(species_english), n)), hjust = 0.5, size = 5, color = "black") +
   geom_text(data = species_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n), 
-            hjust = -0.1, size = 4, color = "black", fontface = "bold") +
+            hjust = -0.1, size = 6, color = "black", fontface = "bold") +
   scale_x_continuous(expand = c(0, 0), limits = c(0, max(sp_summary$n) * 1.2)) +
   theme_bw() +
   guides(size = "none") +
   theme(legend.position = "none",
-        axis.text = element_text(color = "black"),
-        axis.title = element_text(face = "bold", color = "black"),
-        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
+        axis.text = element_text(size = 12,color = "black"),
+        axis.title = element_text(size = 12,face = "bold", color = "black"),
+        plot.caption = element_text(size = 12, color = "gray10", face = "italic")) +
   labs(caption = "The value in each bar is the total number of effect sizes",
        x = "Total number of effect size estimates",
        y = "Species",
@@ -150,12 +155,12 @@ species_effect_size_count_bar_plot <- sp_summary %>%
 main_text_figure_1 <- behaviour_pesticide_class_bubble_plot / species_effect_size_count_bar_plot
 
 print(main_text_figure_1)
-# ggsave(here("figures", "main_text_figure_1.pdf"), width = 8, height = 13, units = "cm", scale = 2, dpi = 800)
-# ggsave(here("figures", "main_text_figure_1.jpg"), width = 8, height = 13, units = "cm", scale = 2, dpi = 800)
+ ggsave(here("figures", "main_text_figure_1.pdf"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
+ ggsave(here("figures", "main_text_figure_1.jpg"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
+
 ```
 
-
-## *Figure sx*
+## *Figure s2*
 A bubble plot showing the number of effect sizes of each species per conspecific interaction behaviour described
 ```{r,fig.width=8, fig.height=6}
 # Group data by species, count entries, and drop groups post-summary.
@@ -183,6 +188,7 @@ top_species <- species_summary %>%
 #   summarise(n = sum(n), .groups = "drop")
 
 # Create the bubble plot the behaviours assessed per species (number of effect size as count)
+
 behaviour_species_bubble_plot <- species_summary %>% # can add _filtered if needed
   ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
              y = fct_reorder(str_to_title(species_english), n, .fun = 'sum'),
@@ -207,8 +213,7 @@ print(behaviour_species_bubble_plot)
 # ggsave(here("figures", "behaviour_species_bubble_plot.jpg"), width = 8, height = 6, units = "cm", scale = 2, dpi = 800)
 ```
 
-
-## *Figure sx*
+## *Figure s3*
 A bar chart showing the sex of fish used in the literature
 ```{r,fig.width=10, fig.height=5}
 # Group data by 'sex of fish' and count entries, then drop grouping for further analysis.
@@ -245,7 +250,7 @@ print(fish_sex_study_count_bar_plot)
 # ggsave(here("figures", "fish_sex_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s4*
 A bar chart showing the reporting of the source of fish used in the literature
 ```{r,fig.width=10, fig.height=5}
 # Extracts unique records from the dataset based on 'study_id', retaining all other associated data.
@@ -286,7 +291,7 @@ print(fish_source_study_count_bar_plot)
 # ggsave(here("figures", "fish_source_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s5*
 A bubble plot showing the number of effect sizes of each pesticide per conspecific interaction behaviour described
 ```{r,fig.width=8, fig.height=8}
 # Group data by species, count entries, and drop groups post-summary.
@@ -314,6 +319,7 @@ top_pesticides <- p_cb_summary %>%
 
 
 # Create the bubble plot for the behaviours assessed per pesticide (effect size as count)
+
 behaviour_pesticide_bubble_plot <- p_cb_summary %>% # can add _filtered if needed
    ggplot(aes(x = fct_rev(fct_reorder(str_to_title(behaviour_measured_standardised), n, .fun = 'sum')),
              y = fct_reorder(str_to_title(pesticide), n, .fun = 'sum'),
@@ -338,45 +344,7 @@ print(behaviour_pesticide_bubble_plot)
 # ggsave(here("figures", "behaviour_pesticide_bubble_plot.jpg"), width = 8, height = 12, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
-A bar plot showing the control solvents used in the literature
-```{r,fig.width=10, fig.height=5}
-# Group data by 'control solvent' and count entries, then drop the group structure for further analysis.
-solvent_summary <- data %>% 
-  group_by(control_solvent) %>% 
-  summarise(n = n(), .groups = "drop")
-
-# Calculate the proportion and percentage of total studies for each control solvent.
-solvent_pct <- solvent_summary %>% 
-  mutate(proportion = n / sum(n), 
-         percentage = proportion * 100)
-
-# Create a bar plot visualizing the number of studies per control solvent, annotated with counts and percentages.
-control_solvent_study_count_bar_plot <- solvent_summary %>%
-  ggplot(aes(x = n, y = reorder(str_to_title(control_solvent), n))) + 
-  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[3]) +
-  geom_text(aes(label = n, x = n / 2, y = reorder(str_to_title(control_solvent), n)), hjust = 0.5, size = 4, color = "black") +
-  geom_text(data = solvent_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n),
-            hjust = -0.1, size = 4, color = "black", fontface = "bold") +
-  scale_x_continuous(expand = c(0, 0), limits = c(0, max(solvent_summary$n) * 1.3)) +
-  theme_bw() +
-  guides(size = "none") +
-  theme(legend.position = "none",
-        axis.text = element_text(color = "black"),
-        axis.title = element_text(face = "bold", color = "black"),
-        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
-  labs(caption = "The value in each bar is the total number of studies",
-       x = "Total number of studies",
-       y = "Control Solvent") +
-  scale_y_discrete(labels = function(x) ifelse(x == "Dmso", toupper(x), ifelse(x == "Dtnb", toupper(x), x)))
-
-print(control_solvent_study_count_bar_plot)
-
-# ggsave(here("figures", "control_solvent_study_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-# ggsave(here("figures", "control_solvent_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-```
-
-## *Figure sx*
+## *Figure s6*
 A box and violin plot showing the distribution of pesticide dosages used in the literature
 ```{r}
 # making dosages consistent for dosage comparisons
@@ -426,14 +394,14 @@ pesticide_dosage_violin_plot <- ggplot(filtered_data_dosage, aes(y = dosage_unit
 
 print(pesticide_dosage_violin_plot)
 
-# ggsave(here("figures", "pesticide_dosage_violin_plot.pdf"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-# ggsave(here("figures", "pesticide_dosage_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "pesticide_dosage_violin_plot.pdf"), plot = pesticide_dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "pesticide_dosage_violin_plot.jpg"), plot = pesticide_dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-
-## *Figure sx*
+## *Figure s7*
 A box and violin plot the distribution of durations of pesticide exposure 
 ```{r}
+# making durations consistent for duration comparisons
 data_duration <- data %>% 
   filter(!is.na(duration), duration != "not reported") %>%
   mutate(duration = as.numeric(duration),
@@ -451,7 +419,7 @@ data_duration <- data %>%
 
 summary(data_duration$duration_convert)
 
-# Create the violin plot for duration
+# Create the violin plot 
 pesticide_duration_violin_plot <- ggplot(data_duration, aes(y = duration_unit_consistent, x = duration_convert)) +
   geom_violin(fill = RColorBrewer::brewer.pal(n = 8, name = "Set2")[1], alpha = 0.4, color = NA, trim = FALSE) +
   geom_boxplot(width = 0.1, fill = "white", color = RColorBrewer::brewer.pal(n = 8, name = "Set2")[2], outlier.shape = NA) +
@@ -470,12 +438,50 @@ pesticide_duration_violin_plot <- ggplot(data_duration, aes(y = duration_unit_co
 
 print(pesticide_duration_violin_plot)
 
-# ggsave(here("figures", "pesticide_duration_violin_plot.pdf"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
-# ggsave(here("figures", "pesticide_duration_violin_plot.jpg"), plot = dosage_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "pesticide_duration_violin_plot.pdf"), plot = pesticide_duration_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "pesticide_duration_violin_plot.jpg"), plot = pesticide_duration_violin_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
-A bar plot showing the behavioural assays used to quantify soliality in the literature
+## *Figure s8*
+A bar plot showing the control solvents used in the literature
+```{r,fig.width=10, fig.height=5}
+# Group data by 'control solvent' and count entries, then drop the group structure for further analysis.
+solvent_summary <- data %>% 
+  group_by(control_solvent) %>% 
+  summarise(n = n(), .groups = "drop")
+
+# Calculate the proportion and percentage of total studies for each control solvent.
+solvent_pct <- solvent_summary %>% 
+  mutate(proportion = n / sum(n), 
+         percentage = proportion * 100)
+
+# Create a bar plot visualizing the number of studies per control solvent, annotated with counts and percentages.
+control_solvent_study_count_bar_plot <- solvent_summary %>%
+  ggplot(aes(x = n, y = reorder(str_to_title(control_solvent), n))) + 
+  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[3]) +
+  geom_text(aes(label = n, x = n / 2, y = reorder(str_to_title(control_solvent), n)), hjust = 0.5, size = 4, color = "black") +
+  geom_text(data = solvent_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n),
+            hjust = -0.1, size = 4, color = "black", fontface = "bold") +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, max(solvent_summary$n) * 1.3)) +
+  theme_bw() +
+  guides(size = "none") +
+  theme(legend.position = "none",
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(face = "bold", color = "black"),
+        plot.caption = element_text(size = 10, color = "gray10", face = "italic")) +
+  labs(caption = "The value in each bar is the total number of studies",
+       x = "Total number of studies",
+       y = "Control Solvent") +
+  scale_y_discrete(labels = function(x) ifelse(x == "Dmso", toupper(x), ifelse(x == "Dtnb", toupper(x), x)))
+
+print(control_solvent_study_count_bar_plot)
+
+# ggsave(here("figures", "control_solvent_study_count_bar_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "control_solvent_study_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+```
+
+## *Figure s9*
+A bar plot showing the behavioural assays used to quantify sociality in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "sociality" in behaviour_measure_standardised
 sociality_data <- data %>% 
@@ -491,7 +497,7 @@ sociality_assay_pct <- sociality_assay_summary %>%
   mutate(proportion = n / sum(n), 
          percentage = proportion * 100)
 
-# Create a bar plot visualizing the number of studies quantifying pesticide impacts on aggression, annotated with counts and percentages.
+# Create a bar plot visualizing the number of studies quantifying pesticide impacts on aggression
 sociality_assay_effect_size_count_bar_plot <- sociality_assay_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_title(behavioural_assay_standardised), n))) +
   geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[5]) +
@@ -516,7 +522,7 @@ print(sociality_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "sociality_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s10*
 A bar plot showing the behavioural assays used to quantify aggression in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "aggression" in behaviour_measure_standardised
@@ -558,7 +564,7 @@ print(aggression_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "aggression_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s11*
 A bar plot showing the behavioural assays used to quantify courtship in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "courtship" in behaviour_measure_standardised
@@ -578,7 +584,7 @@ courtship_assay_pct <- courtship_assay_summary %>%
 # Create a bar plot visualizing the number of studies quantifying pesticide impacts on courtship, annotated with counts and percentages.
 courtship_assay_effect_size_count_bar_plot <- courtship_assay_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_title(behavioural_assay_standardised), n))) +
-  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[6]) +
+  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[7]) +
   geom_text(aes(label = ifelse(n < 0, "", n), x = n / 2, y = reorder(str_to_title(behavioural_assay_standardised), n)), 
             hjust = 0.5, size = 4, color = "black") +
   geom_text(data = courtship_assay_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n),
@@ -600,7 +606,7 @@ print(courtship_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "courtship_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s12*
 A bar plot showing the behavioural assays used to quantify collective behaviour (i.e., behaviours measure at collective level) in the literature
 ```{r,fig.width=10, fig.height=5}
 # Filter data for entries containing "collective behaviour" in behaviour_measure_standardised
@@ -620,7 +626,7 @@ collective_behaviour_assay_pct <- collective_behaviour_assay_summary %>%
 # Create a bar plot visualizing the number of studies quantifying pesticide impacts on collective behaviour, annotated with counts and percentages.
 collective_behaviour_assay_effect_size_count_bar_plot <- collective_behaviour_assay_summary %>%
   ggplot(aes(x = n, y = reorder(str_to_sentence(behavioural_assay_standardised), n))) +
-  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[7]) +
+  geom_bar(stat = "identity", width = 0.8, alpha = 0.5, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[8]) +
   geom_text(aes(label = ifelse(n < 9, "", n), x = n / 2, y = reorder(str_to_sentence(behavioural_assay_standardised), n)), 
             hjust = 0.5, size = 4, color = "black") +
   geom_text(data = collective_behaviour_assay_pct, aes(label = paste0("(", round(percentage, 1), "%)"), x = n),
@@ -642,7 +648,7 @@ print(collective_behaviour_assay_effect_size_count_bar_plot)
 # ggsave(here("figures", "collective_behaviour_assay_effect_size_count_bar_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
-## *Figure sx*
+## *Figure s13*
 Visual representation of the characteristics of the primary studies included in the dataset. The vertical bars indicate key categorical variables. The widths of the vertical bars indicate the numbers of effect sizes represented by each level of the categorical variable. The flow lines between vertical bars indicate the connections and overlaps of different levels of the categorical variables. 
 ```{r}
 # Select relevant columns and replace NA values with "Not Reported"
@@ -682,7 +688,7 @@ ggplot(sankey_df, aes(x = x, next_x = next_x,
   geom_sankey(flow.alpha = .6, node.color = "gray30") +
   geom_sankey_label(size = 3, color = "white", fill = "gray40") +
   scale_fill_viridis_d() +
-  scale_x_discrete(labels = c("Behaviour Measured", "Assay type", "Pesticide chemical class", 
+  scale_x_discrete(labels = c("Behaviour Measured", "Assay Type", "Pesticide Class", 
                               "Control Solvent", "Species", "Sex", "Source"), 
                    position = "top") +
   theme_sankey(base_size = 10) +
@@ -690,6 +696,11 @@ ggplot(sankey_df, aes(x = x, next_x = next_x,
   theme(legend.position = "none",
         plot.title = element_text(hjust = .5),
         axis.text.x = element_text(color = "black", size = 9))
+
+
+# ggsave(here("figures", "sankey_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "sankey_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+
 ```
 
 # **Calculate effect size estimates & dependency**
@@ -726,12 +737,15 @@ sd_mean_ratio_bar_plot <- sd_mean_ratio %>%
     plot.caption = element_text(size = 10, color = "gray10", face = "italic")
   ) +
   labs(
-    caption = "Red = Control, Blue = Treatment, Purple = Both\nThe value in each bar is the total number of effect sizes",
+    caption = "Red = Control, Blue = Treatment, Purple = Both",
     x = "SD/Mean Ratio",
     y = "Frequency"
   )
 
 print(sd_mean_ratio_bar_plot)
+
+# ggsave(here("figures", "sd_mean_ratio_bar_plot.pdf"), plot = sd_mean_ratio_bar_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "sd_mean_ratio_bar_plot.jpg"), plot = sd_mean_ratio_bar_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 
 ```
 
@@ -809,6 +823,10 @@ imputed_sd_plot <- ggplot(data_long, aes(x = factor(study_id), y = log_sd, color
 
 # Print the plot
 print(imputed_sd_plot)
+
+# ggsave(here("figures", "imputed_sd_plot.pdf"), plot = imputed_sd_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "imputed_sd_plot.jpg"), plot = imputed_sd_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+
 ```
 
 ## *Calculate effect sizes and sampling variances*
@@ -869,7 +887,6 @@ lnCVR$precision <- ifelse(lnCVR$vi > 0, 1 / sqrt(lnCVR$vi), NA)
 SMD$precision <- ifelse(SMD$vi > 0, 1 / sqrt(SMD$vi), NA)
 lnVR$precision <- ifelse(lnVR$vi > 0, 1 / sqrt(lnVR$vi), NA)
 
-
 # Merge each of the effect size with precision
 effect_size_metrics_set <- data.frame(
   lnRR = lnRR$yi, lnRRv = lnRR$vi, lnRR_precision = lnRR$precision,
@@ -878,17 +895,13 @@ effect_size_metrics_set <- data.frame(
   SMD = SMD$yi, SMDv = SMD$vi, SMD_precision = SMD$precision,
   control_imputed = data$control_sd_report, treatment_imputed = data$treatment_sd_report)
 
-
-
  # Bind the effect size metrics set to the main data
 data <- cbind(data, effect_size_metrics_set)
-
 
 # Check if `effect_direction` is "change" and not NA, then multiply `lnRR` by -1; otherwise, keep original `lnRR`
 data$lnRR <- ifelse(!is.na(data$effect_direction) & data$effect_direction == "change", 
                     -1 * data$lnRR, 
                     data$lnRR)
-
 
 # Select specific columns including the new precision columns
 effect_size_metrics_set_kable <- data[, which(colnames(data) %in% c(
@@ -899,7 +912,6 @@ effect_size_metrics_set_kable <- data[, which(colnames(data) %in% c(
   "SMD", "SMDv", "SMD_precision", 
   "control_imputed", "treatment_imputed"
 ))] %>% dfround(digits = 3)
-
 
 # Table of the effect sizes
  kable(effect_size_metrics_set_kable, "html") %>%
@@ -925,6 +937,8 @@ lnRR_dist_plot <- effect_size_metrics_set_kable %>%
 
 print(lnRR_dist_plot)
 
+# ggsave(here("figures", "lnRR_dist_plot.pdf"), plot = lnRR_dist_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "lnRR_dist_plot.jpg"),  plot = lnRR_dist_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 
  # Plot the distribution of effect size estimates (lnVR)
 lnVR_dist_plot <- effect_size_metrics_set_kable %>%
@@ -944,12 +958,14 @@ lnVR_dist_plot <- effect_size_metrics_set_kable %>%
        y = "Frequency")
 
 print(lnVR_dist_plot)
+
+# ggsave(here("figures", "lnVR_dist_plot.pdf"), plot = lnVR_dist_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "lnVR_dist_plot.jpg"),  plot = lnVR_dist_plot, width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
 ## *Dependent effect size estimates*
 ### *Create phylogentic tree*
 We used the *rotl* package (https://peerj.com/preprints/1471/) to retrieve synthetic species tree from Open Tree of Life (https://opentreeoflife.org/). 
- 
 ```{r}
 data <- as.data.frame(data)
 
@@ -1006,25 +1022,14 @@ data<- data[!is.na(data$lnRRv),]
 
 lnRRVCV <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
 
-lnRRVCV2 <- metafor::vcalc(vi = lnRRv, cluster = exp2_id, obs = assay_id, data = data, rho = 0.5) # Sensitivity analysis with alternative VCV
+lnRRVCV2 <- metafor::vcalc(vi = lnRRv, cluster = exp2_id, obs = assay_id, data = data, rho = 0.5) 
 
 #------------------------------lnVR------------------------------#
 data <- data[!is.na(data$lnVRv),]
 
 lnVRVCV <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
 
-lnVRVCV2 <- metafor::vcalc(vi = lnVRv, cluster = exp2_id, obs = assay2_id, data = data, rho = 0.5) # Sensitivity analysis with alternative VCV
-
-#------------------------------lnCVR------------------------------#
-data <- data[!is.na(data$lnCVRv),]
-
-lnCVRVCV <- metafor::vcalc(vi = lnCVRv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
-
-#------------------------------SMD------------------------------#
-data <- data[!is.na(data$SMDv),]
-
-SMDVCV <- metafor::vcalc(vi = SMDv, cluster = exp_id, obs = assay_id, data = data, rho = 0.5)
-
+lnVRVCV2 <- metafor::vcalc(vi = lnVRv, cluster = exp2_id, obs = assay2_id, data = data, rho = 0.5) 
 
 ```
 
@@ -1180,7 +1185,7 @@ null_mod_lnVR <- rma.mv(yi = lnVR,
                          method = "ML", 
                          test = "t", 
                          data = data, 
-                         sparse = TRUE ) # Use ML to compare information criteria
+                         sparse = TRUE ) 
 
 summary(null_mod_lnVR)
 
@@ -1296,7 +1301,7 @@ summary(mod_lnVR.assay_id.study_id.species.phylogeny.pesticide)
 
 # **Intercept only meta-analysis models**
 
-## Intercept only model (lnRR)
+## *Intercept only model (lnRR)*
 ```{r}
 # Model
 lnRR_intercept_only <- rma.mv(yi = lnRR,
@@ -1328,11 +1333,11 @@ lnRR_percentage_change
 
 ```
 
-## Intercept only model (lnVR)
+## *Intercept only model (lnVR)*
 ```{r}
 # Model
 lnVR_intercept_only <- rma.mv(yi = lnVR,
-                               V = lnCVRVCV,
+                               V = lnVRVCV,
                                random = list(~1 | study_id,
                                             ~1 | assay_id,
                                             ~1 | species_latin,
@@ -1350,8 +1355,7 @@ lnVR_intercept_only <- rma.mv(yi = lnVR,
 # Summary statistics 
 summary(lnVR_intercept_only)
 
-mod_results(lnVR_intercept_only, mod = "1", data = data, group = "study_id")  # For prediction intervals
-
+mod_results(lnVR_intercept_only, mod = "1", data = data, group = "study_id")  
 i2_ml(lnVR_intercept_only)
 
 # Given point estimate of lnRR
@@ -1363,9 +1367,10 @@ lnVR_percentage_change
 
 ```
 
-## Figure 2
+## *Figure 2*
+Impacts of pesticide exposure on fish conspecific interactions. The model estimates the average effects of pesticide exposure on conspecific interactions in fish. (A) shows the mean difference between control and treatment groups on a logarithmic scale, where negative values indicate a reduction in conspecific behavioural activity. (B) shows the difference in variances between control and treatment groups, also on a logarithmic scale, where negative values suggest a reduction in the inter-individual variability of conspecific behavioural activity. Shorter whiskers represent 95% confidence intervals, while longer whiskers indicate 95% prediction intervals. 'k' represents the number of effect sizes, and the number of studies is in brackets. Each circle corresponds to an effect size, with its size scaled according to precision (inverse sampling error variance).
 ```{r}
-# orchard plot
+# Figure 2a)
 intercept_only.lnRR_orchard <- orchaRd::orchard_plot(lnRR_intercept_only,
              group = "study_id",
              xlab = "lnRR",
@@ -1375,43 +1380,40 @@ intercept_only.lnRR_orchard <- orchaRd::orchard_plot(lnRR_intercept_only,
              colour = FALSE,
              fill = TRUE,  
              trunk.size = 3., 
+             legend.pos = "none",
              branch.size = 1.5,
              twig.size = 1) +
     scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[1]) +
   scale_x_discrete(labels = c("Model estimates")) 
 
-
-# orchaRd plot
+# Figure 2b)
 intercept_only.lnVR__orchard <- orchaRd::orchard_plot(lnVR_intercept_only,
              group = "study_id",
              xlab = "lnVR",
              data = data,
-            g = TRUE,
+             g = TRUE,
              k.pos = "right",
              colour = FALSE,
              fill = TRUE,  
              trunk.size = 3., 
+             legend.pos = "none",
              branch.size = 1.5,
              twig.size = 1) +
     scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[2]) +
-  scale_x_discrete(labels = c("Model estimates")) +
-plot_annotation(tag_levels = "b)")
+  scale_x_discrete(labels = c("Model estimates"))
 
+# Combine the two plots 
+main_text_figure_2 <- intercept_only.lnRR_orchard + intercept_only.lnVR__orchard + plot_annotation(tag_levels = "A")
 
+print(main_text_figure_2)
 
-
-# Combine the two plots vertically
-main_text_figure_2 <- intercept_only.lnRR_orchard + intercept_only.lnVR__orchard 
-
-# ggsave(here("figures", "main_text_figure_2.jpg"),width = 20, height = 10, units = "cm", dpi = 800)
-# ggsave(here("figures", "main_text_figure_2.pdf"),width = 20, height = 10, units = "cm", dpi = 800)
-
+# ggsave(here("figures", "main_text_figure_2.jpg"), width = 24, height = 10, units = "cm", dpi = 800)
+# ggsave(here("figures", "main_text_figure_2.pdf"), width = 24, height = 10, units = "cm", dpi = 800)
 ```
-
 
 # **Single moderator meta-regression**
 
-## **Behaviour characteristics**
+## *Behaviour characteristics*                        
 
 ###  *Moderating effects of behaviour type (lnRR)*
 ```{r}
@@ -1432,17 +1434,16 @@ lnRR_mod_behaviour_class <- rma.mv(yi = lnRR,
 # Summary results
 summary(lnRR_mod_behaviour_class)
 
-mod_results(lnRR_mod_behaviour_class, mod = "behaviour_measured_standardised", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnRR_mod_behaviour_class, mod = "behaviour_measured_standardised", data = data, group = "study_id")  
 
 r2_ml(lnRR_mod_behaviour_class)
 
-# Given point estimate of lnRR
+# Give point estimate of lnRR
 courtship_lnRR_point <- -0.4280
 
 # Calculate the percentage change
 courtship_lnRR_percentage_change <- (1 - exp(courtship_lnRR_point)) * 100
 courtship_lnRR_percentage_change
-
 
 ```
 
@@ -1464,57 +1465,15 @@ lnVR_mod_behaviour_class <- rma.mv(yi = lnVR,
 # Summary statistics
 summary(lnVR_mod_behaviour_class)
 
-mod_results(lnVR_mod_behaviour_class, mod = "behaviour_measured_standardised", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnVR_mod_behaviour_class, mod = "behaviour_measured_standardised", data = data, group = "study_id")  
 
 r2_ml(lnVR_mod_behaviour_class)
 
 ```
 
-### *orchaRd plots for the moderating effects of behaviour type*
-```{r}
-# orchaRd plot
-behav_mod.lnRR <- orchaRd::orchard_plot(lnRR_mod_behaviour_class,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "behaviour_measured_standardised",
-            g = TRUE,
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  
-             trunk.size = 3., 
-             branch.size = 1.5,
-             twig.size = 1,
-            angle = 45) +
-      scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) 
-
-# orchaRd plot
-behav_mod.lnVR <- orchaRd::orchard_plot(lnVR_mod_behaviour_class,
-             group = "study_id", 
-             xlab = "lnVR",
-            mod = "behaviour_measured_standardised",
-             data = data,
-            g = TRUE,
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  
-             trunk.size = 3., 
-             branch.size = 1.5,
-             twig.size = 1,
-             angle = 45) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
-  theme(axis.text.y = element_blank())
-
-
-
-main_text_figure_3 <- behav_mod.lnRR + behav_mod.lnVR 
-
-# ggsave(here("figures", "main_text_figure_3.jpg"),width = 24, height = 14, units = "cm", dpi = 800)
-# ggsave(here("figures", "main_text_figure_3.pdf"),width = 24, height = 14, units = "cm", dpi = 800)
-```
-
 ### *Moderate by assay (lnRR)*
 ```{r}
+# Model
 lnRR_mod_assay <- rma.mv(yi = lnRR,
                           V = lnRRVCV,
                           random = list(~1 | study_id,
@@ -1527,13 +1486,11 @@ lnRR_mod_assay <- rma.mv(yi = lnRR,
                           data = data,
                           sparse = T)
 
-
-
 summary(lnRR_mod_assay)
 
 r2_ml(lnRR_mod_assay)
 
-# contrast 
+# Model contrast 
 lnRR_mod_assay_contrast <- rma.mv(yi = lnRR,
                           V = lnRRVCV,
                           random = list(~1 | study_id,
@@ -1548,30 +1505,11 @@ lnRR_mod_assay_contrast <- rma.mv(yi = lnRR,
 
 summary(lnRR_mod_assay_contrast)
 
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_assay_contrast,
-                      group = "study_id", 
-                      xlab = "lnVR",
-                      data = data,
-                      mod = "behavioural_assay_standardised2",
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_assay,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "behavioural_assay_standardised2",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
 ```
 
 ### *Moderate by assay (lnVR)*
 ```{r}
+# Model
 lnVR_mod_assay <- rma.mv(yi = lnVR,
                           V = lnVRVCV,
                           random = list(~1 | study_id,
@@ -1586,7 +1524,10 @@ lnVR_mod_assay <- rma.mv(yi = lnVR,
 
 summary(lnVR_mod_assay)
 
-# contrast 
+r2_ml(lnVR_mod_assay)
+
+
+# Model contrast 
 lnVR_mod_assay_contrast <- rma.mv(yi = lnVR,
                           V = lnVRVCV,
                           random = list(~1 | study_id,
@@ -1601,20 +1542,96 @@ lnVR_mod_assay_contrast <- rma.mv(yi = lnVR,
 
 summary(lnVR_mod_assay_contrast)
 
-
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_mod_assay_contrast,
-                      group = "study_id", 
-                      xlab = "lnVR",
-                      data = data,
-                      mod = "behavioural_assay_standardised2",
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
 ```
 
-## **Pesticide characteristics**
-## *Moderate by pesticide chemical class (lnRR)*
+### *Figure 3*
+```{r}
+# Figure 3a)
+behav_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_behaviour_class,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "behaviour_measured_standardised",
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
+    plot_annotation(tag_levels = "A")
+
+# Figure 3b)
+behav_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_behaviour_class,
+             group = "study_id", 
+             xlab = "lnVR",
+             mod = "behaviour_measured_standardised",
+             data = data,
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
+    theme(axis.text.y = element_blank()) + 
+    plot_annotation(tag_levels = "B")
+
+# Figure 3c)
+assay_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_assay_contrast,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "behavioural_assay_standardised2",
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
+    plot_annotation(tag_levels = "C")
+
+# Figure 3d)
+assay_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_assay_contrast,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "behavioural_assay_standardised2",
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")) +
+    theme(axis.text.y = element_blank()) +
+    plot_annotation(tag_levels = "D")
+
+
+main_text_figure_3 <- (behav_mod_orchard.lnRR + behav_mod_orchard.lnVR) / (assay_mod_orchard.lnRR + assay_mod_orchard.lnVR) + plot_annotation(tag_levels = "A")
+
+print(main_text_figure_3)
+
+# ggsave(here("figures", "main_text_figure_3.jpg"), plot = main_text_figure_3, width = 28, height = 24, units = "cm", dpi = 800)
+# ggsave(here("figures", "main_text_figure_3.pdf"),plot = main_text_figure_3, width = 28, height = 24, units = "cm", dpi = 800)
+```
+
+## *Pesticide characteristics*
+
+### *Moderate by pesticide chemical class (lnRR)*
 ```{r}
 # Model
 lnRR_mod_pesticide <- rma.mv(yi = lnRR,
@@ -1638,7 +1655,7 @@ r2_ml(lnRR_mod_pesticide)
 
 ```
 
-## *Moderate by pesticide chemical class (lnVR)*
+### *Moderate by pesticide chemical class (lnVR)*
 ```{r}
 # Model
 lnVR_mod_pesticide <- rma.mv(yi = lnVR,
@@ -1662,134 +1679,53 @@ r2_ml(lnVR_mod_pesticide)
 
 ```
 
-
+### *Figure s18*
+The moderating effects of pesticide chemical class on (A) response magnitude and (B) response variability in conspecific interactions. Shorter whiskers represent 95% confidence intervals, while longer whiskers indicate 95% prediction intervals. 'k' represents the number of effect sizes, and the number of studies is in brackets. Each circle corresponds to an effect size, with its size scaled according to precision (inverse sampling error variance).
 ```{r}
-# Filter the mod_table for specific pesticide chemical classes
-lnRR_pesticide_mod_results_filter <- dplyr::filter(
-  lnRR_pesticide_mod_results$mod_table,
-    name == "Triazole" |
-    name == "Triazine" |
-    name == "Pyrethroid" |
-    name == "Organophosphate" |
-    name == "Organochlorine" 
-)
+# Figure s18A
+pesticide_all_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_pesticide,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "pesticide_chemical_class",
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) 
 
-# Filter the data for the same pesticide chemical classes
-lnRR_pesticide_data_filter <- dplyr::filter(
-  lnRR_pesticide_mod_results$data,
-    moderator == "Triazole" |
-    moderator == "Triazine" |
-    moderator == "Pyrethroid" |
-    moderator == "Organophosphate" |
-    moderator == "Organochlorine" 
-)
-
-# Create the lnRR_pesticide_orchard object
-lnRR_pesticide_orchard <- list(
-  mod_table = lnRR_pesticide_mod_results_filter,
-  data = lnRR_pesticide_data_filter
-)
-
-# Assign the appropriate classes to the object
-class(lnRR_pesticide_orchard) <- c("orchard", "data.frame")
-
-
-pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_pesticide_orchard,
-                      group = "study_id", 
-                      xlab = "lnRR",
-                      data = data,
-                      mod = "pesticide_chemical_class",
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = TRUE,  
-                      trunk.size = 3, 
-                      branch.size = 1.5,
-                      twig.size = 1,
-                      angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2")))
-
-# Filter the mod_table for lnVR_pesticide_mod_results
-lnVR_pesticide_mod_results_filter <- dplyr::filter(
-  lnVR_pesticide_mod_results$mod_table,
-    name == "Triazole" |
-    name == "Triazine" |
-    name == "Pyrethroid" |
-    name == "Organophosphate" |
-    name == "Organochlorine" 
-)
-
-# Filter the data for lnVR_pesticide_mod_results
-lnVR_pesticide_data_filter <- dplyr::filter(
-  lnVR_pesticide_mod_results$data,
-    moderator == "Triazole" |
-    moderator == "Triazine" |
-    moderator == "Pyrethroid" |
-    moderator == "Organophosphate" |
-    moderator == "Organochlorine" 
-)
-
-# Create the lnVR_pesticide_orchard object
-lnVR_pesticide_orchard <- list(
-  mod_table = lnVR_pesticide_mod_results_filter,
-  data = lnVR_pesticide_data_filter
-)
-class(lnVR_pesticide_orchard) <- c("orchard", "data.frame")
-
-pesticide.mod.lnVR <- orchaRd::orchard_plot(lnVR_pesticide_orchard,
+# Figure s18B
+pesticide_all_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_pesticide,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
              mod = "pesticide_chemical_class",
+             g = TRUE,
              k.pos = "right",
              colour = FALSE,
              fill = TRUE,  
-             trunk.size = 3, 
+             legend.pos = "none",
+             trunk.size = 3., 
              branch.size = 1.5,
              twig.size = 1,
              angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"))) +
-  theme(axis.text.y = element_blank())
-
-pesticide.mod.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_pesticide,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             mod = "pesticide_chemical_class",
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  
-             trunk.size = 3, 
-             branch.size = 1.5,
-             twig.size = 1,
-             angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
-
-pesticide.mod.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_pesticide,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             mod = "pesticide_chemical_class",
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  
-             trunk.size = 3, 
-             branch.size = 1.5,
-             twig.size = 1,
-             angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
-  theme(axis.text.y = element_blank())
-
-main_text_figure_4 <- pesticide.mod.lnRR + pesticide.mod.lnVR 
+    theme(axis.text.y = element_blank())
 
 
-# ggsave(here("figures", "main_text_figure_4.jpg"),width = 24, height = 17, units = "cm", dpi = 800)
-# ggsave(here("figures", "main_text_figure_4.pdf"),width = 24, height = 17, units = "cm", dpi = 800)
+pesticide_all_mod_orchard <- pesticide_all_mod_orchard.lnRR + pesticide_all_mod_orchard.lnVR
+
+print(pesticide_all_mod_orchard)
+
+# ggsave(here("figures", "pesticide_all_mod_orchard.jpg"), plot = pesticide_all_mod_orchard, width = 30, height = 18, units = "cm", dpi = 800)
+# ggsave(here("figures", "pesticide_all_mod_orchard.pdf"),plot = pesticide_all_mod_orchard, width = 30, height = 18, units = "cm", dpi = 800)
 
 ```
 
-## *Moderate by concentration of pesticide (lnRR)*
+### *Moderate by concentration of pesticide (lnRR)*
 ```{r}
 # Create dataframe for model with consistent dosage units
 data_dosage_model <- data %>% 
@@ -1833,25 +1769,13 @@ lnRR_mod_dosage <- rma.mv(yi = lnRR,
 # Summary results 
 summary(lnRR_mod_dosage)
 
-dosage_mod_lnRR_results <- mod_results(lnRR_mod_dosage, mod = "log_dosage_convert_ugL", data = data_dosage_model, group = "study_id")  # For prediction intervals
+dosage_mod_lnRR_results <- mod_results(lnRR_mod_dosage, mod = "log_dosage_convert_ugL", data = data_dosage_model, group = "study_id")  
 
 r2_lnRR_dosage <- r2_ml(lnRR_mod_dosage, data_dosage_model)
 
-# Bubble plot
-bubble_plot(dosage_mod_lnRR_results, mod = "log_dosage_convert_ugL", group = "study_id", data = data_dosage_model, x = "dosage_convert_ugL",
-    y = "lnRR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
-    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
-    x = 7, y = 6.2, label = paste0("italic(R)^{2} == ", round(r2_lnRR_dosage[1], 4)), color = "black",
-    parse = TRUE, size = 4)  + 
-  ggtitle("") + 
-  theme(plot.title = element_text(size = 18),
-    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
-    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
-    xlab("Dosage")
-
 ```
 
-## *Moderate by concentration of pesticide (lnVR)*
+### *Moderate by concentration of pesticide (lnVR)*
 ```{r}
 # Recalculate the VCV matrix based on the new data frame 
 lnVRVCV_dosage <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data_dosage_model, rho = 0.5)
@@ -1872,25 +1796,13 @@ lnVR_mod_dosage <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_dosage)
 
-dosage_mod_lnVR_results <- mod_results(lnVR_mod_dosage, mod = "log_dosage_convert_ugL", data = data_dosage_model, group = "study_id")  # For prediction intervals
+dosage_mod_lnVR_results <- mod_results(lnVR_mod_dosage, mod = "log_dosage_convert_ugL", data = data_dosage_model, group = "study_id") 
 
 r2_lnVR_dosage <- r2_ml(lnVR_mod_dosage, data_dosage_model)
 
-# Bubble plot
-bubble_plot(dosage_mod_lnVR_results, mod = "log_dosage_convert_ugL", group = "study_id", data = data_dosage_model, x = "dosage_convert_ugL",
-    y = "lnVR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
-    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
-    x = 7, y = 6.2, label = paste0("italic(R)^{2} == ", round(r2_lnVR_dosage[1], 4)), color = "black",
-    parse = TRUE, size = 4)  + 
-  ggtitle("") + 
-  theme(plot.title = element_text(size = 18),
-    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
-    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
-    xlab("Dosage")
-
 ```
 
-## *Moderate by duration of pesticide (lnRR)*
+### *Moderate by duration of pesticide (lnRR)*
 ```{r}
 # Create dataframe for model with consistent duration units
 data_duration_model <- data %>% 
@@ -1929,25 +1841,13 @@ lnRR_mod_duration <- rma.mv(yi = lnRR,
 # Summary results
 summary(lnRR_mod_duration)
 
-duration_mod_lnRR_results <- mod_results(lnRR_mod_duration, mod = "duration_convert", data = data_duration_model, group = "study_id")  # For prediction intervals
+duration_mod_lnRR_results <- mod_results(lnRR_mod_duration, mod = "duration_convert", data = data_duration_model, group = "study_id") 
 
 r2_lnRR_duration <- r2_ml(lnRR_mod_duration, data_duration_model)
 
-# Bubble plot
-bubble_plot(duration_mod_lnRR_results, mod = "duration_convert", group = "study_id", data = data_duration_model, x = "duration_convert",
-    y = "lnRR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
-    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
-    x = 7, y = 6.2, label = paste0("italic(R)^{2} == ", round(r2_lnRR_duration[1], 4)), color = "black",
-    parse = TRUE, size = 4)  + 
-  ggtitle("") + 
-  theme(plot.title = element_text(size = 18),
-    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
-    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
-    xlab("Duration")
-
 ```
 
-## *Moderate by duration of pesticide (lnVR)* 
+### *Moderate by duration of pesticide (lnVR)* 
 ```{r}
 # Recalculate the VCV matrix based on the new data frame 
 lnVRVCV_duration <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data_duration_model, rho = 0.5)
@@ -1968,25 +1868,13 @@ lnVR_mod_duration <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_duration)
 
-lnVR_mod_duration_results <- mod_results(lnVR_mod_duration, mod = "duration_convert", data = data_duration_model, group = "study_id")  # For prediction intervals
+lnVR_mod_duration_results <- mod_results(lnVR_mod_duration, mod = "duration_convert", data = data_duration_model, group = "study_id") 
 
 r2_lnVR_duration <- r2_ml(lnVR_mod_duration, data_duration_model)
 
-# Bubble plot
-bubble_plot(lnVR_mod_duration_results, mod = "duration_convert", group = "study_id", data = data_duration_model, x = "duration_convert",
-    y = "lnVR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
-    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
-    x = 7, y = 6.2, label = paste0("italic(R)^{2} == ", round(r2_lnVR_duration[1], 4)), color = "black",
-    parse = TRUE, size = 4)  + 
-  ggtitle("") + 
-  theme(plot.title = element_text(size = 18),
-    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
-    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
-    xlab("Duration")
-
 ```
 
-## *Moderate by control solvent used (lnRR)*
+### *Moderate by control solvent used (lnRR)*
 ```{r}
 # Model
 lnRR_mod_solvent <- rma.mv(yi = lnRR,
@@ -2007,7 +1895,6 @@ mod_results(lnRR_mod_solvent, mod = "control_solvent", data = data, group = "stu
 
 r2_ml(lnRR_mod_solvent)
 
-
 # Model
 lnRR_mod_solvent2 <- rma.mv(yi = lnRR,
                         V = lnRRVCV,
@@ -2027,7 +1914,6 @@ mod_results(lnRR_mod_solvent2, mod = "solvent2", data = data, group = "study_id"
 
 r2_ml(lnRR_mod_solvent2)
 
-
 # Contrast Model
 lnRR_mod_solvent2_contrast <- rma.mv(yi = lnRR,
                         V = lnRRVCV,
@@ -2043,34 +1929,11 @@ lnRR_mod_solvent2_contrast <- rma.mv(yi = lnRR,
 # Summary results
 summary(lnRR_mod_solvent2_contrast)
 
-mod_results(lnRR_mod_solvent2_contrast, mod = "solvent2", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnRR_mod_solvent2_contrast, mod = "solvent2", data = data, group = "study_id") 
 
-r2_ml(lnRR_mod_solvent2_contrast)
-
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_solvent,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "control_solvent",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
-
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_solvent2,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "solvent2",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
 ```
 
-## *Moderate by control solvent used (lnVR)*
+### *Moderate by control solvent used (lnVR)*
 ```{r}
 # Model
 lnVR_mod_solvent <- rma.mv(yi = lnVR,
@@ -2088,7 +1951,7 @@ lnVR_mod_solvent <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_solvent)
 
-mod_results(lnVR_mod_solvent, mod = "control_solvent", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnVR_mod_solvent, mod = "control_solvent", data = data, group = "study_id")  
 
 r2_ml(lnVR_mod_solvent)
 
@@ -2107,10 +1970,9 @@ lnVR_mod_solvent2 <- rma.mv(yi = lnVR,
 # Summary results
 summary(lnVR_mod_solvent2)
 
-mod_results(lnVR_mod_solvent2, mod = "solvent2", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnVR_mod_solvent2, mod = "solvent2", data = data, group = "study_id")  
 
 r2_ml(lnVR_mod_solvent2)
-
 
 # Model
 lnVR_mod_solvent2_contrast <- rma.mv(yi = lnVR,
@@ -2124,39 +1986,207 @@ lnVR_mod_solvent2_contrast <- rma.mv(yi = lnVR,
                         test = "t", 
                         data = data,
                         sparse = T)
+
 # Summary results
 summary(lnVR_mod_solvent2_contrast)
 
-mod_results(lnVR_mod_solvent2_contrast, mod = "solvent2", data = data, group = "study_id")  # For prediction intervals
+mod_results(lnVR_mod_solvent2_contrast, mod = "solvent2", data = data, group = "study_id")  
 
 r2_ml(lnVR_mod_solvent2_contrast)
 
-# orchaRd plot 
-orchaRd::orchard_plot(lnVR_mod_solvent,
+```
+
+### *Main text Figure 4*
+```{r}
+# Filter the mod_table for specific pesticide chemical classes
+lnRR_pesticide_mod_results_filter <- dplyr::filter(
+  lnRR_pesticide_mod_results$mod_table,
+    name == "Triazole" |
+    name == "Triazine" |
+    name == "Pyrethroid" |
+    name == "Organophosphate" |
+    name == "Organochlorine" 
+)
+
+# Filter the data for the same pesticide chemical classes
+lnRR_pesticide_data_filter <- dplyr::filter(
+  lnRR_pesticide_mod_results$data,
+    moderator == "Triazole" |
+    moderator == "Triazine" |
+    moderator == "Pyrethroid" |
+    moderator == "Organophosphate" |
+    moderator == "Organochlorine" 
+)
+
+# Create the lnRR_pesticide_orchard object
+lnRR_pesticide_orchard2 <- list(
+  mod_table = lnRR_pesticide_mod_results_filter,
+  data = lnRR_pesticide_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnRR_pesticide_orchard2) <- c("orchard", "data.frame")
+
+# Filter the mod_table for lnVR_pesticide_mod_results
+lnVR_pesticide_mod_results_filter <- dplyr::filter(
+  lnVR_pesticide_mod_results$mod_table,
+    name == "Triazole" |
+    name == "Triazine" |
+    name == "Pyrethroid" |
+    name == "Organophosphate" |
+    name == "Organochlorine" 
+)
+
+# Filter the data for lnVR_pesticide_mod_results
+lnVR_pesticide_data_filter <- dplyr::filter(
+  lnVR_pesticide_mod_results$data,
+    moderator == "Triazole" |
+    moderator == "Triazine" |
+    moderator == "Pyrethroid" |
+    moderator == "Organophosphate" |
+    moderator == "Organochlorine" 
+)
+
+# Create the lnVR_pesticide_orchard object
+lnVR_pesticide_orchard2 <- list(
+  mod_table = lnVR_pesticide_mod_results_filter,
+  data = lnVR_pesticide_data_filter
+)
+class(lnVR_pesticide_orchard2) <- c("orchard", "data.frame")
+
+```
+
+```{r}
+# Figure 4a)
+pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_pesticide_orchard2,
+                      group = "study_id", 
+                      xlab = "lnRR",
+                      data = data,
+                      mod = "pesticide_chemical_class",
+                      k.pos = "right",
+                      colour = FALSE,
+                      fill = TRUE,  
+                      legend.pos = "none",
+                      trunk.size = 3, 
+                      branch.size = 1.5,
+                      twig.size = 1,
+                      angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2")))
+
+# Figure 4b)
+pesticide.mod.lnVR <- orchaRd::orchard_plot(lnVR_pesticide_orchard2,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
-             mod = "control_solvent",
+             mod = "pesticide_chemical_class",
              k.pos = "right",
              colour = FALSE,
-             fill = FALSE)
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"))) +
+  theme(axis.text.y = element_blank()) 
 
-# orchaRd plot 
-orchaRd::orchard_plot(lnVR_mod_solvent2,
+# Figure 4c)
+dosage_bubble_plot.lnRR <- bubble_plot(dosage_mod_lnRR_results, mod = "log_dosage_convert_ugL", group = "study_id", data = data_dosage_model, x = "dosage_convert_ugL",
+    y = "lnRR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
+    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
+    x = 7, y = 5.8, label = paste0("italic(R)^{2} == ", round(r2_lnRR_dosage[1], 4)), color = "black",
+    parse = TRUE, size = 4)  + 
+  ggtitle("") + 
+  theme(plot.title = element_text(size = 18),
+    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
+    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
+    xlab("Dosage")
+
+# Figure 4d)
+dosage_bubble_plot.lnVR <- bubble_plot(dosage_mod_lnVR_results, mod = "log_dosage_convert_ugL", group = "study_id", data = data_dosage_model, x = "dosage_convert_ugL",
+    y = "lnVR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
+    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + annotate(geom = "text",
+    x = 7, y = 5.8, label = paste0("italic(R)^{2} == ", round(r2_lnVR_dosage[1], 4)), color = "black",
+    parse = TRUE, size = 4)  + 
+  ggtitle("") + 
+  theme(plot.title = element_text(size = 18),
+    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
+    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
+    xlab("Dosage")
+
+# Figure 4e)
+duration_bubble_plot.lnRR <- bubble_plot(duration_mod_lnRR_results, mod = "duration_convert", group = "study_id", data = data_duration_model, x = "duration_convert",
+    y = "lnRR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
+    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) +  annotate(geom = "text", x =2800, y =1.3, 
+           label = paste0("italic(R)^{2} == ", round(r2_lnRR_duration[1], 4)), color = "black",
+           parse = TRUE, size = 4)  + 
+  ggtitle("") + 
+  theme(plot.title = element_text(size = 18),
+    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
+    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
+    xlab("Duration")
+
+# Figure 4f)
+duration_bubble_plot.lnVR <- bubble_plot(lnVR_mod_duration_results, mod = "duration_convert", group = "study_id", data = data_duration_model, x = "duration_convert",
+    y = "lnVR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
+    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) + 
+  annotate(geom = "text",x =2800, y =2.1, 
+           label = paste0("italic(R)^{2} == ", round(r2_lnVR_duration[1], 4)), color = "black",
+           parse = TRUE, size = 4)  + 
+  ggtitle("") + 
+  theme(plot.title = element_text(size = 18),
+    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
+    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
+    xlab("Duration")
+
+# Figure 4g)
+solvent.mod.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_solvent2,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "solvent2",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+# Figure 4h)
+solvent.mod.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_solvent2,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
              mod = "solvent2",
              k.pos = "right",
              colour = FALSE,
-             fill = FALSE)
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank()) 
+
+main_text_figure_4 <- (pesticide.mod.lnRR + pesticide.mod.lnVR)/ (dosage_bubble_plot.lnRR + dosage_bubble_plot.lnVR) / (duration_bubble_plot.lnRR + duration_bubble_plot.lnVR)/ (solvent.mod.lnRR2 + solvent.mod.lnVR2) +   plot_annotation(tag_levels = "A")
+
+print(main_text_figure_4)
+
+# ggsave(here("figures", "main_text_figure_4.jpg"),width = 28, height = 40, units = "cm", dpi = 800)
+# ggsave(here("figures", "main_text_figure_4.pdf"),width = 28, height = 40, units = "cm", dpi = 800)
+ 
 ```
 
 ## **Species characteristics**
 
-## *Moderate by species (lnRR)*
+### *Moderate by species (lnRR)*
 ```{r}
-
 # Model
 lnRR_mod_species <- rma.mv(yi = lnRR,
                                V = lnRRVCV,
@@ -2181,7 +2211,7 @@ lnRR_species_mod_results <- mod_results(lnRR_mod_species, mod = "species_english
 
 ```
 
-## *Moderate by species (lnVR)*
+### *Moderate by species (lnVR)*
 ```{r}
 ## ModeL
 lnVR_mod_species <- rma.mv(yi = lnVR,
@@ -2197,7 +2227,6 @@ lnVR_mod_species <- rma.mv(yi = lnVR,
                                sparse = T)
 
 
-
 # Summary results
 summary(lnVR_mod_species)
 
@@ -2207,141 +2236,53 @@ r2_ml(lnVR_mod_species)
 
 ```
 
-
+### *Figure s19*
+The moderating effects of species chemical class on (A) response magnitude and (B) response variability in conspecific interactions. Shorter whiskers represent 95% confidence intervals, while longer whiskers indicate 95% prediction intervals. 'k' represents the number of effect sizes, and the number of studies is in brackets. Each circle corresponds to an effect size, with its size scaled according to precision (inverse sampling error variance).
 ```{r}
-# Filter the mod_table for specific pesticide chemical classes
-lnRR_species_mod_results_filter <- dplyr::filter(
-  lnRR_species_mod_results$mod_table,
-  name == "Zebrafish" |
-    name == "Sailfin mollie" |
-    name == "Marine Medaka" |
-    name == "Killifish" |
-    name == "Japanese medaka")
-
-# Filter the data for the same pesticide chemical classes
-lnRR_species_data_filter <- dplyr::filter(
-  lnRR_species_mod_results$data,
- moderator == "Zebrafish" |
-    moderator == "Sailfin mollie" |
-    moderator == "Marine Medaka" |
-    moderator == "Killifish" |
-    moderator == "Japanese medaka")
-
-
-# Create the lnRR_pesticide_orchard object
-lnRR_species_orchard <- list(
-  mod_table = lnRR_species_mod_results_filter,
-  data = lnRR_species_data_filter
-)
-
-# Assign the appropriate classes to the object
-class(lnRR_species_orchard) <- c("orchard", "data.frame")
-
-# First plot (lnRR_mod_species)
-species.mod.lnRR <- orchaRd::orchard_plot(lnRR_species_orchard,
+# Figure s19A)
+species_all_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_species,
              group = "study_id", 
              xlab = "lnRR",
              data = data,
              mod = "species_english",
+             g = TRUE,
              k.pos = "right",
              colour = FALSE,
-             fill = TRUE,  # Set fill to TRUE to match the style
-             trunk.size = 3, 
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
              branch.size = 1.5,
              twig.size = 1,
-             angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+             angle = 45) 
 
-
-# First plot (lnRR_mod_species)
-species.mod.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_species,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "species_english",
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  # Set fill to TRUE to match the style
-             trunk.size = 3, 
-             branch.size = 1.5,
-             twig.size = 1,
-             angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854"))
-
-# Filter the mod_table for specific pesticide chemical classes
-lnVR_species_mod_results_filter <- dplyr::filter(
-  lnVR_species_mod_results$mod_table,
-  name == "Zebrafish" |
-    name == "Sailfin mollie" |
-    name == "Marine Medaka" |
-    name == "Killifish" |
-    name == "Japanese medaka")
-
-# Filter the data for the same pesticide chemical classes
-lnVR_species_data_filter <- dplyr::filter(
-  lnVR_species_mod_results$data,
- moderator == "Zebrafish" |
-    moderator == "Sailfin mollie" |
-    moderator == "Marine Medaka" |
-    moderator == "Killifish" |
-    moderator == "Japanese medaka")
-
-# Create the lnVR_pesticide_orchard object
-lnVR_species_orchard <- list(
-  mod_table = lnVR_species_mod_results_filter,
-  data = lnVR_species_data_filter
-)
-
-# Assign the appropriate classes to the object
-class(lnVR_species_orchard) <- c("orchard", "data.frame")
-
-
-# First plot (lnRR_mod_species)
-species.mod.lnVR <- orchaRd::orchard_plot(lnVR_species_orchard,
+# Figure s19B)
+species_all_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_species,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
              mod = "species_english",
+             g = TRUE,
              k.pos = "right",
              colour = FALSE,
-             fill = TRUE,  # Set fill to TRUE to match the style
-             trunk.size = 3, 
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3., 
              branch.size = 1.5,
              twig.size = 1,
              angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
-  theme(axis.text.y = element_blank())
+    theme(axis.text.y = element_blank())
 
-# Second plot (lnVR_mod_species)
-species.mod.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_species,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             mod = "species_english",
-             k.pos = "right",
-             colour = FALSE,
-             fill = TRUE,  # Set fill to TRUE to match the style
-             trunk.size = 3, 
-             branch.size = 1.5,
-             twig.size = 1,
-             angle = 45) +
-  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
-                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
-  theme(axis.text.y = element_blank())
 
-# Combine the plots
-main_text_figure_5 <- species.mod.lnRR + species.mod.lnVR
+species_all_mod_orchard <- species_all_mod_orchard.lnRR + species_all_mod_orchard.lnVR
 
-# Save the plots
-# ggsave(here("figures", "species_plot_figure.jpg"), plot = main_text_figure_5,width = 24, height = 14, units = "cm", dpi = 800)
-# ggsave(here("figures", "species_plot_figure.pdf"), plot = main_text_figure_5, width = 24, height = 14, units = "cm", dpi = 800)
+print(species_all_mod_orchard)
+
+# ggsave(here("figures", "species_all_mod_orchard.jpg"), plot = species_all_mod_orchard, width = 30, height = 18, units = "cm", dpi = 800)
+# ggsave(here("figures", "species_all_mod_orchard.pdf"),plot = species_all_mod_orchard, width = 30, height = 18, units = "cm", dpi = 800)
 
 ```
 
-## *Moderate by sex (lnRR)*
+### *Moderate by sex (lnRR)*
 ```{r}
 # Model
 lnRR_mod_sex <- rma.mv(yi = lnRR,
@@ -2382,20 +2323,9 @@ lnRR_mod_sex_contrast <- rma.mv(yi = lnRR,
 
 summary(lnRR_mod_sex_contrast)
 
-
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_sex,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "sex",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
 ```
 
-## *Moderate by sex (lnVR)*
+### *Moderate by sex (lnVR)*
 ```{r}
 # Model
 lnVR_mod_sex <- rma.mv(yi = lnVR,
@@ -2411,8 +2341,6 @@ lnVR_mod_sex <- rma.mv(yi = lnVR,
                         sparse = T)
 
 
-
-
 # Summary results
 summary(lnVR_mod_sex)
 
@@ -2421,7 +2349,6 @@ mod_results(lnVR_mod_sex, mod = "sex", data = data, group = "study_id")  # For p
 r2_ml(lnVR_mod_sex)
 
 lnVRVCV_sex <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data_sex, rho = 0.5)
-
 
 # Model
 lnVR_mod_sex_contrast <- rma.mv(yi = lnVR,
@@ -2438,20 +2365,16 @@ lnVR_mod_sex_contrast <- rma.mv(yi = lnVR,
 
 summary(lnVR_mod_sex_contrast)
 
-
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_mod_sex,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             mod = "sex",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
 ```
 
-## *Moderate by source of fish (lnRR)*
+### *Moderate by source of fish (lnRR)*
 ```{r}
+data_source <- data %>% filter(source %in% c("wild collected", "commercial supplier"))
+
+lnRRVCV_source <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data_source, rho = 0.5)
+
+lnVRVCV_source <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data_source, rho = 0.5)
+
 ## ModeL
 lnRR_mod_source <- rma.mv(yi = lnRR,
                           V = lnRRVCV,
@@ -2472,36 +2395,24 @@ mod_results(lnRR_mod_source, mod = "source", data = data, group = "study_id")  #
 
 r2_ml(lnRR_mod_source)
 
-
 ## ModeL
 lnRR_mod_source_contrast <- rma.mv(yi = lnRR,
-                          V = lnRRVCV,
+                          V = lnRRVCV_source,
                           random = list(~1 | study_id,
                                              ~1 | assay_id,
                                              ~1 | species_latin,
                                              ~1 | pesticide),
-                          mods = ~source2 ,
+                          mods = ~source ,
                           method = "REML",
                           test = "t", 
-                          data = data,
+                          data = data_source,
                           sparse = T)
 
 summary(lnRR_mod_source_contrast)
 
-
-# orchaRd plot 
-orchaRd::orchard_plot(lnRR_mod_source,
-             group = "study_id", 
-             xlab = "lnRR",
-             data = data,
-             mod = "source",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
-
 ```
 
-## *Moderate by source of fish (lnVR)*
+### *Moderate by source of fish (lnVR)*
 ```{r}
 ## Model
 lnVR_mod_source <- rma.mv(yi = lnVR,
@@ -2523,23 +2434,242 @@ mod_results(lnVR_mod_source, mod = "source", data = data, group = "study_id")  #
 
 r2_ml(lnVR_mod_source)
 
+lnVR_mod_source_contrast <- rma.mv(yi = lnVR,
+                                   V = lnVRVCV_source,  
+                                   random = list(~1 | study_id,
+                                                 ~1 | assay_id,
+                                                 ~1 | species_latin,
+                                                 ~1 | pesticide),
+                                   mods = ~source,
+                                   method = "REML",
+                                   test = "t", 
+                                   data = data_source,
+                                   sparse = TRUE)
 
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_mod_source,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             mod = "source",
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
+summary(lnVR_mod_source_contrast)
 
 ```
 
-# **Model selection and multi-model inference **
+## *Figure 5*
+```{r}
+# Filter the mod_table for specific pesticide chemical classes
+lnRR_species_mod_results_filter <- dplyr::filter(
+  lnRR_species_mod_results$mod_table,
+  name == "Zebrafish" |
+    name == "Sailfin mollie" |
+    name == "Marine Medaka" |
+    name == "Killifish" |
+    name == "Japanese medaka")
 
+# Filter the data for the same pesticide chemical classes
+lnRR_species_data_filter <- dplyr::filter(
+  lnRR_species_mod_results$data,
+ moderator == "Zebrafish" |
+    moderator == "Sailfin mollie" |
+    moderator == "Marine Medaka" |
+    moderator == "Killifish" |
+    moderator == "Japanese medaka")
+
+# Create the lnRR_pesticide_orchard object
+lnRR_species_orchard <- list(
+  mod_table = lnRR_species_mod_results_filter,
+  data = lnRR_species_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnRR_species_orchard) <- c("orchard", "data.frame")
+
+# First plot (lnRR_mod_species)
+species.mod_orchard.lnRR2 <- orchaRd::orchard_plot(lnRR_mod_species,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854"))
+
+# Filter the mod_table for specific pesticide chemical classes
+lnVR_species_mod_results_filter <- dplyr::filter(
+  lnVR_species_mod_results$mod_table,
+  name == "Zebrafish" |
+    name == "Sailfin mollie" |
+    name == "Marine Medaka" |
+    name == "Killifish" |
+    name == "Japanese medaka")
+
+# Filter the data for the same pesticide chemical classes
+lnVR_species_data_filter <- dplyr::filter(
+  lnVR_species_mod_results$data,
+ moderator == "Zebrafish" |
+    moderator == "Sailfin mollie" |
+    moderator == "Marine Medaka" |
+    moderator == "Killifish" |
+    moderator == "Japanese medaka")
+
+# Create the lnVR_pesticide_orchard object
+lnVR_species_orchard <- list(
+  mod_table = lnVR_species_mod_results_filter,
+  data = lnVR_species_data_filter
+)
+
+# Assign the appropriate classes to the object
+class(lnVR_species_orchard) <- c("orchard", "data.frame")
+
+# Second plot (lnVR_mod_species)
+species.mod_orchard.lnVR2 <- orchaRd::orchard_plot(lnVR_mod_species,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank())
+
+```
+
+```{r}
+# Figure 5a)
+species.mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_species_orchard,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  # Set fill to TRUE to match the style
+             trunk.size = 3, 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+# Figure 5b)
+species.mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_species_orchard,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "species_english",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  # Set fill to TRUE to match the style
+             trunk.size = 3, 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank())
+
+# Figure 5c)
+sex_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_sex,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data,
+             mod = "sex",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+# Figure 5d)
+sex_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_sex,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data,
+             mod = "sex",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank())
+
+# Figure 5e)
+source_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_source_contrast,
+             group = "study_id", 
+             xlab = "lnRR",
+             data = data_source,
+             mod = "source",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3, 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) 
+
+# Figure 5f)
+source_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_source_contrast,
+             group = "study_id", 
+             xlab = "lnVR",
+             data = data_source,
+             mod = "source",
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             legend.pos = "none",
+             trunk.size = 3, 
+             branch.size = 1.5,
+             twig.size = 1,
+             angle = 45) +
+  scale_fill_manual(values = c(RColorBrewer::brewer.pal(8, "Dark2"), 
+                               "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")) +
+  theme(axis.text.y = element_blank())
+
+
+
+# Combine the plots
+main_text_figure_5 <- (species.mod_orchard.lnRR + species.mod_orchard.lnVR)/ (sex_mod_orchard.lnRR + sex_mod_orchard.lnVR)/ (source_mod_orchard.lnRR + source_mod_orchard.lnVR) + plot_annotation(tag_levels = "A")
+
+print(main_text_figure_5)
+
+# ggsave(here("figures", "main_text_figure_5.jpg"), plot = main_text_figure_5,width = 28, height = 30, units = "cm", dpi = 800)
+# ggsave(here("figures", "main_text_figure_5.pdf"), plot = main_text_figure_5, width = 28, height = 30, units = "cm", dpi = 800)
+```
+
+# **Model selection and multi-model inference**
 ## *lnRR model selection and multi-model inference*
 ```{r}
+# save to save time - running this model is time-consuming
+
+# saveRDS(mlmr.dredge.lnRR, file = "mlmr.dredge.lnRR.Rds")
+mlmr.dredge.lnRR <- readRDS(here("R.data",file = "mlmr.dredge.lnRR.Rds"))
+
+# save(mlmr.dredge.lnRR, file = "mlmr.dredge.lnRR.Rdata") 
+load(here("R.data", "mlmr.dredge.lnRR.Rdata"))
+
+### LOAD DATA RATHER THAN RUN MODEL ###
 mlmr.full.lnRR <- rma.mv(yi = lnRR, 
                     V = lnRRVCV, 
                     random = list(~1 | study_id,
@@ -2553,6 +2683,7 @@ mlmr.full.lnRR <- rma.mv(yi = lnRR,
                     data = data, 
                     sparse = T)
 
+###
 
 r2_ml(mlmr.full.lnRR, data = data)
 
@@ -2560,20 +2691,8 @@ eval(metafor:::.MuMIn)  # use eval() function to extract helper functions from M
 
 mlmr.dredge.lnRR <- dredge(mlmr.full.lnRR, beta = "none", evaluate = TRUE, rank = "AICc", trace=2)
 
-
-# save to save time - running this model is time-consuming
-
-saveRDS(mlmr.dredge.lnRR, file = "mlmr.dredge.lnRR.Rds")
-mlmr.dredge.lnRR <- readRDS(file = "mlmr.dredge.lnRR.Rds")
-
-save(mlmr.dredge.lnRR, file = "mlmr.dredge.lnRR.Rdata") 
-load(here("R.data", "mlmr.dredge.lnRR.Rdata"))
-
-
 # multimodel inference
 summary(mlmr.full.lnRR)
-
-
 
 # Select "best" models based on delta <= 2
 best_model <- subset(mlmr.dredge.lnRR, delta <= 2, recalc.weights = FALSE)
@@ -2584,43 +2703,30 @@ best_model %>%
   kable_styling("bordered", position = "left") %>%
   scroll_box(width = "100%", height = "800px")
 
-
-# the relative importance values for the predictors
-
+# Relative importance values for the predictors
 weights_lnRR <- sw(mlmr.dredge.lnRR) 
-
 
 # Convert the named vector into a data frame
 weights_lnRR_df <- data.frame(
-  predictor = names(weights_lnRR),  # First column: the names of the vector
-  weight = as.numeric(weights_lnRR) # Second column: the values of the vector
+  predictor = names(weights_lnRR),  
+  weight = as.numeric(weights_lnRR), 
+  R2_marginal = c(0.07, 0.103, 0.009, 0.092, 0.112, 0.02, 0.051)
 )
 
-
-weights_lnRR_df %>% ggplot(aes(x = reorder(predictor, weight), y = weight), fill = "lightgrey") +
-  geom_col(aes(), width = 0.7) +
-  #scale_fill_manual(values = cols) +
-  coord_flip() + 
-  labs(y = "Akaike weights", x = "Moderator variables", title = "") +
-  #ylim(0,1)+
-  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
-  #coord_cartesian(ylim = c(0,1)) + 
-  geom_text(aes(label=scales::percent(weight, accuracy = 1)), size = 3, position = position_stack(vjust = 0.5), color = "white", fontface = "bold") +
-  theme(legend.position = "none",
-        panel.grid = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank(),
-        axis.text.y = element_text(size = 12, color = "black"),
-        axis.title.y = element_text(size = 12, color = "black"),
-        axis.ticks.y = element_blank(),
-        axis.line.x = element_line(colour = "black")) +
-  scale_x_discrete(labels = c("Source of fish", "Behaviour measured","Control Solvent","Species","Sex of fish","Pesticide chemical class","Behavioural assay"))
-dev.off()
 
 ```
 
 
 ```{r}
+# Save to save time - running this model is time-consuming
+
+# saveRDS(mlmr.dredge.lnVR, file = "mlmr.dredge.lnVR.Rds")
+mlmr.dredge.lnVR <- readRDS(here("R.data",file = "mlmr.dredge.lnVR.Rds"))
+
+# save(mlmr.dredge.lnVR, file = "mlmr.dredge.lnVR.Rdata") 
+load(here("R.data", "mlmr.dredge.lnVR.Rdata"))
+
+### LOAD DATA RATHER THAN RUN MODEL ###
 mlmr.full.lnVR <- rma.mv(yi = lnVR, 
                     V = lnVRVCV, 
                     random = list(~1 | study_id,
@@ -2634,18 +2740,13 @@ mlmr.full.lnVR <- rma.mv(yi = lnVR,
                     data = data, 
                     sparse = TRUE)
 
+###
+
 r2_ml(mlmr.full.lnVR, data = data)
 
 eval(metafor:::.MuMIn)  # use eval() to extract helper functions from MuMIn and make them usable in metafor.
 
 mlmr.dredge.lnVR <- dredge(mlmr.full.lnVR, beta = "none", evaluate = TRUE, rank = "AICc", trace = 2)
-
-# Save to save time - running this model is time-consuming
-saveRDS(mlmr.dredge.lnVR, file = "mlmr.dredge.lnVR.Rds")
-mlmr.dredge.lnVR <- readRDS(file = "mlmr.dredge.lnVR.Rds")
-
-save(mlmr.dredge.lnVR, file = "mlmr.dredge.lnVR.Rdata") 
-load(here("R.data", "mlmr.dredge.lnVR.Rdata"))
 
 # Multimodel inference
 summary(mlmr.full.lnVR)
@@ -2664,110 +2765,131 @@ weights_lnVR <- sw(mlmr.dredge.lnVR)
 
 # Convert the named vector into a data frame
 weights_lnVR_df <- data.frame(
-  predictor = names(weights_lnVR),  # First column: the names of the vector
-  weight = as.numeric(weights_lnVR) # Second column: the values of the vector
+  predictor = names(weights_lnVR),  
+  weight = as.numeric(weights_lnVR),
+  R2_marginal = c(0.02, 0.086, 0.036, 0.068, 0.71, 0.011, 0.040)
+
 )
 
-weights_lnVR_df %>% ggplot(aes(x = reorder(predictor, weight), y = weight), fill = "lightgrey") +
-  geom_col(aes(), width = 0.7) +
+```
+
+## *Main text Figure 6*
+```{r}
+# lnRR model selection plot
+weights_lnRR_plot <- weights_lnRR_df %>%
+  ggplot(aes(x = reorder(predictor, weight), y = weight)) +
+  geom_col(width = 0.8, alpha = 0.7) +
   coord_flip() + 
-  labs(y = "Akaike weights", x = "Moderator variables", title = "") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
-  geom_text(aes(label = scales::percent(weight, accuracy = 1)), size = 3, position = position_stack(vjust = 0.5), color = "white", fontface = "bold") +
-  theme(legend.position = "none",
-        panel.grid = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank(),
-        axis.text.y = element_text(size = 12, color = "black"),
-        axis.title.y = element_text(size = 12, color = "black"),
-        axis.ticks.y = element_blank(),
-        axis.line.x = element_line(colour = "black")) +
-  scale_x_discrete(labels = c("Source of fish", "Behaviour measured","Control Solvent","Species","Sex of fish","Pesticide chemical class","Behavioural assay"))
-dev.off()
+  scale_y_continuous(
+    limits = c(0, 1.2),
+    breaks = seq(0, 1, by = 0.2),
+    expand = c(0, 0)
+  ) +
+  geom_text(aes(label = scales::percent(weight, accuracy = 1)), 
+            size = 6, position = position_stack(vjust = 0.5), 
+            color = "white", fontface = "bold") +
+  geom_text(aes(y = 1.1,label = paste0("R2 = ", round(R2_marginal, 2))), 
+            size = 4, 
+            fontface = "italic", 
+            color = "red") +
+  theme_bw() +
+  guides(size = "none") +
+  theme(
+    legend.position = "none",
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(face = "bold", color = "black"),
+    plot.caption = element_text(size = 10, color = "gray10", face = "italic")
+  ) +
+  labs(
+    y = "Akaike Weights",
+    x = "Moderators",
+    tag = "A"
+  ) +
+  scale_x_discrete(labels = c(
+    "Source of fish", "Behaviour measured", "Control Solvent",
+    "Species", "Sex of fish", "Pesticide chemical class", "Behavioural assay"
+  ))
 
+
+# lnVR model selection plot
+weights_lnVR_plot <- weights_lnVR_df %>% 
+  ggplot(aes(x = reorder(predictor, weight), y = weight)) +
+  geom_col(width = 0.8, alpha = 0.7) +
+  coord_flip() + 
+  scale_y_continuous(
+    limits = c(0, 1.2),  
+    breaks = seq(0, 1, by = 0.2),
+    expand = c(0, 0)
+  ) +
+  geom_text(aes(label = scales::percent(weight, accuracy = 1)), 
+            size = 6, position = position_stack(vjust = 0.5), 
+            color = "white", fontface = "bold") +
+  geom_text(aes(y = 1.1, label = paste0("R2 = ", round(R2_marginal, 2))), 
+            size = 4, 
+            fontface = "italic", 
+            color = "red") +
+  theme_bw() +
+  guides(size = "none") +
+  theme(
+    legend.position = "none",
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(face = "bold", color = "black"),
+    plot.caption = element_text(size = 10, color = "gray10", face = "italic")
+  ) +
+  labs(
+    caption = "The value in each bar is the relative importance of each moderator based on Akaike weights",
+    y = "Akaike Weights",
+    x = "Moderators",
+    tag = "B"
+  ) +
+  scale_x_discrete(labels = c(
+    "Source of fish", "Behaviour measured", "Control Solvent",
+    "Species", "Sex of fish", "Pesticide chemical class", "Behavioural assay"
+  ))
+
+
+main_text_figure_6 <- weights_lnRR_plot/weights_lnVR_plot
+
+print(main_text_figure_6)
+
+# ggsave(here("figures", "main_text_figure_6.pdf"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "main_text_figure_6.jpg"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
 ```
 
-# Publication bias
+# **Publication bias**
 
-## Funnel plot
+## *Figure s20*
+A funnel plot illustrating the distribution of study effect sizes in the meta-analysis. The symmetry of the plot suggests the absence of publication bias.
 ```{r}
-# Create the funnel plot with adjustments
-funnel.1 <- funnel(lnRR_intercept_only,
-       yaxis = "seinv",  # Inverse of standard error (precision) as the y axis
-       level = c(95),  # levels of statistical significance highlighted
-       shade = c("white"),  # shades for different levels of statistical significance
-       legend = FALSE,  # display legend
-       pch = 21,
-       refline = 0,
-       ylab = "Precision (1/SE)") 
+# Set up a PNG device with desired dimensions and resolution
+# png(filename = "funnel_plot.png", width = 800, height = 600, res = 150)
 
+# Create the funnel plot with gray points
+funnel_fig <- funnel(
+  lnRR_intercept_only,
+  yaxis = "seinv",
+  level = c(90, 95),
+  shade = c("white", "gray30"),
+  back = "#EBEBEB",
+  legend = FALSE,
+  ylab = "Precision (1/SE)",
+  cex.lab = 1.5,
+  digits = 1,
+  xlim = c(-5, 5),
+  pch = 21,         
+  col = "gray",  
+  bg = "black"     
+)
 
+# fig_funnel <- recordPlot()
+# invisible(dev.off())
+
+print(funnel_fig)
 ```
 
-## Time lag bias
+## *Egger's regression*
 ```{r}
-data$pub_year <- str_extract(data$study_id, "\\d{4}")
-
-
-data$pub_year <- as.numeric(data$pub_year)
-
-
-time_lag_bias_model <- rma.mv(yi = lnRR,
-                          V = lnRRVCV,
-                          random = list(~1 | study_id,
-                                             ~1 | assay_id,
-                                             ~1 | species_latin,
-                                             ~1 | pesticide),
-                          mods = ~pub_year -1,
-                          method = "REML",
-                          test = "t", 
-                          data = data,
-                          sparse = T)
-
-summary(time_lag_bias_model)
-
-
-lnRR_mod_time_lag_results <- mod_results(time_lag_bias_model, mod = "pub_year", data = data, group = "study_id")  # For prediction intervals
-
-
-
-r2_lnRR_time_lag <- r2_ml(time_lag_bias_model, data)
-
-
-# Calculate R^2 value
-r2_lnRR_time_lag <- r2_ml(time_lag_bias_model, data)
-
-# Get the minimum year for x-axis limit
-min_year <- min(data$pub_year, na.rm = TRUE)
-
-# Create the bubble plot
-bubble_plot(lnRR_mod_time_lag_results, mod = "pub_year", group = "study_id", data = data, x = "pub_year",
-    y = "lnRR", est.lwd = 1, legend.pos = "bottom.right", k.pos = "bottom.left",
-    ci.col = "red", pi.col = "black", est.col = "black", g = TRUE) +
-  annotate(geom = "text",
-    x = min_year + 2, y = max(data$lnRR, na.rm = TRUE) + 0.2, label = paste0("italic(R)^{2} ==", round(r2_lnRR_time_lag[1], 4)), color = "black",
-    parse = TRUE, size = 4)  + 
-  ggtitle("") + 
-  theme(plot.title = element_text(size = 18),
-    legend.position = "none", axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16),
-    axis.text.y = element_text(size = 14), axis.text.x = element_text(size = 14)) +
-  xlab("Publication Year") +
-  scale_x_continuous(limits = c(min_year, max(data$pub_year, na.rm = TRUE)))
-
-
-
-```
-
-## Heteroscadacity check
-```{r}
-qplot(y = sqrt(residuals(time_lag_bias_model)^2), x = fitted(time_lag_bias_model)) + # plot sqrt(residuals^2) against fitted values
-      geom_point() +
-      geom_smooth(method = "lm") + # method ="lm" to generate a straight line 
-      geom_hline(yintercept = 0, colour="red") 
-```
-
-## Egger's regression
-```{r}
+# Model
 eggers_regression <- rma.mv(yi = lnRR,
                           V = lnRRVCV,
                           random = list(~1 | study_id,
@@ -2781,32 +2903,134 @@ eggers_regression <- rma.mv(yi = lnRR,
                           sparse = T)
 
 
+# Summary
 summary(eggers_regression)
 
+```
+
+### *Figure s21*
+A plot showing the moderating effect of standard error on lnRR. The thick black lines show the prediction from the uni-moderator models with their associated 95% confidence interval (darker shaded area) and 95% prediction interval (lighter shaded area).
+```{r}
+# Prepare data for Egger's regression plot
 egger_pred <- predict.rma(eggers_regression)
+data <- data %>%
+  mutate(
+    fit = egger_pred$pred,
+    ci.lb = egger_pred$ci.lb,
+    ci.ub = egger_pred$ci.ub,
+    pr.lb = egger_pred$cr.lb,
+    pr.ub = egger_pred$cr.ub
+  )
 
-
-data %>% mutate(fit=egger_pred$pred, 
-               ci.lb=egger_pred$ci.lb,
-               ci.ub=egger_pred$ci.ub,
-               pr.lb=egger_pred$cr.lb,
-               pr.ub=egger_pred$cr.ub) %>% 
-ggplot(aes(x = sqrt(lnRRv), y = lnRR)) +
-     geom_ribbon(aes(ymin = pr.lb, ymax = pr.ub, color = NULL), alpha = .1) +
-     geom_ribbon(aes(ymin = ci.lb, ymax = ci.ub, color = NULL), alpha = .3) +
-     geom_point(size=2,shape=21, alpha=0.7, fill=RColorBrewer::brewer.pal(n = 8, name = "Dark2")[1], col="gray25",stroke=1) +
-     geom_line(aes(y = fit), size = 1.2)+  
-  labs(x = "Standard error", y = "lnRR") +
+# Create Egger's regression plot
+egger_fig <- ggplot(data, aes(x = sqrt(lnRRv), y = lnRR)) +
+  geom_ribbon(aes(ymin = pr.lb, ymax = pr.ub), alpha = 0.1, fill = "gray") +
+  geom_ribbon(aes(ymin = ci.lb, ymax = ci.ub), alpha = 0.3, fill = "gray") +
+  geom_point(size = 2, shape = 21, alpha = 0.7, fill = RColorBrewer::brewer.pal(n = 8, name = "Dark2")[1], col = "gray25", stroke = 1) +
+  geom_line(aes(y = fit), size = 1.2) +
+  labs(x = "Standard Error", y = "lnRR") +
   theme_bw() +
-  geom_hline(yintercept = 0,linetype = 2, colour = "black",alpha=0.5)+   # horizontal line at lnRR = 0
-  theme(text = element_text(size = 18, colour = "black", hjust = 0.5), # change font sizes and legend position
-          legend.text=element_text(size=14),
-          legend.position=c(0,0), 
-          legend.justification = c(0,0),
-          legend.background = element_blank(), 
-          legend.direction="horizontal",
-          legend.title = element_text(size=15), 
-          panel.border=element_rect(colour="black", fill=NA, size=1.2))
+  geom_hline(yintercept = 0, linetype = 2, colour = "black", alpha = 0.5) +
+  theme(
+    text = element_text(size = 18, colour = "black", hjust = 0.5),
+    legend.text = element_text(size = 14),
+    legend.position = c(0, 0),
+    legend.justification = c(0, 0),
+    legend.background = element_blank(),
+    legend.direction = "horizontal",
+    legend.title = element_text(size = 15),
+    panel.border = element_rect(colour = "black", fill = NA, size = 1.2)
+  )
+
+print(egger_fig)
+# ggsave(here("figures", "egger_figure.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "egger_figure.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+```
+
+## *Time lag bias*
+```{r}
+data$pub_year <- str_extract(data$study_id, "\\d{4}")
+
+
+data$pub_year <- as.numeric(data$pub_year)
+
+# Model
+time_lag_bias_model <- rma.mv(yi = lnRR,
+                          V = lnRRVCV,
+                          random = list(~1 | study_id,
+                                             ~1 | assay_id,
+                                             ~1 | species_latin,
+                                             ~1 | pesticide),
+                          mods = ~ scale(pub_year) ,
+                          method = "REML",
+                          test = "t", 
+                          data = data,
+                          sparse = T)
+
+# Summary stats
+summary(time_lag_bias_model)
+
+
+lnRR_mod_time_lag_results <- mod_results(time_lag_bias_model, mod = "pub_year", data = data, group = "study_id")  
+
+
+r2_lnRR_time_lag <- r2_ml(time_lag_bias_model, data)
+
+
+# Calculate R^2 value
+r2_lnRR_time_lag <- r2_ml(time_lag_bias_model, data)
+
+# Set minimum year for x-axis limit
+min_year <- min(data$pub_year, na.rm = TRUE)
+
+```
+
+## *Figure s22*
+A bubble plot showing the moderating effect of publication year on lnRR. The thick black lines show the prediction from the uni-moderator models with their associated 95% confidence interval (red dotted line) and 95% prediction interval (black dotted line).
+```{r}
+# Create bubble plot and save as ggplot object
+time_lag_bias <- bubble_plot(
+  lnRR_mod_time_lag_results,
+  mod = "pub_year",
+  group = "study_id",
+  data = data,
+  x = "pub_year",
+  y = "lnRR",
+  est.lwd = 1,
+  legend.pos = "bottom.right",
+  k.pos = "bottom.left",
+  ci.col = "red",
+  pi.col = "black",
+  est.col = "black",
+  g = TRUE
+) +
+  annotate(
+    geom = "text",
+    x = min_year + 2,
+    y = max(data$lnRR, na.rm = TRUE) + 0.2,
+    label = paste0("italic(R)^{2} ==", round(r2_lnRR_time_lag[1], 5)),
+    color = "black",
+    parse = TRUE,
+    size = 4
+  ) +
+  geom_point(size = 2, color = "gray25", fill = "blue", shape = 21, alpha = 0.7, stroke = 1) +
+  geom_line(color = "blue", size = 1.2) +
+  ggtitle("") +
+  theme(
+    plot.title = element_text(size = 18),
+    legend.position = "none",
+    axis.title.x = element_text(size = 16),
+    axis.title.y = element_text(size = 16),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 14)
+  ) +
+  xlab("Publication Year") +
+  scale_x_continuous(limits = c(min_year, max(data$pub_year, na.rm = TRUE)))
+
+print(time_lag_bias)
+
+# ggsave(here("figures", "time_lag_figure.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "time_lag_figure.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
 ```
 
 # **Sensitivity Analysis** 
@@ -2815,13 +3039,26 @@ ggplot(aes(x = sqrt(lnRRv), y = lnRR)) +
 
 ### *Leave one study out*
 
-#### Intercept only model (lnRR)
+#### *Intercept only model (lnRR)*
 ```{r}
 data$leave_study <- as.factor(data$study_id)
 
 ### create a list to contain model estimates
 leave_study_out_model_lnRR <- list()
 VCV_leave_study_out_lnRR <- list()
+
+# Save as .Rds file
+# saveRDS(leave_study_out_model_lnRR, file = here("R.data", "leave_study_out_model_lnRR.Rds"))
+
+# Load from .Rds file
+leave_study_out_model_lnRR <- readRDS(here("R.data", "leave_study_out_model_lnRR.Rds"))
+
+# Save as .Rdata file
+# save(leave_study_out_model_lnVR, file = here("R.data", "leave_study_out_model_lnVR.Rdata"))
+
+# Load from .Rdata file
+load(here("R.data", "leave_study_out_model_lnVR.Rdata"))
+
 
 ### repeatedly run the multilevel model, leaving out one study at a time
 for(i in 1:length(levels(data$leave_study))){
@@ -2844,12 +3081,12 @@ for(i in 1:length(levels(data$leave_study))){
 }
 
 results.leave_study_out_model_lnRR <- as.data.frame(cbind(
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$beta), 
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$se),   
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$zval), 
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$pval), 
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.lb),
+  sapply(leave_study_out_model_lnRR, function(x) summary(x)$ci.ub) 
 ))
 
 colnames(results.leave_study_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
@@ -2873,13 +3110,17 @@ leave_one_study_out_lnRR_forest_plot <- ggplot(results.leave_study_out_model_lnR
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
   labs(caption = "The value in each point is the point estimate excluding one study at a time",
        x = "Study ID",
-       y = "Estimate") +
+       y = "lnRR") +
+       ylim(-0.6, 0.2) +
   coord_flip()
 
 print(leave_one_study_out_lnRR_forest_plot)
+
+# ggsave(here("figures", "leave_one_study_out_lnRR_forest_plot.pdf"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_study_out_lnRR_forest_plot.jpg"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
+
 
 results.leave_study_out_model_lnRR %>% 
   summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
@@ -2892,7 +3133,7 @@ results.leave_study_out_model_lnRR %>%
 
 ```
 
-#### Intercept only model (lnVR)
+#### *Intercept only model (lnVR)*
 ```{r}
 data$leave_study <- as.factor(data$study_id)
 
@@ -2900,15 +3141,28 @@ data$leave_study <- as.factor(data$study_id)
 leave_study_out_model_lnVR <- list()
 VCV_leave_study_out_lnVR <- list()
 
+# save to save time - running this model is time-consuming
+
+# Save as .Rds file
+# saveRDS(leave_study_out_model_lnVR, file = here("R.data", "leave_study_out_model_lnVR.Rds"))
+
+# Load from .Rds file
+leave_study_out_model_lnVR <- readRDS(here("R.data", "leave_study_out_model_lnVR.Rds"))
+
+
+# Save as .Rdata file
+# save(leave_study_out_model_lnVR, file = here("R.data", "leave_study_out_model_lnVR.Rdata"))
+
+# Load from .Rdata file
+load(here("R.data", "leave_study_out_model_lnVR.Rdata"))
+
+
 ### repeatedly run the multilevel model, leaving out one study at a time
 for(i in 1:length(levels(data$leave_study))){
-  ### create the data with one study removed at a time
   data_study_leave <- data %>% filter(leave_study != levels(data$leave_study)[i])
   
-  ### create a list of VCV matrices for following model fitting
   VCV_leave_study_out_lnVR[[i]] <- impute_covariance_matrix(vi = data_study_leave$lnVRv, cluster = data_study_leave$study_id, r = 0.5)
   
-  ### model fitting
   leave_study_out_model_lnVR[[i]] <- rma.mv(yi = lnVR, V = VCV_leave_study_out_lnVR[[i]], 
                                             random = list(~1 | study_id,
                                                           ~1 | assay_id,
@@ -2921,12 +3175,12 @@ for(i in 1:length(levels(data$leave_study))){
 }
 
 results.leave_study_out_model_lnVR <- as.data.frame(cbind(
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_study_out_model_lnVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$beta), 
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$se),  
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$zval),
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$pval), 
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$ci.lb),
+  sapply(leave_study_out_model_lnVR, function(x) summary(x)$ci.ub) 
 ))
 
 colnames(results.leave_study_out_model_lnVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub")
@@ -2950,16 +3204,18 @@ leave_one_study_out_lnVR_forest_plot <- ggplot(results.leave_study_out_model_lnV
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.5) +
   labs(caption = "The value in each point is the point estimate excluding one study at a time",
        x = "Study ID",
-       y = "Estimate") +
+       y = "lnVR") +
   coord_flip()
 
 print(leave_one_study_out_lnVR_forest_plot)
 
+# ggsave(here("figures", "leave_one_study_out_lnVR_forest_plot.pdf"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_study_out_lnVR_forest_plot.jpg"), width = 10, height = 10, units = "cm", scale = 2, dpi = 800)
+
 results.leave_study_out_model_lnVR %>% 
-  summarise(estimate = mean(Estimate), # calculate the mean coefficients across the models generated
+  summarise(estimate = mean(Estimate), 
             se = mean(SE), 
             zval = mean(zval), 
             pval = mean(pval), 
@@ -2967,12 +3223,11 @@ results.leave_study_out_model_lnVR %>%
             ci.ub = mean(ci.ub)) %>% 
   kable() %>% kable_styling("striped", position = "left")
 
-
 ```
 
 ### *Leave one species out*
 
-#### Intercept only model (lnRR)
+#### *Intercept only model (lnRR)*
 ```{r}
 # Convert species_latin to a factor and create a new column for the leave-one-out procedure
 data$leave_species <- as.factor(data$species_latin)
@@ -2981,11 +3236,25 @@ data$leave_species <- as.factor(data$species_latin)
 leave_species_out_model_lnRR <- list()
 VCV_leave_species_out_lnRR <- list()
 
+# save to save time - running this model is time-consuming
+
+# Save as .Rds file
+# saveRDS(leave_species_out_model_lnRR, file = here("R.data", "leave_species_out_model_lnRR.Rds"))
+
+# Load from .Rds file
+leave_species_out_model_lnRR <- readRDS(here("R.data", "leave_species_out_model_lnRR.Rds"))
+
+
+# Save as .Rdata file
+# save(leave_study_out_model_lnVR, file = here("R.data", "leave_species_out_model_lnRR.Rdata"))
+
+# Load from .Rdata file
+load(here("R.data", "leave_species_out_model_lnRR.Rdata"))
+
 # Iteratively run the multilevel model, leaving out one species at a time
 for(i in 1:length(levels(data$leave_species))){
   # Create the data with one species removed at a time
   data_species_leave <- data %>% filter(leave_species != levels(data$leave_species)[i])
-  
   
   # Create a VCV matrix for the subset data
   VCV_leave_species_out_lnRR[[i]] <- impute_covariance_matrix(vi = data_species_leave$lnRRv, cluster = data_species_leave$study_id, r = 0.5)
@@ -3005,15 +3274,15 @@ for(i in 1:length(levels(data$leave_species))){
 
 
 results.leave_species_out_model_lnRR <- as.data.frame(cbind(
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$beta), 
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$se),   
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$zval), 
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$pval), 
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.lb),
+  sapply(leave_species_out_model_lnRR, function(x) summary(x)$ci.ub) 
 ))
 
-colnames(results.leave_species_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+colnames(results.leave_species_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") 
 results.leave_species_out_model_lnRR$species_latin <- unique(data$species_latin)
 
 # Display the results table
@@ -3034,16 +3303,29 @@ leave_one_species_out_lnRR_forest_plot <- ggplot(results.leave_species_out_model
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
   labs(caption = "The value in each point is the estimate excluding one species at a time",
        x = "Species Latin",
-       y = "Estimate") +
+       y = "lnRR") +
+         ylim(-0.6, 0.2) +
   coord_flip()
 
 print(leave_one_species_out_lnRR_forest_plot)
+
+# ggsave(here("figures", "leave_one_species_out_lnRR_forest_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_species_out_lnRR_forest_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+
+results.leave_species_out_model_lnRR %>% 
+  summarise(estimate = mean(Estimate), 
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+
 ```
 
-#### Intercept only model (lnVR) 
+#### *Intercept only model (lnVR)*
 ```{r}
 # Convert species_latin to a factor and create a new column for the leave-one-out procedure
 data$leave_species <- as.factor(data$species_latin)
@@ -3051,6 +3333,19 @@ data$leave_species <- as.factor(data$species_latin)
 # Initialize lists to contain the model estimates and VCV matrices
 leave_species_out_model_lnVR <- list()
 VCV_leave_species_out_lnVR <- list()
+
+# Save as .Rds file
+# saveRDS(leave_species_out_model_lnRR, file = here("R.data", "leave_species_out_model_lnVR.Rds"))
+
+# Load from .Rds file
+leave_species_out_model_lnVR <- readRDS(here("R.data", "leave_species_out_model_lnVR.Rds"))
+
+
+# Save as .Rdata file
+# save(leave_study_out_model_lnVR, file = here("R.data", "leave_species_out_model_lnVR.Rdata"))
+
+# Load from .Rdata file
+load(here("R.data", "leave_species_out_model_lnVR.Rdata"))
 
 # Iteratively run the multilevel model, leaving out one species at a time
 for(i in 1:length(levels(data$leave_species))){
@@ -3074,15 +3369,15 @@ for(i in 1:length(levels(data$leave_species))){
 } 
 
 results.leave_species_out_model_lnVR <- as.data.frame(cbind(
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_species_out_model_lnVR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
-))
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$beta), 
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$se),   
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$zval), 
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$pval), 
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$ci.lb),
+  sapply(leave_species_out_model_lnVR, function(x) summary(x)$ci.ub)
+  ))
 
-colnames(results.leave_species_out_model_lnVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+colnames(results.leave_species_out_model_lnVR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") 
 results.leave_species_out_model_lnVR$species_latin <- unique(data$species_latin)
 
 # Display the results table
@@ -3103,20 +3398,30 @@ leave_one_species_out_lnVR_forest_plot <- ggplot(results.leave_species_out_model
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
   labs(caption = "The value in each point is the estimate excluding one species at a time",
        x = "Species Latin",
-       y = "Estimate") +
+       y = "lnVR") +
   coord_flip()
 
 print(leave_one_species_out_lnVR_forest_plot)
 
+# ggsave(here("figures", "leave_one_species_out_lnVR_forest_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_species_out_lnVR_forest_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+
+results.leave_species_out_model_lnVR %>% 
+  summarise(estimate = mean(Estimate), 
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
 
 ```
 
 ### *Leave one pesticide out*
 
-#### Intercept only model (lnRR) 
+#### *Intercept only model (lnRR)*
 ```{r}
 # Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
 data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
@@ -3125,15 +3430,25 @@ data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
 leave_pesticide_out_model_lnRR <- list()
 VCV_leave_pesticide_out_lnRR <- list()
 
+# Save as .Rds file
+# saveRDS(leave_species_out_model_lnRR, file = here("R.data", "leave_pesticide_out_model_lnRR.Rds"))
+
+# Load from .Rds file
+leave_pesticide_out_model_lnRR <- readRDS(here("R.data", "leave_pesticide_out_model_lnRR.Rds"))
+
+
+# Save as .Rdata file
+# save(leave_pesticide_out_model_lnRR, file = here("R.data", "leave_pesticide_out_model_lnRR.Rdata"))
+
+# Load from .Rdata file
+load(here("R.data", "leave_pesticide_out_model_lnRR.Rdata"))
+
 # Iteratively run the multilevel model, leaving out one pesticide chemical class at a time
 for(i in 1:length(levels(data$leave_pesticide))){
-  # Create the data with one pesticide removed at a time
   data_pesticide_leave <- data %>% filter(leave_pesticide != levels(data$leave_pesticide)[i])
   
-  # Create a VCV matrix for the subset data
   VCV_leave_pesticide_out_lnRR[[i]] <- impute_covariance_matrix(vi = data_pesticide_leave$lnRRv, cluster = data_pesticide_leave$study_id, r = 0.5)
   
-  # Model fitting
   leave_pesticide_out_model_lnRR[[i]] <- rma.mv(yi = data_pesticide_leave$lnRR,
                                                 V = VCV_leave_pesticide_out_lnRR[[i]],
                                                 random = list(~1 | study_id,
@@ -3147,15 +3462,15 @@ for(i in 1:length(levels(data$leave_pesticide))){
 } 
 
 results.leave_pesticide_out_model_lnRR <- as.data.frame(cbind(
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$beta), # extract the beta coefficient from all models
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$se),   # extract the standard error from all models
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$zval), # extract the z value from all models
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$pval), # extract the p value from all models
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.lb),# extract the lower confidence interval for all models
-  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.ub) # extract the upper confidence interval for all models
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$beta), 
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$se),   
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$zval), 
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$pval), 
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.lb),
+  sapply(leave_pesticide_out_model_lnRR, function(x) summary(x)$ci.ub) 
 ))
 
-colnames(results.leave_pesticide_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") # change column names
+colnames(results.leave_pesticide_out_model_lnRR) <- c("Estimate", "SE", "zval", "pval", "ci.lb", "ci.ub") 
 results.leave_pesticide_out_model_lnRR$pesticide_chemical_class <- unique(data$pesticide_chemical_class)
 
 # Display the results table
@@ -3176,18 +3491,29 @@ leave_one_pesticide_out_lnRR_forest_plot <- ggplot(results.leave_pesticide_out_m
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
   labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
        x = "Pesticide Chemical Class",
-       y = "Estimate") +
+       y = "lnRR") +
+         ylim(-0.7, 0.2) +
   coord_flip()
 
 print(leave_one_pesticide_out_lnRR_forest_plot)
 
+# ggsave(here("figures", "leave_one_pesticide_out_lnRR_forest_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_pesticide_out_lnRR_forest_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+
+results.leave_pesticide_out_model_lnRR %>% 
+  summarise(estimate = mean(Estimate), 
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
 
 ```
 
-#### Intercept only model (lnVR)
+#### *Intercept only model (lnVR)*
 ```{r}
 # Convert pesticide_chemical_class to a factor and create a new column for the leave-one-out procedure
 data$leave_pesticide <- as.factor(data$pesticide_chemical_class)
@@ -3247,79 +3573,25 @@ leave_one_pesticide_out_lnVR_forest_plot <- ggplot(results.leave_pesticide_out_m
         axis.title = element_text(face = "bold", color = "black"),
         plot.caption = element_text(size = 10, color = "gray10", face = "italic"),
         axis.text.y = element_text(size = 8)) +
-  geom_text(aes(label = round(Estimate, 2)), size = 4, color = "gray10", nudge_x = 0.3) +
   labs(caption = "The value in each point is the estimate excluding one pesticide at a time",
        x = "Pesticide Chemical Class",
-       y = "Estimate") +
+       y = "lnVR") +
   coord_flip()
 
 print(leave_one_pesticide_out_lnVR_forest_plot)
 
-```
-
-## *Alternative effect sizes*
-
-### Intercept only model (SMD)
-```{r}
-# Model
-SMD_intercept_only <- rma.mv(yi = SMD,
-                              V = SMDVCV,
-                              random = list(~1 | study_id,
-                                            ~1 | assay_id,
-                                            ~1 | species_latin,
-                                            ~1 | pesticide),
-                              method = "REML",
-                              test = "t", 
-                              data = data,
-                              sparse = T)
-
-# Summary statistics 
-summary(SMD_intercept_only)
-
-mod_results(SMD_intercept_only, mod = "1", data = data, group = "study_id")  # For prediction intervals
-
-i2_ml(SMD_intercept_only)
-  
-# orchaRd plot
-orchaRd::orchard_plot(SMD_intercept_only,
-             group = "study_id",
-             xlab = "SMDH",
-             data = data,
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE) 
-```
-
-### Intercept only model (lnCVR)
-```{r}
-# Model
-lnCVR_intercept_only <- rma.mv(yi = lnCVR,
-                               V = lnCVRVCV,
-                               random = list(~1 | study_id,
-                                            ~1 | assay_id,
-                                            ~1 | species_latin,
-                                            ~1 | pesticide),
-                              method = "REML",
-                              test = "t", 
-                              data = data,
-                              sparse = T)
-  
-
-# Summary results
-summary(lnCVR_intercept_only)
-
-mod_results(lnCVR_intercept_only, mod = "1", data = data, group = "study_id")  # For prediction intervals
-
-i2_ml(lnCVR_intercept_only)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnCVR_intercept_only,
-             group = "study_id", 
-             xlab = "lnVR",
-             data = data,
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE) 
+# ggsave(here("figures", "leave_one_pesticide_out_lnVR_forest_plot.pdf"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+# ggsave(here("figures", "leave_one_pesticide_out_lnVR_forest_plot.jpg"), width = 10, height = 5, units = "cm", scale = 2, dpi = 800)
+ 
+ results.leave_pesticide_out_model_lnVR %>% 
+  summarise(estimate = mean(Estimate), 
+            se = mean(SE), 
+            zval = mean(zval), 
+            pval = mean(pval), 
+            ci.lb = mean(ci.lb), 
+            ci.ub = mean(ci.ub)) %>% 
+  kable() %>% kable_styling("striped", position = "left")
+ 
 ```
 
 ## *Alternative variance-covariance matrices*
@@ -3341,21 +3613,11 @@ lnRR_intercept_only2 <- rma.mv(yi = lnRR,
 # Summary statistics 
 summary(lnRR_intercept_only2)
 
-mod_results(lnRR_intercept_only2, mod = "1", data = data, group = "study_id")  # For prediction intervals
-
+mod_results(lnRR_intercept_only2, mod = "1", data = data, group = "study_id")  
 i2_ml(lnRR_intercept_only2)
-  
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_intercept_only2,
-             group = "study_id",
-             xlab = "lnRR",
-             data = data,
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE) 
 ```
 
-### Intercept only model (lnVR)
+### *Intercept only model (lnVR)*
 ```{r}
 # Model
 lnVR_intercept_only2 <- rma.mv(yi = lnVR,
@@ -3377,15 +3639,48 @@ mod_results(lnVR_intercept_only2, mod = "1", data = data, group = "study_id")  #
 
 i2_ml(lnVR_intercept_only2)
 
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_intercept_only2,
+```
+
+### *Figure s19*
+Impacts of pesticide exposure on fish conspecific interactions using alternative more conservative variance covariance matrix
+```{r}
+lnRR_intercept_only2_orchard <- orchaRd::orchard_plot(lnRR_intercept_only2,
+             group = "study_id",
+             xlab = "lnRR",
+             data = data,
+             g = TRUE,
+             k.pos = "right",
+             colour = FALSE,
+             fill = TRUE,  
+             trunk.size = 3., 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[3]) +
+  scale_x_discrete(labels = c("Model estimates"))
+
+lnVR_intercept_only2_orchard <- orchaRd::orchard_plot(lnVR_intercept_only2,
              group = "study_id", 
              xlab = "lnVR",
              data = data,
+             g = TRUE,
              k.pos = "right",
              colour = FALSE,
-             fill = FALSE) 
+             fill = TRUE,  
+             trunk.size = 3., 
+             legend.pos = "none",
+             branch.size = 1.5,
+             twig.size = 1) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[4]) +
+  scale_x_discrete(labels = c("Model estimates"))
 
+# Combine the two plots 
+alternative_VCV_figure <- lnRR_intercept_only2_orchard + lnVR_intercept_only2_orchard + plot_annotation(tag_levels = "A")
+
+
+print(alternative_VCV_figure)
+# ggsave(here("figures", "alternative_VCV_figure.jpg"), width = 24, height = 10, units = "cm", dpi = 800)
+# ggsave(here("figures", "alternative_VCV_figure.pdf"), width = 24, height = 10, units = "cm", dpi = 800)
 ```
 
 ## *Leave studies with imputed errors out*
@@ -3411,18 +3706,6 @@ lnRR_intercept_only_no_imputed <- rma.mv(yi = lnRR,
 # Summary statistics 
 summary(lnRR_intercept_only_no_imputed)
 
-mod_results(lnRR_intercept_only_no_imputed, mod = "1", data = data, group = "study_id")  # For prediction intervals
-
-i2_ml(lnRR_intercept_only_no_imputed)
-  
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_intercept_only_no_imputed,
-             group = "study_id",
-             xlab = "lnRR",
-             data = data,
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE) 
 ```
 
 ### Intercept only model (lnVR) 
@@ -3445,229 +3728,55 @@ lnVR_intercept_only_no_imputed <- rma.mv(yi = lnVR,
 # Summary statistics 
 summary(lnVR_intercept_only_no_imputed)
 
-mod_results(lnVR_intercept_only_no_imputed, mod = "1", data = data_no_imputed, group = "study_id")  # For prediction intervals
-
-i2_ml(lnVR_intercept_only_no_imputed)
-  
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_intercept_only_no_imputed,
-             group = "study_id",
-             xlab = "lnVR",
-             data = data_no_imputed,
-             k.pos = "right",
-             colour = FALSE,
-             fill = FALSE)
-
 ```
 
-
-## *Create models with only Zebrafish*
-
-### Intercept only models (lnRR)
 ```{r}
+# Plot without imputed data - lnRR
+lnRR_intercept_only_no_imputed_orchard <- orchaRd::orchard_plot(
+  lnRR_intercept_only_no_imputed,
+  group = "study_id",
+  xlab = "lnRR",
+  data = data_no_imputed,
+  g = TRUE,
+  k.pos = "right",
+  colour = FALSE,
+  fill = TRUE,
+  trunk.size = 3,
+  legend.pos = "none",
+  branch.size = 1.5,
+  twig.size = 1
+) +
+  scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[5]) +
+  scale_x_discrete(labels = c("Model estimates"))
 
-data_zebrafish <- data %>% filter(species_english == "zebrafish")
-
-lnRRVCV_zebrafish <- metafor::vcalc(vi = lnRRv, cluster = exp_id, obs = assay_id, data = data_zebrafish, rho = 0.5)
-
-# Model
-lnRR_intercept_only_zebrafish <- rma.mv(yi = lnRR,
-                                        V = lnRRVCV_zebrafish,
-                                        random = list(~1 | study_id,
-                                                      ~1 | assay_id,
-                                                      ~1 | species_latin,
-                                                      ~1 | pesticide),
-                                        method = "REML",
-                                        test = "t", 
-                                        data = data_zebrafish,
-                                        sparse = T)
-
-# Summary statistics 
-summary(lnRR_intercept_only_zebrafish)
-
-mod_results(lnRR_intercept_only_zebrafish, mod = "1", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-i2_ml(lnRR_intercept_only_zebrafish)
-  
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_intercept_only_zebrafish,
-                      group = "study_id",
-                      xlab = "lnRR",
-                      data = data_zebrafish,
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
+# Plot without imputed data - lnVR
+lnVR_intercept_only_no_imputed_orchard <- orchaRd::orchard_plot(
+  lnVR_intercept_only_no_imputed,
+  group = "study_id",
+  xlab = "lnVR",
+  data = data_no_imputed,
+  g = TRUE,
+  k.pos = "right",
+  colour = FALSE,
+  fill = TRUE,
+  trunk.size = 3,
+  legend.pos = "none",
+  branch.size = 1.5,
+  twig.size = 1
+) +
+  scale_fill_manual(values = RColorBrewer::brewer.pal(8, "Dark2")[6]) +
+  scale_x_discrete(labels = c("Model estimates"))
 
 
-```
+# Combine the two plots 
+no_imputed_figure <- lnRR_intercept_only_no_imputed_orchard + lnVR_intercept_only_no_imputed_orchard + plot_annotation(tag_levels = "A")
 
-### Intercept only models (lnVR)
-```{r}
-# Calculate the variance-covariance matrix for lnVR
-lnVRVCV_zebrafish <- metafor::vcalc(vi = lnVRv, cluster = exp_id, obs = assay_id, data = data_zebrafish, rho = 0.5)
 
-# Model
-lnVR_intercept_only_zebrafish <- rma.mv(yi = lnVR,
-                                        V = lnVRVCV_zebrafish,
-                                        random = list(~1 | study_id,
-                                                      ~1 | assay_id,
-                                                      ~1 | species_latin,
-                                                      ~1 | pesticide),
-                                        method = "REML",
-                                        test = "t", 
-                                        data = data_zebrafish,
-                                        sparse = TRUE)
+print(no_imputed_figure)
 
-# Summary statistics 
-summary(lnVR_intercept_only_zebrafish)
-
-mod_results(lnVR_intercept_only_zebrafish, mod = "1", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-i2_ml(lnVR_intercept_only_zebrafish)
-  
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_intercept_only_zebrafish,
-                      group = "study_id",
-                      xlab = "lnVR",
-                      data = data_zebrafish,
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
-
-```
-
-### Moderate by behavioural class (lnRR) only including studies using zebrafish
-```{r}
-# Model
-lnRR_mod_behaviour_class_zebrafish <- rma.mv(yi = lnRR,
-                                             V = lnRRVCV_zebrafish,
-                                             random = list(~1 | study_id,
-                                                           ~1 | assay_id,
-                                                           ~1 | species_latin,
-                                                           ~1 | pesticide),
-                                             mods = ~behaviour_measured_standardised -1,
-                                             method = "REML",
-                                             test = "t", 
-                                             data = data_zebrafish,
-                                             sparse = T)
-
-# Summary results
-summary(lnRR_mod_behaviour_class_zebrafish)
-
-mod_results(lnRR_mod_behaviour_class_zebrafish, mod = "behaviour_measured_standardised", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-r2_ml(lnRR_mod_behaviour_class_zebrafish)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_behaviour_class_zebrafish,
-                      group = "pesticide_chemical_class", 
-                      xlab = "lnRR",
-                      data = data_zebrafish,
-                      mod = "behaviour_measured_standardised",
-                      k.pos = "right",
-                      colour = TRUE,
-                      fill = FALSE)
-```
-
-### Moderate by behavioural class (lnVR)
-```{r}
-# Model
-lnVR_mod_behaviour_class_zebrafish <- rma.mv(yi = lnVR,
-                                             V = lnVRVCV_zebrafish,
-                                             random = list(~1 | study_id,
-                                                           ~1 | assay_id,
-                                                           ~1 | species_latin,
-                                                           ~1 | pesticide),
-                                             mods = ~behaviour_measured_standardised -1,
-                                             method = "REML",
-                                             test = "t", 
-                                             data = data_zebrafish,
-                                             sparse = TRUE)
-
-# Summary results
-summary(lnVR_mod_behaviour_class_zebrafish)
-
-mod_results(lnVR_mod_behaviour_class_zebrafish, mod = "behaviour_measured_standardised", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-r2_ml(lnVR_mod_behaviour_class_zebrafish)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_mod_behaviour_class_zebrafish,
-                      group = "pesticide_chemical_class", 
-                      xlab = "lnVR",
-                      data = data_zebrafish,
-                      mod = "behaviour_measured_standardised",
-                      k.pos = "right",
-                      colour = TRUE,
-                      fill = FALSE)
-
-```
-
-### Moderate by pesticide chemical class (lnRR)
-```{r}
-# Model
-lnRR_mod_pesticide_zebrafish <- rma.mv(yi = lnRR,
-                                       V = lnRRVCV_zebrafish,
-                                       random = list(~1 | study_id,
-                                                     ~1 | assay_id,
-                                                     ~1 | species_latin,
-                                                     ~1 | pesticide),
-                                       mods = ~pesticide_chemical_class -1,
-                                       method = "REML",
-                                       test = "t", 
-                                       data = data_zebrafish,
-                                       sparse = TRUE)
-
-# Summary results
-summary(lnRR_mod_pesticide_zebrafish)
-
-mod_results(lnRR_mod_pesticide_zebrafish, mod = "pesticide_chemical_class", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-r2_ml(lnRR_mod_pesticide_zebrafish)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnRR_mod_pesticide_zebrafish,
-                      group = "study_id", 
-                      xlab = "lnRR",
-                      data = data_zebrafish,
-                      mod = "pesticide_chemical_class",
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
-
-```
-
-### Moderate by pesticide chemcial class (lnVR)
-```{r}
-# Model
-lnVR_mod_pesticide_zebrafish <- rma.mv(yi = lnVR,
-                                       V = lnVRVCV_zebrafish,
-                                       random = list(~1 | study_id,
-                                                     ~1 | assay_id,
-                                                     ~1 | species_latin,
-                                                     ~1 | pesticide),
-                                       mods = ~pesticide_chemical_class -1,
-                                       method = "REML",
-                                       test = "t", 
-                                       data = data_zebrafish,
-                                       sparse = TRUE)
-
-# Summary results
-summary(lnVR_mod_pesticide_zebrafish)
-
-mod_results(lnVR_mod_pesticide_zebrafish, mod = "pesticide_chemical_class", data = data_zebrafish, group = "study_id")  # For prediction intervals
-
-r2_ml(lnVR_mod_pesticide_zebrafish)
-
-# orchaRd plot
-orchaRd::orchard_plot(lnVR_mod_pesticide_zebrafish,
-                      group = "study_id", 
-                      xlab = "lnVR",
-                      data = data_zebrafish,
-                      mod = "pesticide_chemical_class",
-                      k.pos = "right",
-                      colour = FALSE,
-                      fill = FALSE)
+# Save the plots without imputed data if needed
+# ggsave(here("figures","no_imputed_orchard.jpg"), width = 24, height = 10, units = "cm", dpi = 800)
+# ggsave(here("figures","no_imputed_orchard.pdf"), width = 24, height = 10, units = "cm", dpi = 800)
 ```
 
 ```{r}

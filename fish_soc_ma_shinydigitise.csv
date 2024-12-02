@@ -1,5 +1,0 @@
-"","filename","variable","group_id","mean","sd","n","r","se","error_type","plot_type"
-"1","hawkey_2020_fig5b.jpg","Changing in position - shoaling approach (cm)","control DMSO",1.68125499167004,4.62269317933353,22,NA,0.985561497326103,"se","mean_error"
-"2","hawkey_2020_fig5b.jpg","Changing in position - shoaling approach (cm)","Treatment 0.3 um",3.49884928187467,3.87528547967412,18,NA,0.913413547237111,"se","mean_error"
-"3","hawkey_2020_fig5b.jpg","Changing in position - shoaling approach (cm)","Treatment 1 um",5.18744443189652,4.51483869929528,22,NA,0.962566844919786,"se","mean_error"
-"4","hawkey_2020_fig5b.jpg","Changing in position - shoaling approach (cm)","Treatment 3 um",7.22800913497369,6.20897485196131,20,NA,1.38836898395722,"se","mean_error"
