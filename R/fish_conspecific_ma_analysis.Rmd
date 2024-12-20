@@ -155,8 +155,9 @@ species_effect_size_count_bar_plot <- sp_summary %>%
 main_text_figure_1 <- behaviour_pesticide_class_bubble_plot / species_effect_size_count_bar_plot
 
 print(main_text_figure_1)
- ggsave(here("figures", "main_text_figure_1.pdf"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
- ggsave(here("figures", "main_text_figure_1.jpg"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
+
+# ggsave(here("figures", "main_text_figure_1.pdf"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
+ #ggsave(here("figures", "main_text_figure_1.jpg"), width = 10, height = 13, units = "cm", scale = 2, dpi = 800)
 
 ```
 
@@ -1155,6 +1156,7 @@ summary(mod_lnRR.assay_id.study_id.species.phylogeny)
 fitstats(mod_lnRR.assay_id.study_id.species, mod_lnRR.assay_id.study_id.species.phylogeny)
 
 i2_ml(mod_lnRR.assay_id.study_id.species.phylogeny)
+
 ```
 
 ## Add *pesticide* as a random effect to the above model (that used *assay_id* , *study_id*, *species* and *phylogeny* as random effects) (lnRR)
@@ -1369,7 +1371,7 @@ lnVR_percentage_change
 
 ## *Figure 2*
 Impacts of pesticide exposure on fish conspecific interactions. The model estimates the average effects of pesticide exposure on conspecific interactions in fish. (A) shows the mean difference between control and treatment groups on a logarithmic scale, where negative values indicate a reduction in conspecific behavioural activity. (B) shows the difference in variances between control and treatment groups, also on a logarithmic scale, where negative values suggest a reduction in the inter-individual variability of conspecific behavioural activity. Shorter whiskers represent 95% confidence intervals, while longer whiskers indicate 95% prediction intervals. 'k' represents the number of effect sizes, and the number of studies is in brackets. Each circle corresponds to an effect size, with its size scaled according to precision (inverse sampling error variance).
-```{r}
+```{r,fig.width=24, fig.height=10}
 # Figure 2a)
 intercept_only.lnRR_orchard <- orchaRd::orchard_plot(lnRR_intercept_only,
              group = "study_id",
@@ -1545,7 +1547,7 @@ summary(lnVR_mod_assay_contrast)
 ```
 
 ### *Figure 3*
-```{r}
+```{r,fig.width=28, fig.height=24}
 # Figure 3a)
 behav_mod_orchard.lnRR <- orchaRd::orchard_plot(lnRR_mod_behaviour_class,
              group = "study_id", 
@@ -1996,7 +1998,7 @@ r2_ml(lnVR_mod_solvent2_contrast)
 
 ```
 
-### *Main text Figure 4*
+### *Figure 4*
 ```{r}
 # Filter the mod_table for specific pesticide chemical classes
 lnRR_pesticide_mod_results_filter <- dplyr::filter(
@@ -2056,7 +2058,7 @@ class(lnVR_pesticide_orchard2) <- c("orchard", "data.frame")
 
 ```
 
-```{r}
+```{r,fig.width=28, fig.height=40}
 # Figure 4a)
 pesticide.mod.lnRR <- orchaRd::orchard_plot(lnRR_pesticide_orchard2,
                       group = "study_id", 
@@ -2450,7 +2452,7 @@ summary(lnVR_mod_source_contrast)
 
 ```
 
-## *Figure 5*
+### *Figure 5*
 ```{r}
 # Filter the mod_table for specific pesticide chemical classes
 lnRR_species_mod_results_filter <- dplyr::filter(
@@ -2652,7 +2654,6 @@ source_mod_orchard.lnVR <- orchaRd::orchard_plot(lnVR_mod_source_contrast,
 # Combine the plots
 main_text_figure_5 <- (species.mod_orchard.lnRR + species.mod_orchard.lnVR)/ (sex_mod_orchard.lnRR + sex_mod_orchard.lnVR)/ (source_mod_orchard.lnRR + source_mod_orchard.lnVR) + plot_annotation(tag_levels = "A")
 
-print(main_text_figure_5)
 
 # ggsave(here("figures", "main_text_figure_5.jpg"), plot = main_text_figure_5,width = 28, height = 30, units = "cm", dpi = 800)
 # ggsave(here("figures", "main_text_figure_5.pdf"), plot = main_text_figure_5, width = 28, height = 30, units = "cm", dpi = 800)
@@ -2710,7 +2711,7 @@ weights_lnRR <- sw(mlmr.dredge.lnRR)
 weights_lnRR_df <- data.frame(
   predictor = names(weights_lnRR),  
   weight = as.numeric(weights_lnRR), 
-  R2_marginal = c(0.07, 0.103, 0.009, 0.092, 0.112, 0.02, 0.051)
+  R2_marginal = c(0.009, 0.1, 0.112, 0.092, 0.02, 0.071, 0.051)
 )
 
 
@@ -2767,13 +2768,13 @@ weights_lnVR <- sw(mlmr.dredge.lnVR)
 weights_lnVR_df <- data.frame(
   predictor = names(weights_lnVR),  
   weight = as.numeric(weights_lnVR),
-  R2_marginal = c(0.02, 0.086, 0.036, 0.068, 0.71, 0.011, 0.040)
+  R2_marginal = c(0.036, 0.085, 0.071, 0.021, 0.068, 0.040, 0.113)
 
 )
 
 ```
 
-## *Main text Figure 6*
+### *Figure 6*
 ```{r}
 # lnRR model selection plot
 weights_lnRR_plot <- weights_lnRR_df %>%
